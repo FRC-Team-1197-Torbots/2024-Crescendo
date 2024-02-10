@@ -295,7 +295,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    System.out.println("X set");
   }
 
   public void setZero(){
@@ -305,28 +304,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
-  public void changeState(){
-    if(is_Locked == false){
-      //m_isLocked = isLocked.LOCK;
-      is_Locked = true;
-      System.out.println(is_Locked);
-    }
-    else{
-      //m_isLocked = isLocked.UNLOCK;
-      is_Locked = false;
-      System.out.println(is_Locked);
-    }
-
-    /*switch(m_isLocked){
-      case LOCK:
-        //System.out.println("Locked");
-        setX();
-        break;
-      case UNLOCK:
-        //System.out.println("unlocked");
-        setModuleStates(getModuleStates());
-        break;
-    }*/
+  public void changeLockState(){
+    is_Locked = !is_Locked;
   }
 
   public boolean checkLocked(){

@@ -1,5 +1,5 @@
 package frc.robot.subsystems;
-import frc.robot.LimelightHelpers;
+import frc.robot.utils.LimelightHelpers;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
