@@ -139,12 +139,23 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
-  public static final class ArmConstants{
-    public static final int MotorTop = 1;
+
+  public static final class ArmConstants {
+    public static final int MotorA = 1;
+    public static final int MotorB = 1;
   }
-  public static final class IntakeConstants{
+
+  public static final class IntakeConstants {
     public static final int MotorA = 11;
     public static final int MotorB = 12;
-    
+  }
+
+  public static final class ShooterConstants {
+    public static final int MotorA = 14;
+    public static final int MotorB = 15;
+  }
+
+  public static final class ClimberConstants {
+    public static final int MotorA = 13;
   }
 }
