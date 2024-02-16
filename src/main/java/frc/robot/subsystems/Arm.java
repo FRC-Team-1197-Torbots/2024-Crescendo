@@ -9,16 +9,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Arm extends SubsystemBase {
-    private CANSparkMax MotorA;
+    private CANSparkMax ArmMotor;
     public Arm(){
-        MotorA = new CANSparkMax(ArmConstants.MotorTop, MotorType.kBrushless);
+        ArmMotor = new CANSparkMax(ArmConstants.MotorTop, MotorType.kBrushless);
         
     } 
     public void runArm(double spd ){
-        MotorA.set(spd);
+        ArmMotor.set(spd);
     }
     public void stopMotor(){ 
-        MotorA.set(0);
+        ArmMotor.set(0);
     }
     public void getPose(){
         LimelightHelpers.getBotPose(getName());
