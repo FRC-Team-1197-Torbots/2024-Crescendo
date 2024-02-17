@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
 
@@ -13,7 +12,6 @@ public class Climber extends SubsystemBase{
     public Climber(){
         leftClimberFlex = new CANSparkFlex(ClimberConstants.LeftClimberMotor, MotorType.kBrushless);
         rightClimberFlex = new CANSparkFlex(ClimberConstants.RightClimberMotor, MotorType.kBrushless);
-
     }
 
     public void runMotors(){
@@ -21,7 +19,7 @@ public class Climber extends SubsystemBase{
         rightClimberFlex.set(0.2);
     }
 
-    public void stopMotors(){
+    public void stopMotors() {
         leftClimberFlex.set(0);
         rightClimberFlex.set(0);
     }
