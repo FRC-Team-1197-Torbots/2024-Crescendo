@@ -14,7 +14,7 @@ public class Climber extends SubsystemBase{
         rightClimberFlex = new CANSparkFlex(ClimberConstants.RightClimberMotor, MotorType.kBrushless);
     }
 
-    public void runMotors() {
+    public void runMotors(){
         leftClimberFlex.set(0.2);
         rightClimberFlex.set(0.2);
     }
