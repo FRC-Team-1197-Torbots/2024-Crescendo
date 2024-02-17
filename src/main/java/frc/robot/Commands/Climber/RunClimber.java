@@ -1,13 +1,14 @@
-package frc.robot.Commands;
+package frc.robot.Commands.Climber;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Climber;
 
-public class RunArm extends Command{
+public class RunClimber extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final Arm m_arm;
-    public RunArm(Arm subsystem) {
-        m_arm = subsystem;
+    private final Climber m_Climber;
+    public RunClimber(Climber subsystem) {
+        m_Climber = subsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -22,12 +23,12 @@ public class RunArm extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_arm.runArm(0.2);
+        m_Climber.runMotors();
       }
 
       @Override
         public void end(boolean interrupted) {
-            m_arm.stopMotor();
+            m_Climber.stopMotors();
         }
 
   // Returns true when the command should end.
@@ -35,10 +36,5 @@ public class RunArm extends Command{
   public boolean isFinished() {
     return false;
   }
-
-//limelight procedure
-//1. Have driver select with button what to target: amp, speaker or source  
-//2. Based on alliance and target, pick apriltag id number
-//3. Look for the apriltag, and retrieve the distance and maybe angle
-
+    
 }
