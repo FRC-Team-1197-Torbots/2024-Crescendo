@@ -141,8 +141,26 @@ public final class Constants {
   }
 
   public static final class ArmConstants{
+    //Spark Max & Spark Flex Constants
     public static final int MotorTop = 1;
-    public static final int LeftMotor = 12; 
+    public static final int LeftMotor = 12;
+    
+    public static enum ArmStates {
+      STORE, INTAKE, SPEAKER, AMP
+    }
+
+    //Storing Position values
+    public static final double StorePos = 0; //Need to change these two values later
+    public static final double IntakePos = 0;
+
+    //Arm PID Constants
+    public static final double Arm_kP = 0;
+    public static final double Arm_kI = 0;
+    public static final double Arm_kD = 0;
+
+    //Arm Motion Profiling Constants
+    public static final double MaxAngularVelo = 0;
+    public static final double MaxAngularAccel = 0;
   }
 
   public static final class ClimberConstants{
@@ -151,12 +169,16 @@ public final class Constants {
   }
 
   public static final class IntakeConstants{
-    public static final int Motor = 11;
+    public static final int IntakeMotor = 11;
   }
 
   public static final class ShooterConstants {
+    // SparkMax & Spark Flex Constants
     public static final int TopMotor = 16;
     public static final int BottomMotor = 17;
+
+    //Digital Input Constants
+    public static final int breakBeam = 1;
   }
 
 }

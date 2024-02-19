@@ -4,6 +4,7 @@ import frc.robot.utils.LimelightHelpers;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -11,10 +12,18 @@ public class Shooter extends SubsystemBase {
 
     private CANSparkMax MotorA;
     private CANSparkMax MotorB;
+    private DigitalInput breakBeam;
+
+    private boolean gamePieceStored;
 
     public Shooter() {
-        MotorA = new CANSparkMax(ShooterConstants.MotorA, MotorType.kBrushless);
-        MotorB = new CANSparkMax(ShooterConstants.MotorB, MotorType.kBrushless);
+        MotorA = new CANSparkMax(ShooterConstants.TopMotor, MotorType.kBrushless);
+        MotorB = new CANSparkMax(ShooterConstants.BottomMotor, MotorType.kBrushless);
+    }
+
+    @Override
+    public void periodic(){
+        
     } 
 
     public void runShooter(double spd){
@@ -26,4 +35,10 @@ public class Shooter extends SubsystemBase {
         MotorA.set(0);
         MotorB.set(0);
     }
+
+    public boolean breakBeamState(){
+        return breakBeam.get();
+    }
+
+    
 }

@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Commands.Arm.RunArm;
+import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -44,12 +45,15 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final Intake m_Intake = new Intake();
+  private final Shooter m_Shooter = new Shooter();
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
 
-  private Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
+  private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
+  //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -87,7 +91,10 @@ public class RobotContainer {
            // m_robotDrive));
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_robotDrive.changeLockState()));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    m_driverController.x().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    m_driverController.x().and(m_Shooter::breakBeamState).whileTrue(new RevShooter(m_Shooter));
+    //m_driverController.a().whileTrue
+    //m_driverController.x().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    
     
 
   }
