@@ -6,15 +6,17 @@ import frc.robot.subsystems.Arm;
 public class RunArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Arm m_arm;
-    public RunArm(Arm subsystem) {
+    private double m_Speed;
+    public RunArm(Arm subsystem, double speed) {
         m_arm = subsystem;
+        m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
 
       @Override
       public void initialize() {
-        System.out.println("James' Arm Psuedocode Initialized");
+        //System.out.println("James' Arm Psuedocode Initialized");
         
       }
     
@@ -22,7 +24,7 @@ public class RunArm extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_arm.runArm(0.2);
+        m_arm.runArm(m_Speed);
       }
 
       @Override

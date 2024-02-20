@@ -52,15 +52,17 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI/2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 4;
-    public static final int kRearLeftDrivingCanId = 6;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kRearRightDrivingCanId = 8;
+    public static final int kFrontLeftDrivingCanId = 5;
+    public static final int kRearLeftDrivingCanId = 3;
+    public static final int kFrontRightDrivingCanId = 7;
+    public static final int kRearRightDrivingCanId = 9;
 
-    public static final int kFrontLeftTurningCanId = 3;
-    public static final int kRearLeftTurningCanId = 5;
-    public static final int kFrontRightTurningCanId = 9;
-    public static final int kRearRightTurningCanId = 7;
+    public static final int kFrontLeftTurningCanId = 4;
+    public static final int kRearLeftTurningCanId = 2;
+    public static final int kFrontRightTurningCanId = 6;
+    public static final int kRearRightTurningCanId = 8;
+
+
 
     public static final boolean kGyroReversed = false;
   }
@@ -142,25 +144,27 @@ public final class Constants {
 
   public static final class ArmConstants{
     //Spark Max & Spark Flex Constants
-    public static final int MotorTop = 1;
-    public static final int LeftMotor = 12;
-    
+    public static final int Motor1 = 13; // front
+    public static final int Motor2 = 14; // back
+    public static final int encoderChannelA = 7;
+    public static final int encoderChannelB = 8;
+    public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
     public static enum ArmStates {
       STORE, INTAKE, SPEAKER, AMP
     }
 
     //Storing Position values
     public static final double StorePos = 0; //Need to change these two values later
-    public static final double IntakePos = 0;
+    public static final double IntakePos = 83;
 
     //Arm PID Constants
-    public static final double Arm_kP = 0;
-    public static final double Arm_kI = 0;
+    public static final double Arm_kP = 0.01;
+    public static final double Arm_kI = 0.0;
     public static final double Arm_kD = 0;
 
     //Arm Motion Profiling Constants
-    public static final double MaxAngularVelo = 0;
-    public static final double MaxAngularAccel = 0;
+    public static final double MaxAngularVelo = 160;
+    public static final double MaxAngularAccel = 120;
   }
 
   public static final class ClimberConstants{
@@ -169,13 +173,13 @@ public final class Constants {
   }
 
   public static final class IntakeConstants{
-    public static final int IntakeMotor = 11;
+    public static final int IntakeMotor = 13;
   }
 
   public static final class ShooterConstants {
     // SparkMax & Spark Flex Constants
-    public static final int TopMotor = 16;
-    public static final int BottomMotor = 17;
+    public static final int TopMotor = 12;
+    public static final int BottomMotor = 11;
 
     //Digital Input Constants
     public static final int breakBeam = 1;

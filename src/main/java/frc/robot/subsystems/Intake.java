@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.utils.LimelightHelpers;
+
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.IntakeConstants;

@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import frc.robot.utils.LimelightHelpers;
+
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ShooterConstants;
@@ -10,15 +12,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
-    private CANSparkMax MotorA;
-    private CANSparkMax MotorB;
+    private CANSparkFlex MotorA;
+    private CANSparkFlex MotorB;
     private DigitalInput breakBeam;
 
     private boolean gamePieceStored;
 
     public Shooter() {
-        MotorA = new CANSparkMax(ShooterConstants.TopMotor, MotorType.kBrushless);
-        MotorB = new CANSparkMax(ShooterConstants.BottomMotor, MotorType.kBrushless);
+        MotorA = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
+        MotorB = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
     }
 
     @Override

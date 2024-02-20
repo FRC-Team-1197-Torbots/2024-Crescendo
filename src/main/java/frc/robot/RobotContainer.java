@@ -5,34 +5,18 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Commands.Arm.RunArm;
-import frc.robot.Commands.Shooter.RevShooter;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.util.List;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -45,8 +29,9 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final Intake m_Intake = new Intake();
-  private final Shooter m_Shooter = new Shooter();
+  //private final Intake m_Intake = new Intake();
+  //private final Shooter m_Shooter = new Shooter();
+  private final Arm m_Arm = new Arm();
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -89,9 +74,14 @@ public class RobotContainer {
         //.whileTrue(new RunCommand(
            // () -> m_robotDrive.setX(),
            // m_robotDrive));
-    m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_robotDrive.changeLockState()));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
-    exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    m_driverController.x().and(m_Shooter::breakBeamState).whileTrue(new RevShooter(m_Shooter));
+    //m_driverController.leftBumper().onTrue(new InstantCommand(() ->m_robotDrive.setX(), m_robotDrive));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
+    m_driverController.leftBumper().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    m_driverController.y().onTrue(new InstantCommand(() -> m_Arm.setToIntake(), m_Arm));
+    m_driverController.a().onTrue(new InstantCommand(() -> m_Arm.setToStore(), m_Arm));
+    m_driverController.pov(0).whileTrue(new RunArm(m_Arm, 0.15));
+    m_driverController.pov(180).whileTrue(new RunArm(m_Arm, -0.15));
+    // exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    // m_driverController.x().and(m_Shooter::breakBeamState).whileTrue(new RevShooter(m_Shooter)); //uncomment later
     //m_driverController.a().whileTrue
     //m_driverController.x().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     

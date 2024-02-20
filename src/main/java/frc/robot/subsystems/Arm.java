@@ -1,18 +1,24 @@
 package frc.robot.subsystems;
 
 import frc.robot.utils.LimelightHelpers;
+
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Arm extends SubsystemBase {
-    private CANSparkMax ArmMotor;
+    private CANSparkFlex ArmMotor1;
+    private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
     private ArmConstants.ArmStates m_ArmStates;
 
@@ -22,18 +28,24 @@ public class Arm extends SubsystemBase {
     private TrapezoidProfile.Constraints m_Constraints;
     private ProfiledPIDController m_armPIDController;
 
-    public Arm(){
-        ArmMotor = new CANSparkMax(ArmConstants.MotorTop, MotorType.kBrushless);
-        ArmEncoder = new Encoder(2, 3);
-        m_ArmStates = ArmStates.STORE;
-        targetPos = ArmConstants.StorePos;
+    public Arm() {
+        ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
+        ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
+        ArmMotor1.setIdleMode(IdleMode.kBrake);
+        ArmMotor2.setIdleMode(IdleMode.kBrake);
+        ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
+        ArmEncoder.reset();
+        m_ArmStates = ArmStates.SPEAKER;
         m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
     }
     
     @Override
-    public void periodic() {    
-        switch(m_ArmStates){
+    public void periodic() {
+        SmartDashboard.putNumber("Arm Position Encoder", ArmEncoder.get());
+        SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
+
+        switch(m_ArmStates) {
             case STORE:
                 targetPos = ArmConstants.StorePos;
                 break;
@@ -47,19 +59,34 @@ public class Arm extends SubsystemBase {
             }
         
         armSpeed = setArmSpeed();
+        runArm(armSpeed);
         
     }
+
+    public void setToIntake() {
+        m_ArmStates = ArmStates.INTAKE;
+    }
+
+    public void setToStore() {
+        m_ArmStates = ArmStates.STORE;
+    }
     
-    public void runArm(double spd ){
-        ArmMotor.set(spd);
+    public void runArm(double spd) {
+        ArmMotor1.set(spd);
+        ArmMotor2.set(spd);
     }
 
-    public void stopMotor(){ 
-        ArmMotor.set(0);
+    public void stopMotor() { 
+        ArmMotor1.set(0);
+        ArmMotor2.set(0);
     }
 
-    public double setArmSpeed(){
-        return m_armPIDController.calculate(ArmEncoder.getDistance(), targetPos);
+    public double setArmSpeed() {
+        return m_armPIDController.calculate(ticksToDegrees(ArmEncoder.get()), targetPos);
+    }
+
+    public double ticksToDegrees(double ticks) {
+        return ticks / ArmConstants.TICKS_PER_DEGREE;
     }
 
     public void getPose() {
