@@ -5,10 +5,10 @@ import frc.robot.subsystems.Arm;
 
 public class RunArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final Arm m_arm;
+    private final Arm m_Arm;
     private double m_Speed;
     public RunArm(Arm subsystem) {
-        m_arm = subsystem;
+        m_Arm = subsystem;
         //m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
@@ -17,7 +17,7 @@ public class RunArm extends Command{
       @Override
       public void initialize() {
 
-        m_arm.setToIntake();
+        m_Arm.setToIntake();
         
       }
     
@@ -29,7 +29,8 @@ public class RunArm extends Command{
 
       @Override
         public void end(boolean interrupted) {
-            m_arm.setToStore();
+            m_Arm.setToStore();
+        
         }
 
   // Returns true when the command should end.

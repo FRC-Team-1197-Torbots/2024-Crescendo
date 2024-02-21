@@ -29,6 +29,8 @@ public class RunClimber extends Command{
       @Override
         public void end(boolean interrupted) {
             m_Climber.stopMotors();
+            m_Climber.resetLeft();
+            m_Climber.resetRight();
         }
 
   // Returns true when the command should end.

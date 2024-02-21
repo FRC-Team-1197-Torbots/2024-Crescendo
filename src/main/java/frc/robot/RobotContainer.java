@@ -84,17 +84,15 @@ public class RobotContainer {
         //.whileTrue(new RunCommand(
            // () -> m_robotDrive.setX(),
            // m_robotDrive));
-    m_driverController.rightBumper().onTrue(new InstantCommand(() ->m_robotDrive.setX(), m_robotDrive));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    //m_driverController.y().onTrue(new InstantCommand(() -> m_Arm.setToIntake(), m_Arm));
+    
+    m_driverController.rightBumper().onTrue(new InstantCommand(() ->m_robotDrive.setX(), m_robotDrive));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
     m_driverController.rightTrigger(0.5).whileTrue(new ParallelCommandGroup(new RunIntake(m_intake), new RunArm(m_Arm)));
     m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(new RunCommand(()-> m_Arm.setToSpeaker(), m_Arm), new RevShooter(m_Shooter)));
     m_driverController.leftBumper().whileTrue(new Shoot(m_intake));
+
     m_MechController.y().whileTrue(new RunClimber(m_Climber, -0.2));
     m_MechController.a().whileTrue(new RunClimber(m_Climber, 0.2));
-    //m_driverController.b().whileTrue(new RunIntake(m_intake));
-    //m_driverController.pov(0).whileTrue(new RunArm(m_Arm, 0.15));
-    //m_driverController.pov(180).whileTrue(new RunArm(m_Arm, -0.15));
     // exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     // m_driverController.x().and(m_Shooter::breakBeamState).whileTrue(new RevShooter(m_Shooter)); //uncomment later
     //m_driverController.a().whileTrue

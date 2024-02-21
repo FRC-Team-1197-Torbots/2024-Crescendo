@@ -5,10 +5,10 @@ import frc.robot.subsystems.Intake;
 
 public class RunIntake extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final Intake m_intake;
+    private final Intake m_Intake;
     //private double m_Speed;
     public RunIntake(Intake subsystem) {
-        m_intake = subsystem;
+        m_Intake = subsystem;
         //m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
@@ -24,18 +24,18 @@ public class RunIntake extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_intake.runIntake(0.5);
+        m_Intake.runIntake(0.5);
       }
 
       @Override
         public void end(boolean interrupted) {
-            m_intake.stopMotor();
+            m_Intake.stopMotor();
         }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_intake.gamePieceStored();
+    return m_Intake.gamePieceStored();
   }
     
 }

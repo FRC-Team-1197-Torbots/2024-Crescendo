@@ -169,7 +169,7 @@ public final class Constants {
   }
 
   public static final class ClimberConstants{
-    public static final int LeftClimberMotor = 15;
+    public static final int LeftClimberMotor = 17;
     public static final int RightClimberMotor = 16;
   }
 

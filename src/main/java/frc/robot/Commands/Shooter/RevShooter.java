@@ -7,9 +7,9 @@ import frc.robot.subsystems.Shooter;
 public class RevShooter extends Command{
 
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-    private final Shooter m_shooter;
+    private final Shooter m_Shooter;
     public RevShooter(Shooter subsystem) {
-        m_shooter = subsystem;
+        m_Shooter = subsystem;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -23,12 +23,12 @@ public class RevShooter extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_shooter.runShooter(0.9);
+        m_Shooter.runShooter(0.9);
       }
 
       @Override
         public void end(boolean interrupted) {
-          m_shooter.stopMotor();
+          m_Shooter.stopMotor();
             //m_Climber.stopMotors();
         }
 
