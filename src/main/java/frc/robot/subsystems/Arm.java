@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
         ArmMotor2.setIdleMode(IdleMode.kBrake);
         ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
         ArmEncoder.reset();
-        m_ArmStates = ArmStates.SPEAKER;
+        m_ArmStates = ArmStates.STORE;
         m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
     }
@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Arm Position Encoder", ArmEncoder.get());
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
-
+        SmartDashboard.putNumber("Target Angle", targetPos);
         switch(m_ArmStates) {
             case STORE:
                 targetPos = ArmConstants.StorePos;
@@ -53,6 +53,7 @@ public class Arm extends SubsystemBase {
                 targetPos = ArmConstants.IntakePos;
                 break;
             case SPEAKER:
+                targetPos = ArmConstants.SpeakerPos;
                 break;
             case AMP:
                 break;
@@ -69,6 +70,10 @@ public class Arm extends SubsystemBase {
 
     public void setToStore() {
         m_ArmStates = ArmStates.STORE;
+    }
+
+    public void setToSpeaker() {
+        m_ArmStates = ArmStates.SPEAKER;
     }
     
     public void runArm(double spd) {
@@ -91,5 +96,10 @@ public class Arm extends SubsystemBase {
 
     public void getPose() {
         LimelightHelpers.getBotPose(getName());
+    }
+
+    public void setMotorMode(IdleMode mode){
+        ArmMotor1.setIdleMode(mode);
+        ArmMotor2.setIdleMode(mode);
     }
 }

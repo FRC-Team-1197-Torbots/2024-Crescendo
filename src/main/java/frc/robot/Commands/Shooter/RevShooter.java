@@ -16,7 +16,6 @@ public class RevShooter extends Command{
 
       @Override
       public void initialize() {
-        System.out.println("James' Arm Psuedocode Initialized");
         
       }
     
@@ -24,11 +23,12 @@ public class RevShooter extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        //m_shooter.runMotors();
+        m_shooter.runShooter(0.9);
       }
 
       @Override
         public void end(boolean interrupted) {
+          m_shooter.stopMotor();
             //m_Climber.stopMotors();
         }
 

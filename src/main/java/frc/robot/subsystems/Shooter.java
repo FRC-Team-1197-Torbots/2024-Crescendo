@@ -12,15 +12,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 
-    private CANSparkFlex MotorA;
-    private CANSparkFlex MotorB;
-    private DigitalInput breakBeam;
-
-    private boolean gamePieceStored;
+    private CANSparkFlex TopMotor;
+    private CANSparkFlex BottomMotor;
 
     public Shooter() {
-        MotorA = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
-        MotorB = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
+        TopMotor = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
+        BottomMotor = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
     }
 
     @Override
@@ -29,18 +26,16 @@ public class Shooter extends SubsystemBase {
     } 
 
     public void runShooter(double spd){
-        MotorA.set(spd);
-        MotorB.set(-spd); 
+        TopMotor.set(-spd);
+        BottomMotor.set(-spd); 
     }
 
     public void stopMotor() { 
-        MotorA.set(0);
-        MotorB.set(0);
+        TopMotor.set(0);
+        BottomMotor.set(0);
     }
 
-    public boolean breakBeamState(){
-        return breakBeam.get();
-    }
+
 
     
 }

@@ -7,18 +7,27 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Commands.Arm.RunArm;
+import frc.robot.Commands.Climber.RunClimber;
+import frc.robot.Commands.Intake.RunIntake;
+import frc.robot.Commands.Intake.Shoot;
+import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
 
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.time.Instant;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -29,14 +38,15 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  //private final Intake m_Intake = new Intake();
-  //private final Shooter m_Shooter = new Shooter();
-  private final Arm m_Arm = new Arm();
+  private final Intake m_intake = new Intake();
+  private final Shooter m_Shooter = new Shooter();
+  public final Arm m_Arm = new Arm();
+  private final Climber m_Climber = new Climber();
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
-
+  private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
   //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
@@ -74,12 +84,17 @@ public class RobotContainer {
         //.whileTrue(new RunCommand(
            // () -> m_robotDrive.setX(),
            // m_robotDrive));
-    //m_driverController.leftBumper().onTrue(new InstantCommand(() ->m_robotDrive.setX(), m_robotDrive));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
-    m_driverController.leftBumper().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    m_driverController.y().onTrue(new InstantCommand(() -> m_Arm.setToIntake(), m_Arm));
-    m_driverController.a().onTrue(new InstantCommand(() -> m_Arm.setToStore(), m_Arm));
-    m_driverController.pov(0).whileTrue(new RunArm(m_Arm, 0.15));
-    m_driverController.pov(180).whileTrue(new RunArm(m_Arm, -0.15));
+    m_driverController.rightBumper().onTrue(new InstantCommand(() ->m_robotDrive.setX(), m_robotDrive));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
+    exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    //m_driverController.y().onTrue(new InstantCommand(() -> m_Arm.setToIntake(), m_Arm));
+    m_driverController.rightTrigger(0.5).whileTrue(new ParallelCommandGroup(new RunIntake(m_intake), new RunArm(m_Arm)));
+    m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(new RunCommand(()-> m_Arm.setToSpeaker(), m_Arm), new RevShooter(m_Shooter)));
+    m_driverController.leftBumper().whileTrue(new Shoot(m_intake));
+    m_MechController.y().whileTrue(new RunClimber(m_Climber, -0.2));
+    m_MechController.a().whileTrue(new RunClimber(m_Climber, 0.2));
+    //m_driverController.b().whileTrue(new RunIntake(m_intake));
+    //m_driverController.pov(0).whileTrue(new RunArm(m_Arm, 0.15));
+    //m_driverController.pov(180).whileTrue(new RunArm(m_Arm, -0.15));
     // exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     // m_driverController.x().and(m_Shooter::breakBeamState).whileTrue(new RevShooter(m_Shooter)); //uncomment later
     //m_driverController.a().whileTrue
@@ -138,5 +153,13 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
     */
+  }
+
+  public void teleopInit(){
+    m_Arm.setMotorMode(IdleMode.kBrake);
+  }
+
+  public void disableInit(){
+    m_Arm.setMotorMode(IdleMode.kCoast);
   }
 }

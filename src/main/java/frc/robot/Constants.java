@@ -155,7 +155,8 @@ public final class Constants {
 
     //Storing Position values
     public static final double StorePos = 0; //Need to change these two values later
-    public static final double IntakePos = 83;
+    public static final double IntakePos = 81;
+    public static final double SpeakerPos = 48; //53
 
     //Arm PID Constants
     public static final double Arm_kP = 0.01;
@@ -173,7 +174,10 @@ public final class Constants {
   }
 
   public static final class IntakeConstants{
-    public static final int IntakeMotor = 13;
+    public static final int IntakeMotor = 10;
+
+    //Digital Input Constants
+    public static final int breakBeam = 9;
   }
 
   public static final class ShooterConstants {
@@ -181,8 +185,6 @@ public final class Constants {
     public static final int TopMotor = 12;
     public static final int BottomMotor = 11;
 
-    //Digital Input Constants
-    public static final int breakBeam = 1;
   }
 
 }

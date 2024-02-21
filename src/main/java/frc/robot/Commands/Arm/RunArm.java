@@ -7,16 +7,17 @@ public class RunArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Arm m_arm;
     private double m_Speed;
-    public RunArm(Arm subsystem, double speed) {
+    public RunArm(Arm subsystem) {
         m_arm = subsystem;
-        m_Speed = speed;
+        //m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
 
       @Override
       public void initialize() {
-        //System.out.println("James' Arm Psuedocode Initialized");
+
+        m_arm.setToIntake();
         
       }
     
@@ -24,12 +25,11 @@ public class RunArm extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_arm.runArm(m_Speed);
       }
 
       @Override
         public void end(boolean interrupted) {
-            m_arm.stopMotor();
+            m_arm.setToStore();
         }
 
   // Returns true when the command should end.
