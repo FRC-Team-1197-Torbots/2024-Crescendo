@@ -12,7 +12,7 @@ import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
-
+import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -85,21 +85,22 @@ public class RobotContainer {
            // () -> m_robotDrive.setX(),
            // m_robotDrive));
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    
+
     m_driverController.rightBumper().onTrue(new InstantCommand(() ->m_robotDrive.setX(), m_robotDrive));//.andThen(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive).until(m_robotDrive::checkLocked)));//.)until(m_robotDrive::checkLocked));
     m_driverController.rightTrigger(0.5).whileTrue(new ParallelCommandGroup(new RunIntake(m_intake), new RunArm(m_Arm)));
     m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(new RunCommand(()-> m_Arm.setToSpeaker(), m_Arm), new RevShooter(m_Shooter)));
     m_driverController.leftBumper().whileTrue(new Shoot(m_intake));
-
-    m_MechController.y().whileTrue(new RunClimber(m_Climber, -0.2));
-    m_MechController.a().whileTrue(new RunClimber(m_Climber, 0.2));
+    
+    m_MechController.a().whileTrue(new RunClimber(m_Climber, 0.2, ClimberDirection.DOWN));
+    m_MechController.y().whileTrue(new RunClimber(m_Climber, -0.2, ClimberDirection.UP));
+    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake(), m_Arm));
     // exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     // m_driverController.x().and(m_Shooter::breakBeamState).whileTrue(new RevShooter(m_Shooter)); //uncomment later
     //m_driverController.a().whileTrue
     //m_driverController.x().whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     
     
-
+  
   }
 
   /**

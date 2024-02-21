@@ -45,6 +45,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm Position Encoder", ArmEncoder.get());
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
+        SmartDashboard.putString("Arm state", m_ArmStates.toString());
         switch(m_ArmStates) {
             case STORE:
                 targetPos = ArmConstants.StorePos;
@@ -63,9 +64,16 @@ public class Arm extends SubsystemBase {
         runArm(armSpeed);
         
     }
-
+    
     public void setToIntake() {
         m_ArmStates = ArmStates.INTAKE;
+    }
+
+    public void toggleIntake() {
+        if(m_ArmStates == ArmStates.INTAKE)
+            m_ArmStates = ArmStates.STORE;
+        else
+            m_ArmStates = ArmStates.INTAKE;
     }
 
     public void setToStore() {

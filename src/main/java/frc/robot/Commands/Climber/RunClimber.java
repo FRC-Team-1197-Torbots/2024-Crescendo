@@ -1,6 +1,8 @@
 package frc.robot.Commands.Climber;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ClimberConstants;
+import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Climber;
 
@@ -8,9 +10,11 @@ public class RunClimber extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Climber m_Climber;
     private double m_Speed;
-    public RunClimber(Climber subsystem, double speed) {
+    private ClimberDirection m_Direction;
+    public RunClimber(Climber subsystem, double speed, ClimberDirection direction) {
         m_Climber = subsystem;
         m_Speed = speed;
+        m_Direction = direction;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -23,7 +27,7 @@ public class RunClimber extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_Climber.runMotors(m_Speed);
+        m_Climber.runMotors(m_Speed, m_Direction);
       }
 
       @Override

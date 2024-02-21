@@ -171,6 +171,13 @@ public final class Constants {
   public static final class ClimberConstants{
     public static final int LeftClimberMotor = 17;
     public static final int RightClimberMotor = 16;
+
+    public static final double LeftClimberTopPos = -172.2;
+    public static final double RightClimberTopPos = -177.5;
+
+    public static enum ClimberDirection {
+      UP, DOWN
+    }
   }
 
   public static final class IntakeConstants{
