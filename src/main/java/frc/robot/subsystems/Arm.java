@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -27,6 +28,7 @@ public class Arm extends SubsystemBase {
     private double armSpeed;
     private TrapezoidProfile.Constraints m_Constraints;
     private ProfiledPIDController m_armPIDController;
+    private ArmFeedforward m_ArmFeedforward;
 
     public Arm() {
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
@@ -38,7 +40,15 @@ public class Arm extends SubsystemBase {
         m_ArmStates = ArmStates.STORE;
         m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
-    }
+        m_ArmFeedforward = new ArmFeedforward(0.1, 0.66, 1.30, 0.02); //ks value might need to change 
+        /**************************** 
+         * 
+         * 
+         * Feedforward numbers based off of this link: 
+         * https://www.reca.lc/arm?armMass=%7B%22s%22%3A29.608%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A9.0826%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=100&endAngle=%7B%22s%22%3A83%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22NEO%20Vortex%2A%22%7D&ratio=%7B%22magnitude%22%3A76.8%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
+    
+         * 
+         * **************************/ }
     
     @Override
     public void periodic() {
@@ -60,9 +70,13 @@ public class Arm extends SubsystemBase {
                 break;
             }
         
-        armSpeed = setArmSpeed();
+        armSpeed = setArmOutput();
         runArm(armSpeed);
         
+    }
+
+    public void setStates(ArmStates states){
+        m_ArmStates = states;
     }
     
     public void setToIntake() {
@@ -85,8 +99,8 @@ public class Arm extends SubsystemBase {
     }
     
     public void runArm(double spd) {
-        ArmMotor1.set(spd);
-        ArmMotor2.set(spd);
+        ArmMotor1.setVoltage(spd);
+        ArmMotor2.setVoltage(spd);
     }
 
     public void stopMotor() { 
@@ -94,8 +108,11 @@ public class Arm extends SubsystemBase {
         ArmMotor2.set(0);
     }
 
-    public double setArmSpeed() {
-        return m_armPIDController.calculate(ticksToDegrees(ArmEncoder.get()), targetPos);
+    public double setArmOutput() {
+        return m_armPIDController.calculate(ticksToDegrees(ArmEncoder.get()), Math.toRadians(targetPos)) + m_ArmFeedforward.calculate
+        (Math.toRadians(targetPos), 
+        Math.toRadians(ArmConstants.MaxAngularVelo),
+        Math.toRadians(ArmConstants.MaxAngularAccel));
     }
 
     public double ticksToDegrees(double ticks) {

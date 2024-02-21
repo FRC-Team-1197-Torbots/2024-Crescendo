@@ -149,6 +149,7 @@ public final class Constants {
     public static final int encoderChannelA = 7;
     public static final int encoderChannelB = 8;
     public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
+
     public static enum ArmStates {
       STORE, INTAKE, SPEAKER, AMP
     }
@@ -169,11 +170,16 @@ public final class Constants {
   }
 
   public static final class ClimberConstants{
+    //Climber Spark Flex IDs
     public static final int LeftClimberMotor = 17;
     public static final int RightClimberMotor = 16;
 
+    //Climber Top position in Encoder Ticks
     public static final double LeftClimberTopPos = -172.2;
     public static final double RightClimberTopPos = -177.5;
+
+    //Constant Climber Speed
+    public static final double climberSpeed = 0.2;
 
     public static enum ClimberDirection {
       UP, DOWN

@@ -9,11 +9,9 @@ import frc.robot.subsystems.Climber;
 public class RunClimber extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Climber m_Climber;
-    private double m_Speed;
     private ClimberDirection m_Direction;
-    public RunClimber(Climber subsystem, double speed, ClimberDirection direction) {
+    public RunClimber(Climber subsystem, ClimberDirection direction) {
         m_Climber = subsystem;
-        m_Speed = speed;
         m_Direction = direction;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
@@ -27,7 +25,7 @@ public class RunClimber extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_Climber.runMotors(m_Speed, m_Direction);
+        m_Climber.runMotors(ClimberConstants.climberSpeed, m_Direction);
       }
 
       @Override
@@ -40,7 +38,7 @@ public class RunClimber extends Command{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return m_Climber.atEndPos(m_Direction);
   }
     
 }

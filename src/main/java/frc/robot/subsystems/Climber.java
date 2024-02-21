@@ -20,14 +20,13 @@ public class Climber extends SubsystemBase {
     private ClimberDirection m_ClimberDirection;
 
     public Climber() {
+        //Spark Flex Instantiations
         leftClimberFlex = new CANSparkFlex(ClimberConstants.LeftClimberMotor, MotorType.kBrushless);
         rightClimberFlex = new CANSparkFlex(ClimberConstants.RightClimberMotor, MotorType.kBrushless);
-        rightClimberFlex.setIdleMode(IdleMode.kBrake);
-        leftClimberFlex.setIdleMode(IdleMode.kBrake);
-        //leftClimberFlex.setSmartCurrentLimit(40);
-        //rightClimberFlex.setSmartCurrentLimit(40);
-        leftClimberFlex.getEncoder().setPosition(0);
-        rightClimberFlex.getEncoder().setPosition(0);
+
+        setMotorMode(IdleMode.kBrake);
+
+        resetPosition();
     }
 
     public void setMotorMode(IdleMode mode) {
@@ -36,11 +35,8 @@ public class Climber extends SubsystemBase {
     }
 
     public void runMotors(double speed, ClimberDirection direction) {
-        if (speed < 0) {
-            m_ClimberDirection = ClimberDirection.UP;
-        } else {
-            m_ClimberDirection = ClimberDirection.DOWN;
-        }
+        m_ClimberDirection = direction;
+
         switch (m_ClimberDirection) {
             case UP:
                 if (getLeftPosition() <= ClimberConstants.LeftClimberTopPos) { //Stop the Motors when it reaches the top position
@@ -64,40 +60,16 @@ public class Climber extends SubsystemBase {
                 if (leftAtBottom) {
                     leftClimberFlex.set(0);
                 } else {
-                    leftClimberFlex.set(speed);
+                    leftClimberFlex.set(-speed);
                 }
                 if (rightAtBottom) {
                     rightClimberFlex.set(0);
                 } else {
-                    rightClimberFlex.set(speed);
+                    rightClimberFlex.set(-speed);
                 }
                 break;
 
         }
-
-        /*
-         * if (leftClimberFlex.getEncoder().getPosition() <= -172.2){
-         * leftAtTop = true;
-         * }
-         * if (rightClimberFlex.getEncoder().getPosition() <= -177.5){
-         * rightAtTop = true;
-         * }
-         * 
-         * if(leftClimberFlex.getOutputCurrent() > 40){
-         * leftAtBottom = true;
-         * }
-         * if(rightClimberFlex.getOutputCurrent() > 40){
-         * rightAtBottom = true;
-         * }
-         * if(leftAtBottom || leftAtTop)
-         * leftClimberFlex.set(0);
-         * else
-         * leftClimberFlex.set(speed);
-         * if(rightAtBottom || rightAtTop)
-         * rightClimberFlex.set(0);
-         * else
-         * rightClimberFlex.set(speed);
-         */
     }
 
     public void stopMotors() {
@@ -121,6 +93,21 @@ public class Climber extends SubsystemBase {
 
     public double getRightPosition(){
         return rightClimberFlex.getEncoder().getPosition();
+    }
+
+    public void resetPosition(){
+        leftClimberFlex.getEncoder().setPosition(0);
+        rightClimberFlex.getEncoder().setPosition(0);
+    }
+
+    public boolean atEndPos(ClimberDirection dir){
+        if(dir == ClimberDirection.UP){
+            return rightAtTop && leftAtTop;
+        }
+        else {
+            return rightAtBottom && leftAtBottom;
+        }
+
     }
 
 

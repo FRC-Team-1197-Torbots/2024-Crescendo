@@ -1,14 +1,16 @@
 package frc.robot.Commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ArmConstants.ArmStates;
 import frc.robot.subsystems.Arm;
 
 public class RunArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Arm m_Arm;
-    private double m_Speed;
-    public RunArm(Arm subsystem) {
+    private ArmStates m_ArmStates;
+    public RunArm(Arm subsystem, ArmStates armStates) {
         m_Arm = subsystem;
+        m_ArmStates = armStates;
         //m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
@@ -17,7 +19,7 @@ public class RunArm extends Command{
       @Override
       public void initialize() {
 
-        m_Arm.setToIntake();
+        m_Arm.setStates(m_ArmStates);
         
       }
     
@@ -29,7 +31,7 @@ public class RunArm extends Command{
 
       @Override
         public void end(boolean interrupted) {
-            m_Arm.setToStore();
+            m_Arm.setStates(ArmStates.STORE);
         
         }
 
