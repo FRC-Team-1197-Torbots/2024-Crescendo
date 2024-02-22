@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
 
     private CANSparkMax MotorA;
-    private DigitalInput breakBeam;
-    private boolean gamePieceStored;
+    private DigitalInput m_BreakBeam;
+    private boolean isOuttaking;
 
     public Intake() {
         MotorA = new CANSparkMax(IntakeConstants.IntakeMotor, MotorType.kBrushless);
-        breakBeam = new DigitalInput(IntakeConstants.breakBeam);
+        m_BreakBeam = new DigitalInput(IntakeConstants.breakBeam);
+        isOuttaking = false;
+        
 
     } 
 
@@ -28,10 +30,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopMotor() { 
-        MotorA.set(0);
+        MotorA.set(-0.03);
     }
-    public boolean gamePieceStored(){
-        return !breakBeam.get();
+
+    public boolean gamePieceStored() {
+        return !m_BreakBeam.get();
     }
 
     @Override

@@ -1,19 +1,17 @@
 package frc.robot.Commands.Arm;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants.ArmStates;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.Arm;
 
-public class RunArm extends Command{
+public class ManualArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Arm m_Arm;
     private ArmStates m_ArmStates;
-    public RunArm(Arm subsystem, ArmStates armStates) {
+    private double m_Speed;
+    public ManualArm(Arm subsystem, double speed) {
         m_Arm = subsystem;
-        m_ArmStates = armStates;
-        //m_Speed = speed;
+        m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -21,19 +19,19 @@ public class RunArm extends Command{
       @Override
       public void initialize() {
 
-        m_Arm.setStates(m_ArmStates);
         
       }
     
       // Called every time the scheduler runs while the command is scheduled.
       @Override
       public void execute() {
+        m_Arm.runArm(m_Speed);
         //System.out.println("Going up");
       }
 
       @Override
         public void end(boolean interrupted) {
-            m_Arm.setStates(ArmStates.STORE);
+            m_Arm.idleSpeed();
         
         }
 

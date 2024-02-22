@@ -1,5 +1,6 @@
 package frc.robot.Commands.Shooter;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Shooter;
@@ -8,8 +9,11 @@ public class RevShooter extends Command{
 
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Shooter m_Shooter;
+    private PIDController m_ShooterPID;
+    private double targetRPM = -4000;
     public RevShooter(Shooter subsystem) {
         m_Shooter = subsystem;
+        m_ShooterPID = new PIDController(m_Shooter.getKp(), 0.000001, 0);
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -23,7 +27,8 @@ public class RevShooter extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_Shooter.runShooter(0.9);
+        // m_Shooter.runShooter(m_ShooterPID.calculate(targetRPM - m_Shooter.getShooterRPM()));
+        m_Shooter.runShooter(0.85);
       }
 
       @Override

@@ -30,14 +30,14 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
-    public static final double kDirectionSlewRate = 1.2; // radians per second
-    public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
-    public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
+    public static final double kDirectionSlewRate = 1.2; // radians per second 1.2
+    public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%) 1.8
+    public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%) 2.0
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5);
+    public static final double kTrackWidth = Units.inchesToMeters(26.5); //26.5
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5);
+    public static final double kWheelBase = Units.inchesToMeters(26.5); //26.5
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -151,18 +151,20 @@ public final class Constants {
     public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
 
     public static enum ArmStates {
-      STORE, INTAKE, SPEAKER, AMP
+      STORE, INTAKE, SPEAKER, AMP, TEST
     }
 
     //Storing Position values
-    public static final double StorePos = 0; //Need to change these two values later
-    public static final double IntakePos = 81;
-    public static final double SpeakerPos = 48; //53
+    // 66.2
+    public static final double StorePos = 10; //Need to change these two values later
+    public static final double IntakePos = 143;
+    public static final double SpeakerPos = 114.2; //53
+    public static final double TestPos = 114;
 
     //Arm PID Constants
-    public static final double Arm_kP = 0.01;
-    public static final double Arm_kI = 0.0;
-    public static final double Arm_kD = 0;
+    public static final double Arm_kP = 0.025;//around 0.5 degrees of error
+    public static final double Arm_kI = 0.000001;
+    public static final double Arm_kD = 0.00011;
 
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;
@@ -175,8 +177,8 @@ public final class Constants {
     public static final int RightClimberMotor = 16;
 
     //Climber Top position in Encoder Ticks
-    public static final double LeftClimberTopPos = -172.2;
-    public static final double RightClimberTopPos = -177.5;
+    public static final double LeftClimberTopPos = 172.2;
+    public static final double RightClimberTopPos = 177.5;
 
     //Constant Climber Speed
     public static final double climberSpeed = 0.2;
@@ -188,6 +190,8 @@ public final class Constants {
 
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
+    public static final double IntakeSpeed = 0.7;
+    public static final double OuttakeSpeed = -0.9;
 
     //Digital Input Constants
     public static final int breakBeam = 9;

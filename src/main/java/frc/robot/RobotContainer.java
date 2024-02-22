@@ -5,7 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.RunIntake;
@@ -14,6 +16,7 @@ import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,7 +42,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final Intake m_intake = new Intake();
+  private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter();
   public final Arm m_Arm = new Arm();
   private final Climber m_Climber = new Climber();
@@ -49,6 +52,7 @@ public class RobotContainer {
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
+  private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
   /**
@@ -87,32 +91,42 @@ public class RobotContainer {
            // m_robotDrive));
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
+    // m_driverController.povUp()
+    //   .whileTrue(new ManualArm(m_Arm,-0.2));
+    // m_driverController.povDown()
+    //   .whileTrue
+    //     (new ManualArm(m_Arm,0.2));
     m_driverController.leftBumper()
     .onTrue(
       new InstantCommand(
         () -> m_robotDrive.setX(), m_robotDrive));
-    m_driverController.rightTrigger(0.5)
+    m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
       new ParallelCommandGroup(
-        new RunIntake(m_intake), 
+        new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
     m_driverController.leftTrigger(0.5)
     .whileTrue(
       new ParallelCommandGroup(
-        new RunCommand(() -> m_Arm.setToSpeaker(), m_Arm), 
+        new RunArm(m_Arm, ArmStates.TEST), 
         new RevShooter(m_Shooter)));
-    m_driverController.rightBumper().whileTrue(new Shoot(m_intake));
+      m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+      m_driverController.a().onTrue(new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed), m_Intake));
+      m_driverController.a().onFalse(new InstantCommand(() -> m_Intake.stopMotor(), m_Intake));
+        m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
+    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
     
     m_MechController.a()
     .whileTrue(
-      new SequentialCommandGroup(
-        new RunClimber(m_Climber, ClimberDirection.DOWN), 
-        new RunArm(m_Arm, ArmStates.INTAKE)));// We should test this code first
-    m_MechController.y()
-    .whileTrue(
-      new RunClimber(m_Climber, ClimberDirection.UP));
-    m_MechController.x().onTrue(new RunArm(m_Arm, ArmStates.INTAKE)); // Probably Test this later, might need to add a new command class for this
-    
+      new RunClimber(m_Climber, ClimberDirection.DOWN));// We should test this code first
+      m_MechController.y()
+      .whileTrue(
+        new RunClimber(m_Climber, ClimberDirection.UP));
+        m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); // Probably Test this later, might need to add a new command class for this
+    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKi(0.0000001)));
+    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKi(-0.0000001)));
+    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
+    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
     
   
   }
@@ -168,11 +182,15 @@ public class RobotContainer {
     */
   }
 
+  
+
   public void teleopInit(){
     m_Arm.setMotorMode(IdleMode.kBrake);
+    m_robotDrive.setMotorMode(IdleMode.kBrake);
   }
 
   public void disableInit(){
     m_Arm.setMotorMode(IdleMode.kCoast);
+    m_robotDrive.setMotorMode(IdleMode.kCoast);
   }
 }

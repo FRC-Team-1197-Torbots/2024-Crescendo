@@ -8,7 +8,9 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
+import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
@@ -24,12 +26,16 @@ public class Arm extends SubsystemBase {
     private ArmConstants.ArmStates m_ArmStates;
 
     private double targetPos;
-
+    private double armKp;
+    private double armKi;
+    private double armKd;
     private double armSpeed;
     private TrapezoidProfile.Constraints m_Constraints;
-    private ProfiledPIDController m_armPIDController;
+    //private ProfiledPIDController m_armPIDController;
+    private PIDController m_PIDController;
     private ArmFeedforward m_ArmFeedforward;
-
+    private double error;
+    
     public Arm() {
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
@@ -39,7 +45,11 @@ public class Arm extends SubsystemBase {
         ArmEncoder.reset();
         m_ArmStates = ArmStates.STORE;
         m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
-        m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
+        m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
+        armKp = ArmConstants.Arm_kP;
+        armKi = ArmConstants.Arm_kI;
+        armKd = ArmConstants.Arm_kD;
+        //m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
         m_ArmFeedforward = new ArmFeedforward(0.1, 0.66, 1.30, 0.02); //ks value might need to change 
         /**************************** 
          * 
@@ -56,6 +66,14 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
         SmartDashboard.putString("Arm state", m_ArmStates.toString());
+        //SmartDashboard.putNumber("Arm speed", armSpeed);
+        SmartDashboard.putNumber("Arm Kp", armKp);
+        SmartDashboard.putNumber("Arm Ki", armKi);
+        SmartDashboard.putNumber("Arm Kd", armKd);
+        SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
+        SmartDashboard.putNumber("Error", error);
+
+
         switch(m_ArmStates) {
             case STORE:
                 targetPos = ArmConstants.StorePos;
@@ -68,11 +86,32 @@ public class Arm extends SubsystemBase {
                 break;
             case AMP:
                 break;
+            case TEST:
+                targetPos = ArmConstants.TestPos;
+                break;
             }
         
+        error = targetPos - ticksToDegrees(ArmEncoder.get());
         armSpeed = setArmOutput();
         runArm(armSpeed);
         
+    }
+    public double getKp() {
+        return armKp;
+    }
+
+    public void incrementKp(double amount) {
+        armKp += amount;
+        m_PIDController.setP(armKp);
+    }
+
+    public void incrementKi(double amount) {
+        armKi += amount;
+        m_PIDController.setI(armKi);
+    }
+    public void incrementKd(double amount) {
+        armKd += amount;
+        m_PIDController.setD(armKd);
     }
 
     public void setStates(ArmStates states){
@@ -97,10 +136,18 @@ public class Arm extends SubsystemBase {
     public void setToSpeaker() {
         m_ArmStates = ArmStates.SPEAKER;
     }
+    public void setToTest() {
+        m_ArmStates = ArmStates.TEST;
+    }
     
     public void runArm(double spd) {
-        ArmMotor1.setVoltage(spd);
-        ArmMotor2.setVoltage(spd);
+        ArmMotor1.set(spd);
+        ArmMotor2.set(spd);
+    }
+
+    public void idleSpeed(){
+        ArmMotor1.set(-0.01);
+        ArmMotor2.set(-0.01);
     }
 
     public void stopMotor() { 
@@ -108,11 +155,16 @@ public class Arm extends SubsystemBase {
         ArmMotor2.set(0);
     }
 
+    public double getAngularVelo(){
+        return ArmEncoder.getRate() / ArmConstants.TICKS_PER_DEGREE; 
+    }
+
     public double setArmOutput() {
-        return m_armPIDController.calculate(ticksToDegrees(ArmEncoder.get()), Math.toRadians(targetPos)) + m_ArmFeedforward.calculate
-        (Math.toRadians(targetPos), 
-        Math.toRadians(ArmConstants.MaxAngularVelo),
-        Math.toRadians(ArmConstants.MaxAngularAccel));
+
+        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
+        // (Math.toRadians(targetPos), 
+        // Math.toRadians(ArmConstants.MaxAngularVelo),
+        // Math.toRadians(ArmConstants.MaxAngularAccel));
     }
 
     public double ticksToDegrees(double ticks) {
