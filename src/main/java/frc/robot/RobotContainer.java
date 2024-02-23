@@ -5,6 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Commands.Arm.AutoArm;
@@ -16,10 +24,12 @@ import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
-
+import frc.robot.utils.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -27,11 +37,13 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.time.Instant;
+import java.util.List;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -149,10 +161,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("New Auto");
+    // return new PathPlannerAuto("New Auto");
 
-    /* 
-    // Create config for trajectory
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -160,15 +170,24 @@ public class RobotContainer {
         .setKinematics(DriveConstants.kDriveKinematics);
 
     // An example trajectory to follow. All units in meters.
+    double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
+    // System.out.println("TX: " + botpose[0] + " TY: " + botpose[1]);
+    double goalTX = 14.14; //4.65
+    double goalTY = 5.548; //1.78
+
+    double midTX = (goalTX + botpose[0])/2;
+    double midTY = (goalTY + botpose[1])/2;
+
+
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
 
+        new Pose2d(botpose[0], botpose[1], new Rotation2d(0)), //prev 0,0
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(midTX,midTY)),//prev (1,1), (2,-1)
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(goalTX, goalTY, new Rotation2d(0)),//prev 3,0
+        config);
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -190,7 +209,8 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
-    */
+  
+    
   }
 
   

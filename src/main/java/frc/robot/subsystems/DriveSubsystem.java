@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.utils.LimelightHelpers;
 import frc.utils.SwerveUtils;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -146,6 +147,19 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+        
+        double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
+        SmartDashboard.putNumber("BotPose X", botpose[0]);
+        SmartDashboard.putNumber("BotPose Y", botpose[1]);
+        
+        double odometry_x = m_odometry.getPoseMeters().getX();
+        double odometry_y = m_odometry.getPoseMeters().getY();
+        SmartDashboard.putNumber("Odometry X", odometry_x);
+        SmartDashboard.putNumber("Odometry Y", odometry_y);
+        
+        SmartDashboard.putData("Field", m_field2d);
+
+        m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
     /*
     for(int i=0; i<modules.length; i++){
