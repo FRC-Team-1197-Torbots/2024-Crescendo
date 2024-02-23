@@ -15,6 +15,8 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
@@ -56,6 +58,10 @@ import com.revrobotics.CANSparkBase.IdleMode;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  //Auto Selectors
+  private SendableChooser<String> positionChooser = new SendableChooser<>();
+
+  private SendableChooser<String> autoNameChooser = new SendableChooser<>();
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
@@ -78,6 +84,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    addAutoPaths();
     NamedCommands.registerCommand("IntakeDown",(
         new AutoArm(m_Arm, ArmStates.INTAKE)));
     NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
@@ -120,38 +127,59 @@ public class RobotContainer {
     .onTrue(
       new InstantCommand(
         () -> m_robotDrive.setX(), m_robotDrive));
+
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
       new ParallelCommandGroup(
         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
+
     m_driverController.leftTrigger(0.5)
     .whileTrue(
       new ParallelCommandGroup(
         new RunArm(m_Arm, ArmStates.TEST), 
         new RevShooter(m_Shooter)));
+
       m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+
       m_driverController.a().whileTrue(new StartEndCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
        () -> m_Intake.stopMotor(),
         m_Intake));
-      // m_driverController.a().onTrue(new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed), m_Intake));
-      // m_driverController.a().onFalse(new InstantCommand(() -> m_Intake.stopMotor(), m_Intake));
-        m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
+
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
+    
     m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
     
     m_MechController.a()
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.DOWN));// We should test this code first
-      m_MechController.y()
+
+    m_MechController.y()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.UP));
-        m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); // Probably Test this later, might need to add a new command class for this
+
+    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); // Probably Test this later, might need to add a new command class for this
+    
+    // PID testing
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKi(0.000001)));
     m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKi(-0.000001)));
     m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
     m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
     
   
+  }
+
+  private void addAutoPaths(){
+    positionChooser.addOption("Top (AMP)", "Top");
+    positionChooser.addOption("Middle", "Middle");
+    positionChooser.addOption("Bottom", "Bottom");
+
+    autoNameChooser.addOption("4 Note", "4 Note");
+    autoNameChooser.addOption("2 Note", "2 Note");
+
+    SmartDashboard.putData("Positioning", positionChooser);
+    SmartDashboard.putData("Auto Choice", autoNameChooser);
+    //autoChooser.addOption("4 Note Auto", );
   }
 
   /**
@@ -161,9 +189,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
     // return new PathPlannerAuto("New Auto");
 
-    TrajectoryConfig config = new TrajectoryConfig(
+    /*TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
         // Add kinematics to ensure max speed is actually obeyed
@@ -171,6 +200,7 @@ public class RobotContainer {
 
     // An example trajectory to follow. All units in meters.
     double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
+
     // System.out.println("TX: " + botpose[0] + " TY: " + botpose[1]);
     double goalTX = 14.14; //4.65
     double goalTY = 5.548; //1.78
@@ -209,6 +239,7 @@ public class RobotContainer {
 
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
+    */
   
     
   }

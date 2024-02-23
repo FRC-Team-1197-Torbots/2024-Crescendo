@@ -64,7 +64,7 @@ public class DriveSubsystem extends SubsystemBase {
   }*/
 
   // The gyro sensor
-  private final Pigeon2 m_gyro = new Pigeon2(15); //might have to change to pigeon
+  public final Pigeon2 m_gyro = new Pigeon2(15); //might have to change to pigeon
   
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -148,6 +148,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
         
+        /* 
         double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
         SmartDashboard.putNumber("BotPose X", botpose[0]);
         SmartDashboard.putNumber("BotPose Y", botpose[1]);
@@ -156,6 +157,7 @@ public class DriveSubsystem extends SubsystemBase {
         double odometry_y = m_odometry.getPoseMeters().getY();
         SmartDashboard.putNumber("Odometry X", odometry_x);
         SmartDashboard.putNumber("Odometry Y", odometry_y);
+        */
         
         SmartDashboard.putData("Field", m_field2d);
 
