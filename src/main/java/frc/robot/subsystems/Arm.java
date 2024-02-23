@@ -99,7 +99,14 @@ public class Arm extends SubsystemBase {
     public double getKp() {
         return armKp;
     }
-
+    public boolean onTarget(){
+        if(Math.abs(error)<2){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
     public void incrementKp(double amount) {
         armKp += amount;
         m_PIDController.setP(armKp);

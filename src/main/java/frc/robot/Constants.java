@@ -31,13 +31,13 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second 1.2
-    public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%) 1.8
-    public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%) 2.0
+    public static final double kMagnitudeSlewRate = 3.4; // percent per second (1 = 100%) 1.8
+    public static final double kRotationalSlewRate = 4.0; // percent per second (1 = 100%) 2.0
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.5); //26.5
+    public static final double kTrackWidth = Units.inchesToMeters(25); //26.5
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.5); //26.5
+    public static final double kWheelBase = Units.inchesToMeters(25); //26.5
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -162,9 +162,9 @@ public final class Constants {
     public static final double TestPos = 114;
 
     //Arm PID Constants
-    public static final double Arm_kP = 0.025;//around 0.5 degrees of error
-    public static final double Arm_kI = 0.000001;
-    public static final double Arm_kD = 0.00011;
+    public static final double Arm_kP = 0.015;//around 0.5 degrees of error
+    public static final double Arm_kI = 0; //0.00001;
+    public static final double Arm_kD = 0.0002;
 
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;

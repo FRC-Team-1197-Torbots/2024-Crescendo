@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
@@ -22,14 +23,17 @@ import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.time.Instant;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase.IdleMode;
 
@@ -53,6 +57,7 @@ public class RobotContainer {
   private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
+  
   //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
   /**
@@ -61,7 +66,10 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-
+    NamedCommands.registerCommand("IntakeDown",(
+        new AutoArm(m_Arm, ArmStates.INTAKE)));
+    NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+    NamedCommands.registerCommand("Print Command", new PrintCommand("Hope this works"));
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -111,8 +119,11 @@ public class RobotContainer {
         new RunArm(m_Arm, ArmStates.TEST), 
         new RevShooter(m_Shooter)));
       m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
-      m_driverController.a().onTrue(new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed), m_Intake));
-      m_driverController.a().onFalse(new InstantCommand(() -> m_Intake.stopMotor(), m_Intake));
+      m_driverController.a().whileTrue(new StartEndCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+       () -> m_Intake.stopMotor(),
+        m_Intake));
+      // m_driverController.a().onTrue(new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed), m_Intake));
+      // m_driverController.a().onFalse(new InstantCommand(() -> m_Intake.stopMotor(), m_Intake));
         m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
     m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
     
@@ -123,8 +134,8 @@ public class RobotContainer {
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.UP));
         m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); // Probably Test this later, might need to add a new command class for this
-    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKi(0.0000001)));
-    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKi(-0.0000001)));
+    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKi(0.000001)));
+    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKi(-0.000001)));
     m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
     m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
     
@@ -138,7 +149,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Example Auto");
+    return new PathPlannerAuto("New Auto");
 
     /* 
     // Create config for trajectory
