@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
@@ -16,6 +17,7 @@ import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
+import frc.robot.Constants.AutoConstants.AutoPosition;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
@@ -44,11 +46,19 @@ import com.revrobotics.CANSparkBase.IdleMode;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
+  //Auto Chooser
+  private SendableChooser positionChooser = new SendableChooser<String>();
+
+  private SendableChooser autoNameChooser = new SendableChooser<String>();
+
+  //private SendableChooser autoChooser = new SendableChooser<PathPlannerAuto>();
+
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter();
-  public final Arm m_Arm = new Arm();
+  private final Arm m_Arm = new Arm();
   private final Climber m_Climber = new Climber();
 
   // The driver's controller
@@ -142,6 +152,31 @@ public class RobotContainer {
   
   }
 
+  private void addAutoPaths(){
+    positionChooser.addOption("Top (AMP)", "Top");
+    positionChooser.addOption("Middle", "Middle");
+    positionChooser.addOption("Bottom", "Bottom");
+
+    autoNameChooser.addOption("4 Note", "4 Note");
+    autoNameChooser.addOption("2 Note", "2 Note");
+
+    //autoChooser.addOption("4 Note Auto", );
+  }
+
+  /* 
+  private AutoPosition selecPosition(){
+    String position = positionChooser.getSelected().toString();
+    if(position.equals("TOP")){
+      return AutoPosition.TOP;
+    }else if(position.equals("MIDDLE")){
+      return AutoPosition.MIDDLE;
+    }else{
+      return AutoPosition.BOTTOM;
+    }
+  }*/
+
+  
+
   /**
    * 
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -149,7 +184,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("New Auto");
+    return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
 
     /* 
     // Create config for trajectory
