@@ -123,7 +123,6 @@ public class RobotContainer {
            // () -> m_robotDrive.setX(),
            // m_robotDrive));
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-
     // m_driverController.povUp()
     //   .whileTrue(new ManualArm(m_Arm,-0.2));
     // m_driverController.povDown()
@@ -148,15 +147,21 @@ public class RobotContainer {
 
       m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
 
+      m_driverController.leftTrigger(0.5)
+      .whileTrue(
+          new ParallelCommandGroup(
+            new StartEndCommand(() -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), () -> m_Arm.setStates(ArmStates.STORE)),
+            new RevShooter(m_Shooter)));
+
       m_driverController.a().whileTrue(new StartEndCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
        () -> m_Intake.stopMotor(),
         m_Intake));
 
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
+      m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
+    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
     
-    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
+    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
     
-    m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
 
     m_MechController.a()
     .whileTrue(
@@ -170,8 +175,10 @@ public class RobotContainer {
     
     
     // PID testing
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
+    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.25)));
+    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.25)));
+    // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
+    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
     // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
     

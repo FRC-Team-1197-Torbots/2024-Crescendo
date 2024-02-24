@@ -93,7 +93,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   /*Field 2D on Robot Sim */
   private Field2d m_field2d = new Field2d();
-
+  private double odometry_x;
+  private double odometry_y;
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -148,8 +149,8 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         });
                 
-        double odometry_x = m_odometry.getPoseMeters().getX();
-        double odometry_y = m_odometry.getPoseMeters().getY();
+        odometry_x = m_odometry.getPoseMeters().getX();
+        odometry_y = m_odometry.getPoseMeters().getY();
         SmartDashboard.putNumber("Odometry X", odometry_x);
         SmartDashboard.putNumber("Odometry Y", odometry_y);
         
@@ -382,7 +383,10 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double distanceFromSpeaker() {
-    return Math.abs(m_odometry.getPoseMeters().getX() - Constants.TAG_4_X_POS);
+    double xDistance = odometry_x - Constants.TAG_4_X_POS;
+    double yDistance = odometry_y - Constants.TAG_4_Y_POS;
+    return Math.hypot(xDistance, yDistance);
+
   }
-  
+
 }

@@ -171,10 +171,9 @@ public final class Constants {
     public static final double MaxAngularAccel = 120;
 
     // Arm aiming constants
-    public static final double Slope = 1;
-    public static final double YIntercept = 136;
-    public static final double firstDegCoefficient = -16.9;
-    public static final double secondDegCoefficient = 1.61;
+    public static final double A = 1.69;
+    public static final double B = -17.3;
+    public static final double C = 136;
   }
 
   public static final class ClimberConstants{
@@ -196,7 +195,7 @@ public final class Constants {
 
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
-    public static final double IntakeSpeed = 0.7;
+    public static final double IntakeSpeed = 0.8;
     public static final double OuttakeSpeed = -0.9;
 
     //Digital Input Constants
@@ -211,4 +210,5 @@ public final class Constants {
   }
 
   public static final double TAG_4_X_POS = 16.579;  
+  public static final double TAG_4_Y_POS = 5.548;  
 }

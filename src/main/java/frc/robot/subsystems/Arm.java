@@ -86,7 +86,7 @@ public class Arm extends SubsystemBase {
                 targetPos = ArmConstants.IntakePos;
                 break;
             case SPEAKER:
-                targetPos = getArmAngle(distanceFromSpeaker());
+                targetPos = testAngle;
                 break;
             case AMP:
                 break;
@@ -101,12 +101,15 @@ public class Arm extends SubsystemBase {
 
     }
 
-    public double getArmAngle(double distance) {
-        //double angle = ArmConstants.Slope * distance + ArmConstants.YIntercept;
-        double angle = ArmConstants.secondDegCoefficient * Math.pow(distance, 2) 
-        + ArmConstants.firstDegCoefficient * distance
-         + ArmConstants.YIntercept; // New equation based off of Aidan's data
-        return angle;
+    public void setAngleFromDistance(double distance) {
+        m_ArmStates = ArmStates.TEST;
+        testAngle = ArmConstants.A * Math.pow(distance, 2) + ArmConstants.B * distance + ArmConstants.C;
+        if (testAngle < ArmConstants.StorePos) {
+            testAngle = ArmConstants.StorePos;
+        }
+        if (testAngle > ArmConstants.IntakePos) {
+            testAngle = ArmConstants.IntakePos;
+        }
     }
 
     public void runArm(double spd) {
@@ -134,6 +137,10 @@ public class Arm extends SubsystemBase {
         } else {
             return false;
         }
+    }
+
+    public void setAngle(double angle) {
+        testAngle = angle;
     }
 
     public void incrementAngle(double amount) {
