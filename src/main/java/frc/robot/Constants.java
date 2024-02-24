@@ -207,6 +207,8 @@ public final class Constants {
     public static final int TopMotor = 12;
     public static final int BottomMotor = 11;
 
+    public static final double TargetRPM = -4000;
+
   }
 
   public static final double TAG_4_X_POS = 16.579;  

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class Shooter extends SubsystemBase {
+    private Intake m_Intake;
 
     private CANSparkFlex TopMotor;
     private CANSparkFlex BottomMotor;
@@ -48,6 +49,18 @@ public class Shooter extends SubsystemBase {
 
     public double getShooterRPM(){
         return TopMotor.getEncoder().getVelocity();
+    }
+
+    public void getIntakeSubsystem(Intake intake){
+        m_Intake = intake;
+    }
+
+    public boolean getBreakBeamState(){
+        return m_Intake.gamePieceStored();
+    }
+
+    public boolean onTarget(){
+        return Math.abs(ShooterConstants.TargetRPM - getShooterRPM()) < 50;
     }
 
 

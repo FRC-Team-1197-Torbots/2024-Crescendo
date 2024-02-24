@@ -2,21 +2,15 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.0,
-      "y": 7.0
+      "x": 1.3491521419562087,
+      "y": 6.183321696172636
     },
-    "rotation": 0
+    "rotation": 52.814588782612915
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Example Path"
-          }
-        },
         {
           "type": "sequential",
           "data": {
@@ -24,9 +18,28 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "IntakeDown"
+                  "name": "Aim at Speaker"
                 }
               },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rev Up then shoot"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteTop1"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
               {
                 "type": "parallel",
                 "data": {
@@ -34,16 +47,116 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "RunIntake"
+                        "name": "IntakeDown"
                       }
                     },
                     {
-                      "type": "path",
+                      "type": "named",
                       "data": {
-                        "pathName": "Copy of Example Path"
+                        "name": "RunIntake"
                       }
                     }
                   ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Aim at Speaker"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rev Up then shoot"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteTop2"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeDown"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "RunIntake"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Aim at Speaker"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rev Up then shoot"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4NoteTop3"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "IntakeDown"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "RunIntake"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Aim at Speaker"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rev Up then shoot"
                 }
               }
             ]

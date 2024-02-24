@@ -25,6 +25,7 @@ import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Limelight.ScanAprilTag;
+import frc.robot.Commands.Shooter.AutoShooter;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
@@ -35,6 +36,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import frc.robot.utils.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -139,11 +141,11 @@ public class RobotContainer {
         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
 
-    m_driverController.leftTrigger(0.5)
+    /*m_driverController.leftTrigger(0.5)
     .whileTrue(
       new ParallelCommandGroup(
         new RunArm(m_Arm, ArmStates.SPEAKER), //new RunArm(m_Arm, ArmStates.TEST) //may need to uncomment this code
-        new RevShooter(m_Shooter)));
+        new RevShooter(m_Shooter)));*/
 
       m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
 
@@ -189,7 +191,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("IntakeDown",(
         new AutoArm(m_Arm, ArmStates.INTAKE)));
     NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
-    NamedCommands.registerCommand("Print Command", new PrintCommand("Hope this works"));
+    NamedCommands.registerCommand("Rev Up then shoot", new ConditionalCommand(new Shoot(m_Intake), new AutoShooter(m_Shooter), m_Shooter::onTarget));
+    NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));
   }
 
   private void addAutoPaths(){

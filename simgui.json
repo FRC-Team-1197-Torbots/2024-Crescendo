@@ -5,7 +5,8 @@
       "/SmartDashboard/Auto Choice": "String Chooser",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Positioning": "String Chooser",
-      "/SmartDashboard/Robot Field": "Field2d"
+      "/SmartDashboard/Robot Field": "Field2d",
+      "/SmartDashboard/Scheduler": "Scheduler"
     },
     "windows": {
       "/SmartDashboard/Auto Choice": {
@@ -14,6 +15,11 @@
         }
       },
       "/SmartDashboard/Positioning": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Scheduler": {
         "window": {
           "visible": true
         }
