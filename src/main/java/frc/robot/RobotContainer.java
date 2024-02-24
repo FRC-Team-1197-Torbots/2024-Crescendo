@@ -14,6 +14,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -84,13 +85,16 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Add subsystems to different subsystems
+    m_Arm.getDriveSubsystem(m_robotDrive);
+
     // Configure the button bindings
     configureButtonBindings();
+
+    // Add auto selector and commands used
     addAutoPaths();
-    NamedCommands.registerCommand("IntakeDown",(
-        new AutoArm(m_Arm, ArmStates.INTAKE)));
-    NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
-    NamedCommands.registerCommand("Print Command", new PrintCommand("Hope this works"));
+    registerAutoCommands();
+    
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -139,7 +143,7 @@ public class RobotContainer {
     m_driverController.leftTrigger(0.5)
     .whileTrue(
       new ParallelCommandGroup(
-        new RunArm(m_Arm, ArmStates.TEST), 
+        new RunArm(m_Arm, ArmStates.SPEAKER), //new RunArm(m_Arm, ArmStates.TEST) //may need to uncomment this code
         new RevShooter(m_Shooter)));
 
       m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
@@ -174,6 +178,13 @@ public class RobotContainer {
   
   }
 
+  private void registerAutoCommands(){
+    NamedCommands.registerCommand("IntakeDown",(
+        new AutoArm(m_Arm, ArmStates.INTAKE)));
+    NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+    NamedCommands.registerCommand("Print Command", new PrintCommand("Hope this works"));
+  }
+
   private void addAutoPaths(){
     positionChooser.addOption("Top (AMP)", "Top");
     positionChooser.addOption("Middle", "Middle");
@@ -194,7 +205,15 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
+    //PathPlannerAuto pathPlannerAuto;
+    try{
+      return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
+    }
+    catch(Exception e){
+      //System.out.println("Error occurs");
+      DriverStation.reportWarning("Auto is not selected or invalid", false);
+      return new PathPlannerAuto("2 Note Middle");
+    }
     // return new PathPlannerAuto("New Auto");
 
     /*TrajectoryConfig config = new TrajectoryConfig(

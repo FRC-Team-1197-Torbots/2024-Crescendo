@@ -172,7 +172,9 @@ public final class Constants {
 
     // Arm aiming constants
     public static final double Slope = 1;
-    public static final double YIntercept = 0;
+    public static final double YIntercept = 136;
+    public static final double firstDegCoefficient = -16.9;
+    public static final double secondDegCoefficient = 1.61;
   }
 
   public static final class ClimberConstants{

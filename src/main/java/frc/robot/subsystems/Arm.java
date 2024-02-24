@@ -12,6 +12,7 @@ import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -36,12 +37,12 @@ public class Arm extends SubsystemBase {
     private double error;
     private double testAngle;
 
+    private DriveSubsystem m_DriveSubsystem;
+
     public Arm() {
         testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
-        ArmMotor1.setIdleMode(IdleMode.kBrake);
-        ArmMotor2.setIdleMode(IdleMode.kBrake);
         ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
         ArmEncoder.reset();
         m_ArmStates = ArmStates.STORE;
@@ -85,7 +86,7 @@ public class Arm extends SubsystemBase {
                 targetPos = ArmConstants.IntakePos;
                 break;
             case SPEAKER:
-                targetPos = ArmConstants.SpeakerPos;
+                targetPos = getArmAngle(distanceFromSpeaker());
                 break;
             case AMP:
                 break;
@@ -101,7 +102,10 @@ public class Arm extends SubsystemBase {
     }
 
     public double getArmAngle(double distance) {
-        double angle = ArmConstants.Slope * distance + ArmConstants.YIntercept;
+        //double angle = ArmConstants.Slope * distance + ArmConstants.YIntercept;
+        double angle = ArmConstants.secondDegCoefficient * Math.pow(distance, 2) 
+        + ArmConstants.firstDegCoefficient * distance
+         + ArmConstants.YIntercept; // New equation based off of Aidan's data
         return angle;
     }
 
@@ -181,6 +185,14 @@ public class Arm extends SubsystemBase {
 
     public void getPose() {
         LimelightHelpers.getBotPose(getName());
+    }
+
+    public double distanceFromSpeaker(){
+        return m_DriveSubsystem.getPose().getX();
+    }
+
+    public void getDriveSubsystem(DriveSubsystem drive){
+        m_DriveSubsystem = drive;
     }
 
     public void setMotorMode(IdleMode mode) {

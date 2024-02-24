@@ -2,7 +2,22 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Auto Choice": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Positioning": "String Chooser",
+      "/SmartDashboard/Robot Field": "Field2d"
+    },
+    "windows": {
+      "/SmartDashboard/Auto Choice": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Positioning": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables Info": {
