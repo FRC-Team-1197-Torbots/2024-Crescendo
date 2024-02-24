@@ -34,8 +34,10 @@ public class Arm extends SubsystemBase {
     private PIDController m_PIDController;
     private ArmFeedforward m_ArmFeedforward;
     private double error;
+    private double testAngle;
 
     public Arm() {
+        testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
         ArmMotor1.setIdleMode(IdleMode.kBrake);
@@ -63,16 +65,17 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm Position Encoder", ArmEncoder.get());
+        // SmartDashboard.putNumber("Arm Position Encoder", ArmEncoder.get());
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
-        SmartDashboard.putString("Arm state", m_ArmStates.toString());
+        SmartDashboard.putNumber("Test Angle", testAngle);
+        // SmartDashboard.putString("Arm state", m_ArmStates.toString());
         // SmartDashboard.putNumber("Arm speed", armSpeed);
-        SmartDashboard.putNumber("Arm Kp", armKp);
-        SmartDashboard.putNumber("Arm Ki", armKi);
-        SmartDashboard.putNumber("Arm Kd", armKd);
-        SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
-        SmartDashboard.putNumber("Error", error);
+        // SmartDashboard.putNumber("Arm Kp", armKp);
+        // SmartDashboard.putNumber("Arm Ki", armKi);
+        // SmartDashboard.putNumber("Arm Kd", armKd);
+        // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
+        // SmartDashboard.putNumber("Error", error);
 
         switch (m_ArmStates) {
             case STORE:
@@ -87,7 +90,7 @@ public class Arm extends SubsystemBase {
             case AMP:
                 break;
             case TEST:
-                targetPos = ArmConstants.TestPos;
+                targetPos = testAngle;
                 break;
         }
 
@@ -95,6 +98,11 @@ public class Arm extends SubsystemBase {
         armSpeed = setArmOutput();
         runArm(armSpeed);
 
+    }
+
+    public double getArmAngle(double distance) {
+        double angle = ArmConstants.Slope * distance + ArmConstants.YIntercept;
+        return angle;
     }
 
     public void runArm(double spd) {
@@ -112,12 +120,20 @@ public class Arm extends SubsystemBase {
         ArmMotor2.set(-0.01);
     }
 
+    public void setStates(ArmStates states) {
+        m_ArmStates = states;
+    }
+
     public boolean onTarget() {
         if (Math.abs(error) < 2) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public void incrementAngle(double amount) {
+        testAngle += amount;
     }
 
     public double getKp() {
@@ -139,9 +155,6 @@ public class Arm extends SubsystemBase {
         m_PIDController.setD(armKd);
     }
 
-    public void setStates(ArmStates states) {
-        m_ArmStates = states;
-    }
 
     public void toggleIntake() {
         if (m_ArmStates == ArmStates.INTAKE)

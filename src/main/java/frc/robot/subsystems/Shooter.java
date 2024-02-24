@@ -25,7 +25,7 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Flywheel Velocity", TopMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("Shooter Kp", shooterKp);
+        // SmartDashboard.putNumber("Shooter Kp", shooterKp);
     } 
 
     public void runShooter(double spd){

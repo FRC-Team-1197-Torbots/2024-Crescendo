@@ -23,6 +23,7 @@ import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
+import frc.robot.Commands.Limelight.ScanAprilTag;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
@@ -68,6 +69,7 @@ public class RobotContainer {
   private final Shooter m_Shooter = new Shooter();
   public final Arm m_Arm = new Arm();
   private final Climber m_Climber = new Climber();
+  public final Limelight m_Limelight = new Limelight();
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -150,6 +152,8 @@ public class RobotContainer {
     
     m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
     
+    m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
+
     m_MechController.a()
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.DOWN));// We should test this code first
@@ -160,11 +164,12 @@ public class RobotContainer {
 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); // Probably Test this later, might need to add a new command class for this
     
+    
     // PID testing
-    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKi(0.000001)));
-    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKi(-0.000001)));
-    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
-    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
+    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
+    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
+    // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
     
   
   }

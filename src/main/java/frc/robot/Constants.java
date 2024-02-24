@@ -169,6 +169,10 @@ public final class Constants {
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;
     public static final double MaxAngularAccel = 120;
+
+    // Arm aiming constants
+    public static final double Slope = 1;
+    public static final double YIntercept = 0;
   }
 
   public static final class ClimberConstants{
@@ -204,4 +208,5 @@ public final class Constants {
 
   }
 
+  public static final double TAG_4_X_POS = 16.579;  
 }

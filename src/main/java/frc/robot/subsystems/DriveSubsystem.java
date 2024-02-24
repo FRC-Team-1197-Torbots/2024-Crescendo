@@ -75,6 +75,7 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -128,7 +129,6 @@ public class DriveSubsystem extends SubsystemBase {
                 },
                 this // Reference to this subsystem to set requirements
         );
-        SmartDashboard.putData("Field", m_field2d);
   }
 
   @Override
@@ -147,20 +147,14 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-        
-        /* 
-        double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
-        SmartDashboard.putNumber("BotPose X", botpose[0]);
-        SmartDashboard.putNumber("BotPose Y", botpose[1]);
-        
+                
         double odometry_x = m_odometry.getPoseMeters().getX();
         double odometry_y = m_odometry.getPoseMeters().getY();
         SmartDashboard.putNumber("Odometry X", odometry_x);
         SmartDashboard.putNumber("Odometry Y", odometry_y);
-        */
         
-        SmartDashboard.putData("Field", m_field2d);
-
+        SmartDashboard.putData("Robot Field", m_field2d);
+        SmartDashboard.putNumber("Distance X", distanceFromSpeaker());
         m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
     /*
@@ -385,6 +379,10 @@ public class DriveSubsystem extends SubsystemBase {
       module.setMotorMode(mode);
     }
   
+  }
+
+  public double distanceFromSpeaker() {
+    return Math.abs(m_odometry.getPoseMeters().getX() - Constants.TAG_4_X_POS);
   }
   
 }

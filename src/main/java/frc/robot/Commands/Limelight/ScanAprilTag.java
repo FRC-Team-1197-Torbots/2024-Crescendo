@@ -25,9 +25,10 @@ public class ScanAprilTag extends Command{
     public void initialize() {
       System.out.println("ScanAprilTag run!");
       
-      double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
+      double[] botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
+      double[] botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
-      m_robotDrive.resetOdometry(new Pose2d(botpose[0], botpose[1], new Rotation2d(Math.toRadians(botpose[5]))));
+      m_robotDrive.resetOdometry(new Pose2d(botpose_shooter[0], botpose_shooter[1], new Rotation2d(Math.toRadians(botpose_shooter[5]))));
       
       //eventually, make this command triggered when picking up note AND when AprilTag(s) is visible 
     }
@@ -45,6 +46,6 @@ public class ScanAprilTag extends Command{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }  
 }
