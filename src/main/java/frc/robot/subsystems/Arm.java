@@ -100,9 +100,15 @@ public class Arm extends SubsystemBase {
 
     }
 
-    public double getArmAngle(double distance) {
-        double angle = ArmConstants.Slope * distance + ArmConstants.YIntercept;
-        return angle;
+    public void setAngleFromDistance(double distance) {
+        m_ArmStates = ArmStates.TEST;
+        testAngle = ArmConstants.A * distance * distance + ArmConstants.B * distance + ArmConstants.C;
+        if (testAngle < ArmConstants.StorePos) {
+            testAngle = ArmConstants.StorePos;
+        }
+        if (testAngle > ArmConstants.IntakePos) {
+            testAngle = ArmConstants.IntakePos;
+        }
     }
 
     public void runArm(double spd) {
@@ -130,6 +136,10 @@ public class Arm extends SubsystemBase {
         } else {
             return false;
         }
+    }
+
+    public void setAngle(double angle) {
+        testAngle = angle;
     }
 
     public void incrementAngle(double amount) {

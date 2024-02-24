@@ -4,6 +4,7 @@ import frc.robot.utils.LimelightHelpers;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.math.filter.Debouncer;
@@ -17,9 +18,10 @@ public class Intake extends SubsystemBase {
     private CANSparkMax MotorA;
     private DigitalInput m_BreakBeam;
     private boolean isOuttaking;
-    private Debouncer debounce = new Debouncer(0.2);
+    // private Debouncer debounce = new Debouncer(0.2);
     public Intake() {
         MotorA = new CANSparkMax(IntakeConstants.IntakeMotor, MotorType.kBrushless);
+        MotorA.setIdleMode(IdleMode.kBrake);
         m_BreakBeam = new DigitalInput(IntakeConstants.breakBeam);
         isOuttaking = false;
         
@@ -31,11 +33,11 @@ public class Intake extends SubsystemBase {
     }
 
     public void stopMotor() { 
-        MotorA.set(-0.03);
+        MotorA.set(0);
     }
 
     public boolean gamePieceStored() {
-        return !debounce.calculate(m_BreakBeam.get());
+        return !m_BreakBeam.get();
     }
 
     @Override
