@@ -34,7 +34,7 @@ public class Climber extends SubsystemBase {
         rightClimberFlex.setIdleMode(mode);
     }
 
-    public void runMotors(double speed, ClimberDirection direction) {
+    public void runMotors(ClimberDirection direction) {
         m_ClimberDirection = direction;
 
         switch (m_ClimberDirection) {
@@ -42,12 +42,12 @@ public class Climber extends SubsystemBase {
                 if (getLeftPosition() >= ClimberConstants.LeftClimberTopPos) { //Stop the Motors when it reaches the top position
                     leftClimberFlex.set(0);
                 } else {
-                    leftClimberFlex.set(speed);
+                    leftClimberFlex.set(ClimberConstants.ClimberUpSpeed);
                 }
                 if (getRightPosition() >= ClimberConstants.RightClimberTopPos) {
                     rightClimberFlex.set(0);
                 } else {
-                    rightClimberFlex.set(speed);
+                    rightClimberFlex.set((ClimberConstants.ClimberUpSpeed));
                 }
                 break;
             case DOWN:
@@ -60,12 +60,12 @@ public class Climber extends SubsystemBase {
                 if (leftAtBottom) {
                     leftClimberFlex.set(0);
                 } else {
-                    leftClimberFlex.set(-speed);
+                    leftClimberFlex.set(ClimberConstants.ClimberDownSpeed);
                 }
                 if (rightAtBottom) {
                     rightClimberFlex.set(0);
                 } else {
-                    rightClimberFlex.set(-speed);
+                    rightClimberFlex.set(ClimberConstants.ClimberDownSpeed);
                 }
                 break;
 
@@ -117,12 +117,12 @@ public class Climber extends SubsystemBase {
         // SmartDashboard.putNumber("Left Climber Current", leftClimberFlex.getOutputCurrent());
         // SmartDashboard.putNumber("Right Climber Current", rightClimberFlex.getOutputCurrent());
 
-        // SmartDashboard.putBoolean("left at Bottom", leftAtBottom);
-        // SmartDashboard.putBoolean("right at Bottom", rightAtBottom);
+        SmartDashboard.putBoolean("left at Bottom", leftAtBottom);
+        SmartDashboard.putBoolean("right at Bottom", rightAtBottom);
         // SmartDashboard.putNumber("Left Climber Ticks", getLeftPosition());
         // SmartDashboard.putNumber("Right Climber Ticks", getRightPosition());
-        // SmartDashboard.putBoolean("Left at Top", leftAtTop);
-        // SmartDashboard.putBoolean("Right at Top", rightAtTop);
+        SmartDashboard.putBoolean("Left at Top", leftAtTop);
+        SmartDashboard.putBoolean("Right at Top", rightAtTop);
         // SmartDashboard.putNumber("Left Voltage", leftClimberFlex.getBusVoltage());
         // SmartDashboard.putNumber("Right Voltage", rightClimberFlex.getBusVoltage());
 

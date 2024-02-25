@@ -24,7 +24,7 @@ public class RunClimber extends Command{
       // Called every time the scheduler runs while the command is scheduled.
       @Override
       public void execute() {
-        m_Climber.runMotors(ClimberConstants.climberSpeed, m_Direction);
+        m_Climber.runMotors(m_Direction);
       }
 
       @Override

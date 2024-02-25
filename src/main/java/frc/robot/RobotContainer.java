@@ -125,36 +125,16 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    //new JoystickButton(m_driverController, Button.kR1.value)
-        //.whileTrue(new RunCommand(
-           // () -> m_robotDrive.setX(),
-           // m_robotDrive));
-    exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    //atShooterTarget.whileTrue(new Shoot(m_Intake));
-    // m_driverController.povUp()
-    //   .whileTrue(new ManualArm(m_Arm,-0.2));
-    // m_driverController.povDown()
-    //   .whileTrue
-    //     (new ManualArm(m_Arm,0.2));
-    /* 
-    m_driverController.leftBumper()
-    .onTrue(
-      new InstantCommand(
-        () -> m_robotDrive.setX(), m_robotDrive));*/
 
+    exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
+   
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
       new ParallelCommandGroup(
         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
 
-    /*m_driverController.leftTrigger(0.5)
-    .whileTrue(
-      new ParallelCommandGroup(
-        new RunArm(m_Arm, ArmStates.SPEAKER), //new RunArm(m_Arm, ArmStates.TEST) //may need to uncomment this code
-        new RevShooter(m_Shooter)));*/
-
-      
       //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
 
       m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
@@ -180,9 +160,6 @@ public class RobotContainer {
         m_Intake));
 
       m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
-    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.001)));
-    
-    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.001)));
     
 
     m_MechController.a()
@@ -197,11 +174,6 @@ public class RobotContainer {
     
     
     // PID testing
-    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.25)));
-    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.25)));
-    // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
-    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
-    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
     m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
     m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));

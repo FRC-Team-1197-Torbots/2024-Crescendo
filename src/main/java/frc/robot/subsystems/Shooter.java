@@ -41,6 +41,11 @@ public class Shooter extends SubsystemBase {
         BottomMotor.set(0);
     }
 
+    public void idleMotor() { 
+        TopMotor.set(ShooterConstants.IdleSpeed);
+        BottomMotor.set(ShooterConstants.IdleSpeed);
+    }
+
     public double getKp() {
         return shooterKp;
     }

@@ -186,7 +186,8 @@ public final class Constants {
     public static final double RightClimberTopPos = 177.5;
 
     //Constant Climber Speed
-    public static final double climberSpeed = 0.2;
+    public static final double ClimberUpSpeed = 1;
+    public static final double ClimberDownSpeed = -0.7;
 
     public static enum ClimberDirection {
       UP, DOWN
@@ -207,6 +208,7 @@ public final class Constants {
     public static final int TopMotor = 12;
     public static final int BottomMotor = 11;
 
+    public static final double IdleSpeed = -0.4;
     public static final double TargetRPM = -5200;
 
   }
