@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.utils.LimelightHelpers;
 
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -60,7 +61,12 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean onTarget(){
-        return Math.abs(ShooterConstants.TargetRPM - getShooterRPM()) < 50;
+        return getShooterRPM() < -4500;
+    }
+
+    public void setMotorMode(IdleMode mode){
+        TopMotor.setIdleMode(mode);
+        BottomMotor.setIdleMode(mode);
     }
 
 

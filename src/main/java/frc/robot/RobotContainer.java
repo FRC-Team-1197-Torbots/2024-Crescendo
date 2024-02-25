@@ -18,12 +18,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Commands.Arm.AimSpeaker;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
+import frc.robot.Commands.Arm.Store;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
+import frc.robot.Commands.Intake.TestShoot;
 import frc.robot.Commands.Limelight.ScanAprilTag;
 import frc.robot.Commands.Shooter.AutoShooter;
 import frc.robot.Commands.Shooter.RevShooter;
@@ -80,6 +83,8 @@ public class RobotContainer {
   private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
+  private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
+
   
   //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
@@ -125,15 +130,17 @@ public class RobotContainer {
            // () -> m_robotDrive.setX(),
            // m_robotDrive));
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    //atShooterTarget.whileTrue(new Shoot(m_Intake));
     // m_driverController.povUp()
     //   .whileTrue(new ManualArm(m_Arm,-0.2));
     // m_driverController.povDown()
     //   .whileTrue
     //     (new ManualArm(m_Arm,0.2));
+    /* 
     m_driverController.leftBumper()
     .onTrue(
       new InstantCommand(
-        () -> m_robotDrive.setX(), m_robotDrive));
+        () -> m_robotDrive.setX(), m_robotDrive));*/
 
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
@@ -147,16 +154,29 @@ public class RobotContainer {
         new RunArm(m_Arm, ArmStates.SPEAKER), //new RunArm(m_Arm, ArmStates.TEST) //may need to uncomment this code
         new RevShooter(m_Shooter)));*/
 
-      m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+      
+      //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+
+      m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
+      /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
+            new StartEndCommand(
+              () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
+              () -> m_Arm.setStates(ArmStates.STORE))),
+            // new AimSpeaker(m_Arm, m_robotDrive),
+            new RevShooter(m_Shooter)
+            // ,new Store(m_Arm)
+            );*/
 
       m_driverController.leftTrigger(0.5)
-      .whileTrue(
-          new ParallelCommandGroup(
-            new StartEndCommand(() -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), () -> m_Arm.setStates(ArmStates.STORE)),
-            new RevShooter(m_Shooter)));
+      .whileTrue(new ParallelCommandGroup(
+        new StartEndCommand(
+          () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
+          () -> m_Arm.setStates(ArmStates.STORE)), 
+          new RevShooter(m_Shooter)));
 
-      m_driverController.a().whileTrue(new StartEndCommand(() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-       () -> m_Intake.stopMotor(),
+      m_driverController.a().whileTrue(new StartEndCommand(
+        () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+        () -> m_Intake.stopMotor(),
         m_Intake));
 
       m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
@@ -283,10 +303,13 @@ public class RobotContainer {
   public void teleopInit(){
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
+    m_Intake.setMotorMode(IdleMode.kBrake);
+    m_Shooter.setMotorMode(IdleMode.kCoast);
   }
 
   public void disableInit(){
     m_Arm.setMotorMode(IdleMode.kCoast);
     m_robotDrive.setMotorMode(IdleMode.kCoast);
+    m_Intake.setMotorMode(IdleMode.kCoast);
   }
 }

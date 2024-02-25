@@ -44,4 +44,7 @@ public class Intake extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putBoolean("Break beam", gamePieceStored());
     }
+    public void setMotorMode(IdleMode mode){
+        MotorA.setIdleMode(mode);
+    }
 }

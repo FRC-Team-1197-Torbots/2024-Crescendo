@@ -157,7 +157,7 @@ public final class Constants {
     //Storing Position values
     // 66.2
     public static final double StorePos = 10; //Need to change these two values later
-    public static final double IntakePos = 143;
+    public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
     public static final double TestPos = 114;
 
@@ -207,7 +207,7 @@ public final class Constants {
     public static final int TopMotor = 12;
     public static final int BottomMotor = 11;
 
-    public static final double TargetRPM = -4000;
+    public static final double TargetRPM = -5200;
 
   }
 

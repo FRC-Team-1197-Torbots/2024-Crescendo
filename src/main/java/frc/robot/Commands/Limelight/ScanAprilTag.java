@@ -1,10 +1,16 @@
 package frc.robot.Commands.Limelight;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.Constants;
@@ -17,6 +23,11 @@ public class ScanAprilTag extends Command{
   private final DriveSubsystem m_robotDrive;
   private double[] botpose_intake;
   private double[] botpose_shooter;
+  private double coord_x;
+  private double coord_y;
+  private double xDistance;
+  private double yDistance;
+  Optional<Alliance> color = DriverStation.getAlliance();
 
   public ScanAprilTag(DriveSubsystem subsystem) {
       m_robotDrive = subsystem;
@@ -31,7 +42,16 @@ public class ScanAprilTag extends Command{
       botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
       botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
-      m_robotDrive.resetOdometry(new Pose2d(botpose_shooter[0], botpose_shooter[1], new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+      if(botpose_shooter[0] != 0){
+        coord_x = botpose_shooter[0];
+        coord_y = botpose_shooter[1];
+      }      
+      else if(botpose_intake[0] != 0){
+        coord_x = botpose_intake[0];
+        coord_y = botpose_intake[1];
+      }
+
+      m_robotDrive.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
       //seannys soodocode
       //if we see from limelight, check distance. if distance is too large, dont update. if its good, update
 
@@ -57,8 +77,18 @@ public class ScanAprilTag extends Command{
     }
 
     private double distanceFromSpeaker(double x, double y) {
-      double xDistance = x - Constants.TAG_4_X_POS;
-      double yDistance = y - Constants.TAG_4_Y_POS;
+      
+      if (color.isPresent()) {
+          if (color.get() == Alliance.Red) {
+            xDistance = x - Constants.AprilTag4PosX;
+            yDistance = y - Constants.AprilTag4PosY;        
+          }
+          if (color.get() == Alliance.Blue) {
+              xDistance = x - Constants.AprilTag7PosX;
+              yDistance = y - Constants.AprilTag7PosY;
+          }
+      }
+      
       return Math.hypot(xDistance, yDistance);
     }
 
