@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 //import com.ctre.phoenix
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,6 +24,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -95,6 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
   private Field2d m_field2d = new Field2d();
   private double odometry_x;
   private double odometry_y;
+  Optional<Alliance> color = DriverStation.getAlliance();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -383,8 +387,18 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double distanceFromSpeaker() {
-    double xDistance = odometry_x - Constants.TAG_4_X_POS;
-    double yDistance = odometry_y - Constants.TAG_4_Y_POS;
+    double xDistance = 0;
+    double yDistance = 0;
+    if (color.isPresent()) {
+          if (color.get() == Alliance.Red) {
+            xDistance = odometry_x - Constants.AprilTag4PosX;
+            yDistance = odometry_y - Constants.AprilTag4PosY;        
+          }
+          if (color.get() == Alliance.Blue) {
+              xDistance = odometry_x - Constants.AprilTag7PosX;
+              yDistance = odometry_y - Constants.AprilTag7PosY;
+          }
+      }
     return Math.hypot(xDistance, yDistance);
 
   }

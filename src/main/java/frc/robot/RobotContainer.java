@@ -201,8 +201,16 @@ public class RobotContainer {
     // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.25)));
     // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
     // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
-    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKd(0.00001)));
-    // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKd(-0.00001)));
+    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
+    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
+    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
+    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
+    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
+
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
+    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
+    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.01)));
+    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.01)));
     
   
   }

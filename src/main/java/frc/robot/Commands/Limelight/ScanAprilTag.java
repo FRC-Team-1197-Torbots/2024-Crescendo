@@ -87,6 +87,8 @@ public class ScanAprilTag extends Command{
               xDistance = x - Constants.AprilTag7PosX;
               yDistance = y - Constants.AprilTag7PosY;
           }
+      }else{
+        
       }
       
       return Math.hypot(xDistance, yDistance);

@@ -162,9 +162,9 @@ public final class Constants {
     public static final double TestPos = 114;
 
     //Arm PID Constants
-    public static final double Arm_kP = 0.015;//around 0.5 degrees of error
+    public static final double Arm_kP = 0.1;//around 0.5 degrees of error
     public static final double Arm_kI = 0; //0.00001;
-    public static final double Arm_kD = 0.0002;
+    public static final double Arm_kD = 0;
 
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;
@@ -211,6 +211,8 @@ public final class Constants {
 
   }
 
-  public static final double TAG_4_X_POS = 16.579;  
-  public static final double TAG_4_Y_POS = 5.548;  
+  public static final double AprilTag4PosX = 16.579;  
+  public static final double AprilTag4PosY = 5.548;
+  public static final double AprilTag7PosX = -0.0381;//-1.5in
+  public static final double AprilTag7PosY = 5.547868;//218.42in
 }
