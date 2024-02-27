@@ -234,4 +234,6 @@ public final class Constants {
   public static final double AprilTag4PosY = 5.548;
   public static final double AprilTag7PosX = -0.0381;//-1.5in
   public static final double AprilTag7PosY = 5.547868;//218.42in
+
+  public static final double maxSpeakerDistance = 3.3;
 }

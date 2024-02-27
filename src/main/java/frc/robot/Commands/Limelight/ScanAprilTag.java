@@ -36,36 +36,40 @@ public class ScanAprilTag extends Command{
       botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
       botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
-      if(botpose_shooter[0] != 0){
+      if(botpose_shooter[0] != 0){ //check if shooter limelight sees anything
         coord_x = botpose_shooter[0];
         coord_y = botpose_shooter[1];
-        m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
-      }      
-      else if(botpose_intake[0] != 0){
+        // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){
+          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+        // }
+        // else if(botpose_intake[0] != 0){
+        //   coord_x = botpose_intake[0];
+        //   coord_y = botpose_intake[1];
+        //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5]))));
+        // }
+      }
+      else if(botpose_intake[0] != 0){ //if shooter limelight sees nothing, check intake limelight
         coord_x = botpose_intake[0];
         coord_y = botpose_intake[1];
-        m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180+botpose_intake[5]))));
+        // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){ //if distance from speaker is <= max distance
+          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5]))));
+        // }
+        // else if(botpose_shooter[0] != 0){
+        //   coord_x = botpose_shooter[0];
+        //   coord_y = botpose_shooter[1];
+        //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+        // }
       }
 
       m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
       //seannys soodocode
       //if we see from limelight, check distance. if distance is too large, dont update. if its good, update
-
-      
-      //eventually, make this command triggered when picking up note AND when AprilTag(s) is visible 
     }
   
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-      // botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
-      // botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
-      // if(botpose_intake[0] != 0){
-      //   if(distanceFromSpeaker(botpose_intake[0],botpose_intake[1]) < 20){
-      //     m_robotDrive.resetOdometry(new Pose2d(botpose_shooter[0], botpose_shooter[1], new Rotation2d(Math.toRadians(botpose_shooter[5]))));
-      //   }
-      // }
     }
 
     @Override

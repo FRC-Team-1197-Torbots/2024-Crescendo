@@ -100,7 +100,6 @@ public class DriveSubsystem extends SubsystemBase {
   private Field2d m_field2d = new Field2d();
   private double odometry_x;
   private double odometry_y;
-  private double odometry_r;
   Optional<Alliance> color = DriverStation.getAlliance();
 
   /** Creates a new DriveSubsystem. */
@@ -326,6 +325,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
+
 
   public void changeLockState() {
     is_Locked = !is_Locked;
