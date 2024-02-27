@@ -138,7 +138,7 @@ public class RobotContainer {
 
     m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
 
-      m_driverController.leftTrigger(0.5)
+    m_driverController.leftTrigger(0.5)
       .whileTrue(new ParallelCommandGroup(new RunArm(m_Arm, ArmStates.SPEAKER),
           new RevShooter(m_Shooter)));
     m_driverController.leftTrigger(0.5)
@@ -159,85 +159,88 @@ public class RobotContainer {
     //     () -> m_Arm.setStates(ArmStates.STORE)), 
     //     new RevShooter(m_Shooter)));
 
-    m_driverController.a().whileTrue(new StartEndCommand(
-      () -> m_Intake.TestIntake(),
-      //() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+    m_driverController.a().whileTrue(new StartEndCommand( 
+      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(),
       m_Intake));
-
+      
       m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
-    
-
-    m_MechController.a()
-    .whileTrue(
-      new RunClimber(m_Climber, ClimberDirection.DOWN));
-
-    m_MechController.y()
+      
+      
+      m_MechController.a()
       .whileTrue(
-        new RunClimber(m_Climber, ClimberDirection.UP));
-
-    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
-    
-    
-    // PID testing
-    // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
-    // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
-    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
-    // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
-
-    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
-    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
-    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
-    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(0.05)));
-    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(-0.05)));
-    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(-0.2)));
-    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(0.2)));
-    
-  
-  }
-
-  private void registerAutoCommands(){
-    NamedCommands.registerCommand("IntakeDown",(
-        new AutoArm(m_Arm, ArmStates.INTAKE)));
-    NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+        new RunClimber(m_Climber, ClimberDirection.DOWN));
+        
+        m_MechController.y()
+        .whileTrue(
+          new RunClimber(m_Climber, ClimberDirection.UP));
+          
+          m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
+          
+          
+          // PID testing
+          // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
+          // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
+          // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
+          // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
+          
+          // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
+          // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
+          m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
+          m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
+          m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
+          m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
+          m_MechController.povUp().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(0.05)));
+          m_MechController.povDown().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(-0.05)));
+          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementtop(-0.05)));
+          m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementtop(0.05)));
+          m_MechController.a().whileTrue(new StartEndCommand( 
+            () -> m_Intake.TestIntake(),
+            () -> m_Intake.stopMotor(),
+            m_Intake));
+          m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
+          m_MechController.rightBumper().onTrue(new Shoot(m_Intake));
+         }
+        
+        private void registerAutoCommands(){
+          NamedCommands.registerCommand("IntakeDown",(
+            new AutoArm(m_Arm, ArmStates.INTAKE)));
+            NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
     NamedCommands.registerCommand("Rev Shooter", new AutoShooter(m_Shooter));
     NamedCommands.registerCommand("Shoot", new Shoot(m_Intake).onlyWhile(atShooterTarget));
     NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));
-
+    
     NamedCommands.registerCommand("Intake Sequence", new ParallelCommandGroup(
       new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
       new AutoArm(m_Arm, ArmStates.INTAKE)));
-    NamedCommands.registerCommand("Shoot Sequence", new ParallelCommandGroup(
-      new AutoArm(m_Arm, ArmStates.SPEAKER),
-      new AutoShooter(m_Shooter),
-      new Shoot(m_Intake).onlyWhile(atShooterTarget)));
-  }
-
-  private void addAutoPaths(){
-    positionChooser.addOption("Top (AMP)", "Top");
-    positionChooser.addOption("Middle (SPEAKER)", "Middle");
-    positionChooser.addOption("Bottom (STATION)", "Bottom");
-
-    autoNameChooser.addOption("4 Note", "4 Note");
-    autoNameChooser.addOption("2 Note", "2 Note");
-
-    SmartDashboard.putData("Positioning", positionChooser);
-    SmartDashboard.putData("Auto Choice", autoNameChooser);
-    //autoChooser.addOption("4 Note Auto", );
-  }
-
-  /**
-   * 
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    //PathPlannerAuto pathPlannerAuto;
-    try{
+      NamedCommands.registerCommand("Shoot Sequence", new ParallelCommandGroup(
+        new AutoArm(m_Arm, ArmStates.SPEAKER),
+        new AutoShooter(m_Shooter),
+        new Shoot(m_Intake).onlyWhile(atShooterTarget)));
+      }
+      
+      private void addAutoPaths(){
+        positionChooser.addOption("Top (AMP)", "Top");
+        positionChooser.addOption("Middle (SPEAKER)", "Middle");
+        positionChooser.addOption("Bottom (STATION)", "Bottom");
+        
+        autoNameChooser.addOption("4 Note", "4 Note");
+        autoNameChooser.addOption("2 Note", "2 Note");
+        
+        SmartDashboard.putData("Positioning", positionChooser);
+        SmartDashboard.putData("Auto Choice", autoNameChooser);
+        //autoChooser.addOption("4 Note Auto", );
+      }
+      
+      /**
+       * 
+       * Use this to pass the autonomous command to the main {@link Robot} class.
+       *
+       * @return the command to run in autonomous
+       */
+      public Command getAutonomousCommand() {
+        //PathPlannerAuto pathPlannerAuto;
+        try{
       return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
     }
     catch(Exception e){
