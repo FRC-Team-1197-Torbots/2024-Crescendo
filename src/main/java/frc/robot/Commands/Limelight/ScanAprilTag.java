@@ -2,19 +2,13 @@ package frc.robot.Commands.Limelight;
 
 import java.util.Optional;
 
-import com.ctre.phoenix6.hardware.Pigeon2;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.Constants;
-import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Limelight;
 
 
@@ -45,10 +39,12 @@ public class ScanAprilTag extends Command{
       if(botpose_shooter[0] != 0){
         coord_x = botpose_shooter[0];
         coord_y = botpose_shooter[1];
+        m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
       }      
       else if(botpose_intake[0] != 0){
         coord_x = botpose_intake[0];
         coord_y = botpose_intake[1];
+        m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180+botpose_intake[5]))));
       }
 
       m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
