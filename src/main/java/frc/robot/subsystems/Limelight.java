@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -9,15 +10,16 @@ public class Limelight extends SubsystemBase{
     double pose_x;
     double pose_y;
     private double[] botpose1;
+
+    private DriveSubsystem m_robotDrive;
     
-    public Limelight(){
+    public Limelight(DriveSubsystem drive){
+        m_robotDrive = drive;
     }
-
-
 
     @Override
     public void periodic(){
-        botpose1 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
+        // botpose1 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
         // double[] botpose2 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
         // if(botpose1[0] != 0){
@@ -32,6 +34,8 @@ public class Limelight extends SubsystemBase{
         
 
     }
+    public void resetOdometry(Pose2d pose){
+        m_robotDrive.resetOdometry(pose);
+    }
     
-
 }

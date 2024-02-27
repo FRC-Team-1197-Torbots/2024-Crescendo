@@ -52,15 +52,25 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI/2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 5;
-    public static final int kRearLeftDrivingCanId = 3;
-    public static final int kFrontRightDrivingCanId = 7;
-    public static final int kRearRightDrivingCanId = 9;
+    public static final int kFrontLeftDrivingCanId = 9; 
+    public static final int kRearLeftDrivingCanId = 7; 
+    public static final int kFrontRightDrivingCanId = 3; 
+    public static final int kRearRightDrivingCanId = 5;
 
-    public static final int kFrontLeftTurningCanId = 4;
-    public static final int kRearLeftTurningCanId = 2;
-    public static final int kFrontRightTurningCanId = 6;
-    public static final int kRearRightTurningCanId = 8;
+    public static final int kFrontLeftTurningCanId = 8;
+    public static final int kRearLeftTurningCanId = 6;
+    public static final int kFrontRightTurningCanId = 2;
+    public static final int kRearRightTurningCanId = 4;
+
+    // public static final int kFrontLeftDrivingCanId = 5;
+    // public static final int kRearLeftDrivingCanId = 3;
+    // public static final int kFrontRightDrivingCanId = 7;
+    // public static final int kRearRightDrivingCanId = 9;
+
+    // public static final int kFrontLeftTurningCanId = 4;
+    // public static final int kRearLeftTurningCanId = 2;
+    // public static final int kFrontRightTurningCanId = 6;
+    // public static final int kRearRightTurningCanId = 8;
 
 
 
@@ -79,7 +89,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.0762;
+    public static final double kWheelDiameterMeters = 0.07438; // 76.2 mm
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -156,7 +166,7 @@ public final class Constants {
 
     //Storing Position values
     // 66.2
-    public static final double StorePos = 10; //Need to change these two values later
+    public static final double StorePos = 46; //Need to change these two values later
     public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
     public static final double TestPos = 114;
@@ -171,9 +181,16 @@ public final class Constants {
     public static final double MaxAngularAccel = 120;
 
     // Arm aiming constants
-    public static final double A = 1.69;
-    public static final double B = -17.3;
-    public static final double C = 136;
+    // // polynomial
+    // public static final double A = 1.69;
+    // public static final double B = -17.3;
+    // public static final double C = 136;
+    // // linear
+    // public static final double M = -6.77;
+    // public static final double B = 121;
+    // logarithmic
+    public static final double A = -20.3;
+    public static final double B = 123;
   }
 
   public static final class ClimberConstants{
@@ -196,7 +213,7 @@ public final class Constants {
 
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
-    public static final double IntakeSpeed = 0.8;
+    public static final double IntakeSpeed = 0.6;
     public static final double OuttakeSpeed = -0.9;
 
     //Digital Input Constants

@@ -110,7 +110,7 @@ public class Arm extends SubsystemBase {
 
     public void setAngleFromDistance(double distance) {
         m_ArmStates = ArmStates.TEST;
-        testAngle = ArmConstants.A * Math.pow(distance, 2) + ArmConstants.B * distance + ArmConstants.C;
+        testAngle = ArmConstants.A *Math.log(distance) + ArmConstants.B;//ArmConstants.A * Math.pow(distance, 2) + ArmConstants.B * distance + ArmConstants.C;
         if (testAngle < ArmConstants.StorePos) {
             testAngle = ArmConstants.StorePos;
         }
@@ -141,7 +141,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        if (Math.abs(error) < 2) {
+        if (Math.abs(error) < 1.5) {//was 2
             return true;
         } else {
             return false;

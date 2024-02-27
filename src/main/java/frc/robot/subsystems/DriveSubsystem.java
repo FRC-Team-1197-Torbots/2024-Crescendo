@@ -55,20 +55,22 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightTurningCanId,
       DriveConstants.kBackRightChassisAngularOffset);
 
-  private MAXSwerveModule[] modules = new MAXSwerveModule[]{
-        m_frontLeft,
-        m_frontRight,
-        m_rearLeft,
-        m_rearRight
-      };
+  private MAXSwerveModule[] modules = new MAXSwerveModule[] {
+      m_frontLeft,
+      m_frontRight,
+      m_rearLeft,
+      m_rearRight
+  };
 
- /*  private enum isLocked {
-    LOCK, UNLOCK
-  }*/
+  /*
+   * private enum isLocked {
+   * LOCK, UNLOCK
+   * }
+   */
 
   // The gyro sensor
-  public final Pigeon2 m_gyro = new Pigeon2(15); //might have to change to pigeon
-  
+  public final Pigeon2 m_gyro = new Pigeon2(15); // might have to change to pigeon
+
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
   private double m_currentTranslationDir = 0.0;
@@ -77,7 +79,6 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
-
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -91,58 +92,62 @@ public class DriveSubsystem extends SubsystemBase {
       });
 
   private SwerveDriveKinematics kinematics;
-  //private isLocked m_isLocked = isLocked.UNLOCK;
+  // private isLocked m_isLocked = isLocked.UNLOCK;
   private boolean is_Locked = false;
 
-  /*Field 2D on Robot Sim */
+  /* Field 2D on Robot Sim */
   private Field2d m_field2d = new Field2d();
   private double odometry_x;
   private double odometry_y;
+  private double odometry_r;
   Optional<Alliance> color = DriverStation.getAlliance();
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     zeroHeading();
-            // All other subsystem initialization
-        // ...
+    resetEncoders();
+    // All other subsystem initialization
+    // ...
 
-        kinematics = DriveConstants.kDriveKinematics;
+    kinematics = DriveConstants.kDriveKinematics;
 
-        // Configure AutoBuilder last
-        AutoBuilder.configureHolonomic(
-                this::getPose, // Robot pose supplier
-                this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-                this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
-                        4.5, // Max module speed, in m/s
-                        0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                        new ReplanningConfig() // Default path replanning config. See the API for the options here
-                ),
-                () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    // Configure AutoBuilder last
+    AutoBuilder.configureHolonomic(
+        this::getPose, // Robot pose supplier
+        this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+        this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+            4.5, // Max module speed, in m/s
+            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+            new ReplanningConfig() // Default path replanning config. See the API for the options here
+        ),
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
-                    }
-                    return false;
-                },
-                this // Reference to this subsystem to set requirements
-        );
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        },
+        this // Reference to this subsystem to set requirements
+    );
   }
 
   @Override
   public void periodic() {
-    //System.out.println(m_gyro.getYaw());
-    //System.out.println(m_gyro.getAngle());
-  
-    //SmartDashboard.getNumber("Yaw", m_gyro.getAngle());
-    //SmartDashboard.putString("Robot Angle", Rotation2d.fromDegrees(m_gyro.getYaw()).toString());
+    // System.out.println(m_gyro.getYaw());
+    // System.out.println(m_gyro.getAngle());
+    SmartDashboard.putBoolean("Color present", color.isPresent());
+    // SmartDashboard.getNumber("Yaw", m_gyro.getAngle());
+    // SmartDashboard.putString("Robot Angle",
+    // Rotation2d.fromDegrees(m_gyro.getYaw()).toString());
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(-m_gyro.getAngle()),
@@ -152,26 +157,20 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-                
-        odometry_x = m_odometry.getPoseMeters().getX();
-        odometry_y = m_odometry.getPoseMeters().getY();
-        SmartDashboard.putNumber("Odometry X", odometry_x);
-        SmartDashboard.putNumber("Odometry Y", odometry_y);
-        
-        SmartDashboard.putData("Robot Field", m_field2d);
-        SmartDashboard.putNumber("Distance X", distanceFromSpeaker());
-        m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
-    /*
-    for(int i=0; i<modules.length; i++){
-      SmartDashboard.putNumber("Module " + (i+1) + " Velocity", modules[i].getEncodeVelo());
-    }
+    odometry_x = m_odometry.getPoseMeters().getX();
+    odometry_y = m_odometry.getPoseMeters().getY();
+    SmartDashboard.putNumber("Odometry X", odometry_x);
+    SmartDashboard.putNumber("Odometry Y", odometry_y);
 
-    SmartDashboard.putNumber("Gyro Angle", m_gyro.getAngle());
-    */
-    //System.out.println("Gyro Angle: " + -m_gyro.getAngle());
+    SmartDashboard.putData("Robot Field", m_field2d);
+    SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
+    m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
-
+    SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
+    SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);
+    SmartDashboard.putNumber("Back Left Pos", m_rearLeft.getPosition().distanceMeters);
+    SmartDashboard.putNumber("Back Right Pos", m_rearRight.getPosition().distanceMeters);
   }
 
   /**
@@ -227,7 +226,6 @@ public class DriveSubsystem extends SubsystemBase {
     return states;
   }
 
-
   /**
    * Method to drive the robot using joystick info.
    *
@@ -239,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
-    
+
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -248,42 +246,40 @@ public class DriveSubsystem extends SubsystemBase {
       double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
       double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
 
-      // Calculate the direction slew rate based on an estimate of the lateral acceleration
+      // Calculate the direction slew rate based on an estimate of the lateral
+      // acceleration
       double directionSlewRate;
       if (m_currentTranslationMag != 0.0) {
         directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
       } else {
-        directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
+        directionSlewRate = 500.0; // some high number that means the slew rate is effectively instantaneous
       }
-      
 
       double currentTime = WPIUtilJNI.now() * 1e-6;
       double elapsedTime = currentTime - m_prevTime;
       double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
-      if (angleDif < 0.45*Math.PI) {
-        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+      if (angleDif < 0.45 * Math.PI) {
+        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+            directionSlewRate * elapsedTime);
         m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
-      }
-      else if (angleDif > 0.85*Math.PI) {
-        if (m_currentTranslationMag > 1e-4) { //some small number to avoid floating-point errors with equality checking
+      } else if (angleDif > 0.85 * Math.PI) {
+        if (m_currentTranslationMag > 1e-4) { // some small number to avoid floating-point errors with equality checking
           // keep currentTranslationDir unchanged
           m_currentTranslationMag = m_magLimiter.calculate(0.0);
-        }
-        else {
+        } else {
           m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
           m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
         }
-      }
-      else {
-        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
+      } else {
+        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+            directionSlewRate * elapsedTime);
         m_currentTranslationMag = m_magLimiter.calculate(0.0);
       }
       m_prevTime = currentTime;
-      
+
       xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
       ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
       m_currentRotation = m_rotLimiter.calculate(rot);
-
 
     } else {
       xSpeedCommanded = xSpeed;
@@ -295,10 +291,11 @@ public class DriveSubsystem extends SubsystemBase {
     double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
-    
+
     SwerveModuleState[] swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-m_gyro.getAngle())) //angle flipped intentionally
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
+                Rotation2d.fromDegrees(-m_gyro.getAngle())) // angle flipped intentionally
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -312,25 +309,25 @@ public class DriveSubsystem extends SubsystemBase {
    * Sets the wheels into an X formation to prevent movement.
    */
   public void setX() {
-    //changeState();
+    // changeState();
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
   }
 
-  public void setZero(){
+  public void setZero() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
-  public void changeLockState(){
+  public void changeLockState() {
     is_Locked = !is_Locked;
   }
 
-  public boolean checkLocked(){
+  public boolean checkLocked() {
     return !is_Locked;
   }
 
@@ -379,26 +376,27 @@ public class DriveSubsystem extends SubsystemBase {
     return m_gyro.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
-  public void setMotorMode(IdleMode mode){
-    for(MAXSwerveModule module : modules){
+  public void setMotorMode(IdleMode mode) {
+    for (MAXSwerveModule module : modules) {
       module.setMotorMode(mode);
     }
-  
+
   }
 
   public double distanceFromSpeaker() {
     double xDistance = 0;
     double yDistance = 0;
     if (color.isPresent()) {
-          if (color.get() == Alliance.Red) {
-            xDistance = odometry_x - Constants.AprilTag4PosX;
-            yDistance = odometry_y - Constants.AprilTag4PosY;        
-          }
-          if (color.get() == Alliance.Blue) {
-              xDistance = odometry_x - Constants.AprilTag7PosX;
-              yDistance = odometry_y - Constants.AprilTag7PosY;
-          }
+      if (color.get() == Alliance.Red) {
+        xDistance = odometry_x - Constants.AprilTag4PosX;
+        yDistance = odometry_y - Constants.AprilTag4PosY;
       }
+      if (color.get() == Alliance.Blue) {
+        xDistance = odometry_x - Constants.AprilTag7PosX;
+        yDistance = odometry_y - Constants.AprilTag7PosY;
+      }
+    }
+    SmartDashboard.putNumber("X distance", xDistance);
     return Math.hypot(xDistance, yDistance);
 
   }

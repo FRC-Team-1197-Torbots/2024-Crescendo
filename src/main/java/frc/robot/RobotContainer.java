@@ -75,7 +75,7 @@ public class RobotContainer {
   private final Shooter m_Shooter = new Shooter();
   public final Arm m_Arm = new Arm();
   private final Climber m_Climber = new Climber();
-  public final Limelight m_Limelight = new Limelight();
+  public final Limelight m_Limelight = new Limelight(m_robotDrive);
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -128,7 +128,9 @@ public class RobotContainer {
 
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
-   
+    beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
+    
+    //m_driverController.x().onTrue(getAutonomousCommand());
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
       new ParallelCommandGroup(
@@ -150,6 +152,7 @@ public class RobotContainer {
       m_driverController.leftTrigger(0.5)
       .whileTrue(new ParallelCommandGroup(
         new StartEndCommand(
+          // () -> m_Arm.setStates(ArmStates.TEST),
           () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
           () -> m_Arm.setStates(ArmStates.STORE)), 
           new RevShooter(m_Shooter)));
@@ -159,7 +162,7 @@ public class RobotContainer {
         () -> m_Intake.stopMotor(),
         m_Intake));
 
-      m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
+      m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
     
 
     m_MechController.a()
@@ -179,10 +182,12 @@ public class RobotContainer {
     m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
     m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
 
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.01)));
-    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.01)));
+    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
+    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
+    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
+    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
+    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
     
   
   }
@@ -288,7 +293,7 @@ public class RobotContainer {
   }
 
   public void disableInit(){
-    m_Arm.setMotorMode(IdleMode.kCoast);
+    //m_Arm.setMotorMode(IdleMode.kCoast);
     m_robotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
   }
