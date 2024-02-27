@@ -18,7 +18,8 @@ public class Shooter extends SubsystemBase {
     private CANSparkFlex TopMotor;
     private CANSparkFlex BottomMotor;
     private double shooterKp = 0.001;
-
+    private double top = 0.5;
+    private double bot = 0.5;
     public Shooter() {
         TopMotor = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
         BottomMotor = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
@@ -35,12 +36,20 @@ public class Shooter extends SubsystemBase {
         TopMotor.set(-spd);
         BottomMotor.set(-spd); 
     }
-
+    public void runShooter (){
+        TopMotor.set(-top);
+        BottomMotor.set(-bot); 
+    }
     public void stopMotor() { 
         TopMotor.set(0);
         BottomMotor.set(0);
     }
-
+    public void incrementtop(double amount){
+        top += amount;
+    }
+    public void incrementbot(double amount){
+        bot += amount;
+    }
     public void idleMotor() { 
         TopMotor.set(ShooterConstants.IdleSpeed);
         BottomMotor.set(ShooterConstants.IdleSpeed);
