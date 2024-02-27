@@ -5,29 +5,16 @@
       "x": 1.3491521419562087,
       "y": 6.183321696172636
     },
-    "rotation": 52.814588782612915
+    "rotation": 30.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Aim at Speaker"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rev Up then shoot"
-                }
-              }
-            ]
+            "name": "Shoot Sequence"
           }
         },
         {
@@ -41,34 +28,15 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "IntakeDown"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "RunIntake"
-                      }
-                    }
-                  ]
+                  "name": "Intake Sequence"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Aim at Speaker"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rev Up then shoot"
+                  "name": "Shoot Sequence"
                 }
               }
             ]
@@ -85,34 +53,15 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "IntakeDown"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "RunIntake"
-                      }
-                    }
-                  ]
+                  "name": "Intake Sequence"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Aim at Speaker"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rev Up then shoot"
+                  "name": "Shoot Sequence"
                 }
               }
             ]
@@ -129,34 +78,15 @@
           "data": {
             "commands": [
               {
-                "type": "parallel",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "IntakeDown"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "RunIntake"
-                      }
-                    }
-                  ]
+                  "name": "Intake Sequence"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Aim at Speaker"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Rev Up then shoot"
+                  "name": "Shoot Sequence"
                 }
               }
             ]
@@ -165,6 +95,6 @@
       ]
     }
   },
-  "folder": null,
+  "folder": "4 Note",
   "choreoAuto": false
 }

@@ -73,9 +73,9 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter();
-  public final Arm m_Arm = new Arm();
+  public final Arm m_Arm = new Arm(m_robotDrive);
   private final Climber m_Climber = new Climber();
-  public final Limelight m_Limelight = new Limelight();
+  public final Limelight m_Limelight = new Limelight(m_robotDrive);
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -92,8 +92,6 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    // Add subsystems to different subsystems
-    m_Arm.getDriveSubsystem(m_robotDrive);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -148,10 +146,7 @@ public class RobotContainer {
             );*/
 
       m_driverController.leftTrigger(0.5)
-      .whileTrue(new ParallelCommandGroup(
-        new StartEndCommand(
-          () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
-          () -> m_Arm.setStates(ArmStates.STORE)), 
+      .whileTrue(new ParallelCommandGroup(new RunArm(m_Arm, ArmStates.SPEAKER),
           new RevShooter(m_Shooter)));
 
       m_driverController.a().whileTrue(new StartEndCommand(
@@ -159,7 +154,7 @@ public class RobotContainer {
         () -> m_Intake.stopMotor(),
         m_Intake));
 
-      m_driverController.y().onTrue(new ScanAprilTag(m_robotDrive));
+      m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
     
 
     m_MechController.a()
@@ -191,14 +186,23 @@ public class RobotContainer {
     NamedCommands.registerCommand("IntakeDown",(
         new AutoArm(m_Arm, ArmStates.INTAKE)));
     NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
-    NamedCommands.registerCommand("Rev Up then shoot", new ConditionalCommand(new Shoot(m_Intake), new AutoShooter(m_Shooter), m_Shooter::onTarget));
+    NamedCommands.registerCommand("Rev Shooter", new AutoShooter(m_Shooter));
+    NamedCommands.registerCommand("Shoot", new Shoot(m_Intake).onlyWhile(atShooterTarget));
     NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));
+
+    NamedCommands.registerCommand("Intake Sequence", new ParallelCommandGroup(
+      new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
+      new AutoArm(m_Arm, ArmStates.INTAKE)));
+    NamedCommands.registerCommand("Shoot Sequence", new ParallelCommandGroup(
+      new AutoArm(m_Arm, ArmStates.SPEAKER),
+      new AutoShooter(m_Shooter),
+      new Shoot(m_Intake).onlyWhile(atShooterTarget)));
   }
 
   private void addAutoPaths(){
     positionChooser.addOption("Top (AMP)", "Top");
-    positionChooser.addOption("Middle", "Middle");
-    positionChooser.addOption("Bottom", "Bottom");
+    positionChooser.addOption("Middle (SPEAKER)", "Middle");
+    positionChooser.addOption("Bottom (STATION)", "Bottom");
 
     autoNameChooser.addOption("4 Note", "4 Note");
     autoNameChooser.addOption("2 Note", "2 Note");

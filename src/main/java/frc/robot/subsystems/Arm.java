@@ -40,7 +40,7 @@ public class Arm extends SubsystemBase {
 
     private DriveSubsystem m_DriveSubsystem;
 
-    public Arm() {
+    public Arm(DriveSubsystem drive) {
         testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
@@ -68,6 +68,8 @@ public class Arm extends SubsystemBase {
          * 
          * 
          **************************/
+
+        m_DriveSubsystem = drive;
     }
 
     @Override
@@ -93,7 +95,7 @@ public class Arm extends SubsystemBase {
                 targetPos = ArmConstants.IntakePos;
                 break;
             case SPEAKER:
-                targetPos = testAngle;
+                targetPos = setAngleFromDistance(distanceFromSpeaker());
                 break;
             case AMP:
                 break;
@@ -108,15 +110,15 @@ public class Arm extends SubsystemBase {
 
     }
 
-    public void setAngleFromDistance(double distance) {
-        m_ArmStates = ArmStates.TEST;
-        testAngle = ArmConstants.A * Math.pow(distance, 2) + ArmConstants.B * distance + ArmConstants.C;
+    public double setAngleFromDistance(double distance) {
+        double testAngle = ArmConstants.A * Math.pow(distance, 2) + ArmConstants.B * distance + ArmConstants.C;
         if (testAngle < ArmConstants.StorePos) {
             testAngle = ArmConstants.StorePos;
         }
         if (testAngle > ArmConstants.IntakePos) {
             testAngle = ArmConstants.IntakePos;
         }
+        return testAngle;
     }
 
     public void runArm(double voltage) {
@@ -208,11 +210,7 @@ public class Arm extends SubsystemBase {
     }
 
     public double distanceFromSpeaker(){
-        return m_DriveSubsystem.getPose().getX();
-    }
-
-    public void getDriveSubsystem(DriveSubsystem drive){
-        m_DriveSubsystem = drive;
+        return m_DriveSubsystem.distanceFromSpeaker();
     }
 
     public void setMotorMode(IdleMode mode) {

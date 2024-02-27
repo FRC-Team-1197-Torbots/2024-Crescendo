@@ -25,7 +25,7 @@ public class AutoShooter extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        m_Shooter.runShooter(m_ShooterPID.calculate(targetRPM - m_Shooter.getShooterRPM()));
+        m_Shooter.runShooter(0.85);
         //m_Shooter.runShooter(0.85);
       }
 

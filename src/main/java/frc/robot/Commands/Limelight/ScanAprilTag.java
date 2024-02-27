@@ -20,7 +20,7 @@ import frc.robot.subsystems.Limelight;
 
 public class ScanAprilTag extends Command{
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final DriveSubsystem m_robotDrive;
+  private final Limelight m_Limelight;
   private double[] botpose_intake;
   private double[] botpose_shooter;
   private double coord_x;
@@ -29,8 +29,8 @@ public class ScanAprilTag extends Command{
   private double yDistance;
   Optional<Alliance> color = DriverStation.getAlliance();
 
-  public ScanAprilTag(DriveSubsystem subsystem) {
-      m_robotDrive = subsystem;
+  public ScanAprilTag(Limelight subsystem) {
+      m_Limelight = subsystem;
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(subsystem);
     }
@@ -51,7 +51,7 @@ public class ScanAprilTag extends Command{
         coord_y = botpose_intake[1];
       }
 
-      m_robotDrive.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+      m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
       //seannys soodocode
       //if we see from limelight, check distance. if distance is too large, dont update. if its good, update
 

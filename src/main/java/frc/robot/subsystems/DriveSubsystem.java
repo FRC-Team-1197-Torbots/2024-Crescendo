@@ -9,6 +9,7 @@ import java.util.Optional;
 //import com.ctre.phoenix
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -102,7 +103,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    zeroHeading();
+    setAngle(0);
             // All other subsystem initialization
         // ...
 
@@ -357,8 +358,8 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.setYaw(0);
+  public void setAngle(double angle) {
+    m_gyro.setYaw(angle);
   }
 
   /**
