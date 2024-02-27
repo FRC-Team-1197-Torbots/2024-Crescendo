@@ -160,7 +160,8 @@ public class RobotContainer {
     //     new RevShooter(m_Shooter)));
 
     m_driverController.a().whileTrue(new StartEndCommand(
-      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+      () -> m_Intake.TestIntake(),
+      //() -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(),
       m_Intake));
 
@@ -190,6 +191,10 @@ public class RobotContainer {
     m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
     m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
     m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
+    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(0.05)));
+    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(-0.05)));
+    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(-0.2)));
+    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(0.2)));
     
   
   }

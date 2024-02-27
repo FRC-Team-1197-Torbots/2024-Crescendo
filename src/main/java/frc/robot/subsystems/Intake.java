@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
 
+    private double testspeed = 0;
     private CANSparkMax MotorA;
     private DigitalInput m_BreakBeam;
     private boolean isOuttaking;
@@ -31,7 +32,12 @@ public class Intake extends SubsystemBase {
     public void runIntake(double spd) {
         MotorA.set(-spd);
     }
-
+    public void TestIntake(){
+        MotorA.set(testspeed);
+    }
+    public void incrementIntake(double amount){
+        testspeed += amount;
+    }
     public void stopMotor() { 
         MotorA.set(0);
     }
@@ -43,6 +49,7 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Break beam", gamePieceStored());
+        SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
     }
     public void setMotorMode(IdleMode mode){
         MotorA.setIdleMode(mode);
