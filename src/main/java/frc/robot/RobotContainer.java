@@ -130,57 +130,58 @@ public class RobotContainer {
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     
-    //m_driverController.x().onTrue(getAutonomousCommand());
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
       new ParallelCommandGroup(
         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
 
-      //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+    //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
 
-      m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
-      /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
-            new StartEndCommand(
-              () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
-              () -> m_Arm.setStates(ArmStates.STORE))),
-            // new AimSpeaker(m_Arm, m_robotDrive),
-            new RevShooter(m_Shooter)
-            // ,new Store(m_Arm)
-            );*/
+    m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
 
-      m_driverController.leftTrigger(0.5)
-      .whileTrue(new ParallelCommandGroup(
+    m_driverController.leftTrigger(0.5)
+    .whileTrue(new SequentialCommandGroup(
+      new ScanAprilTag(m_Limelight), // test this
+      new ParallelCommandGroup(
+        new InstantCommand(() -> m_robotDrive.aimRobot(), m_robotDrive), // does nothing
         new StartEndCommand(
-          // () -> m_Arm.setStates(ArmStates.TEST),
           () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
           () -> m_Arm.setStates(ArmStates.STORE)), 
-          new RevShooter(m_Shooter)));
+        new RevShooter(m_Shooter))));
 
-      m_driverController.a().whileTrue(new StartEndCommand(
-        () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-        () -> m_Intake.stopMotor(),
-        m_Intake));
+    // m_driverController.leftTrigger(0.5)
+    // .whileTrue(new ParallelCommandGroup(
+    //   new StartEndCommand(
+    //     // () -> m_Arm.setStates(ArmStates.TEST),
+    //     () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
+    //     () -> m_Arm.setStates(ArmStates.STORE)), 
+    //     new RevShooter(m_Shooter)));
 
-      m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
+    m_driverController.a().whileTrue(new StartEndCommand(
+      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+      () -> m_Intake.stopMotor(),
+      m_Intake));
+
+    m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
     
 
     m_MechController.a()
     .whileTrue(
-      new RunClimber(m_Climber, ClimberDirection.DOWN));// We should test this code first
+      new RunClimber(m_Climber, ClimberDirection.DOWN));
 
     m_MechController.y()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.UP));
 
-    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); // Probably Test this later, might need to add a new command class for this
+    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
     
     
     // PID testing
-    m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
-    m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
-    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
-    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
+    // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
+    // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
+    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
+    // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
 
     // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
     // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));

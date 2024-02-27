@@ -383,22 +383,37 @@ public class DriveSubsystem extends SubsystemBase {
 
   }
 
-  public double distanceFromSpeaker() {
-    double xDistance = 0;
-    double yDistance = 0;
-    if (color.isPresent()) {
+  private double xDistanceFromSpeaker() {
+    if (color.isPresent())
       if (color.get() == Alliance.Red) {
-        xDistance = odometry_x - Constants.AprilTag4PosX;
-        yDistance = odometry_y - Constants.AprilTag4PosY;
+        return odometry_x - Constants.AprilTag4PosX;
       }
       if (color.get() == Alliance.Blue) {
-        xDistance = odometry_x - Constants.AprilTag7PosX;
-        yDistance = odometry_y - Constants.AprilTag7PosY;
+        return odometry_x - Constants.AprilTag7PosX;
       }
-    }
-    SmartDashboard.putNumber("X distance", xDistance);
-    return Math.hypot(xDistance, yDistance);
+    else
+      return 0;
+  }
 
+  private double yDistanceFromSpeaker() {
+    if (color.isPresent())
+      if (color.get() == Alliance.Red) {
+        return odometry_y - Constants.AprilTag4PosY;
+      }
+      if (color.get() == Alliance.Blue) {
+        return odometry_y - Constants.AprilTag7PosY;
+      }
+    else
+      return 0;
+  }
+
+  public double distanceFromSpeaker() {
+    return Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
+  }
+
+  public void aimRobot() {
+    double targetAngle = Math.atan(xDistanceFromSpeaker() / yDistanceFromSpeaker());
+    // go to target angle
   }
 
 }
