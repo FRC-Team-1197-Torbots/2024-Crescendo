@@ -417,7 +417,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void aimRobot() {
     double targetAngle = Math.toDegrees(Math.atan(xDistanceFromSpeaker() / yDistanceFromSpeaker())); // not sure if it's degrees
-    // go to target angle
+
+    //goal is to go to target angle:
+    //probably use drive(), set rotation to targetAngle?
+
+    //drive(0, 0, targetAngle, true, true);
+    
   }
 
 }
