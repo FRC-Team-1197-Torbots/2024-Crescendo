@@ -21,12 +21,12 @@ public class Shoot extends Command{
       // Called every time the scheduler runs while the command is scheduled.
       @Override
       public void execute() {
-        //System.out.println("Going up");
         m_intake.runIntake(0.5);
       }
 
       @Override
         public void end(boolean interrupted) {
+            System.out.println("The program finished shoot command");
             m_intake.stopMotor();
         }
 

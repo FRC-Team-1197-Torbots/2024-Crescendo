@@ -1,26 +1,27 @@
 package frc.robot.Commands.Shooter;
 
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Shooter;
 
-public class RevShooter extends Command{
+public class AmpShooter extends Command{
 
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Shooter m_Shooter;
-    private PIDController m_ShooterPID;
-    private double targetRPM = -4000;
-    public RevShooter(Shooter subsystem) {
+
+    public AmpShooter(Shooter subsystem) {
         m_Shooter = subsystem;
-        m_ShooterPID = new PIDController(m_Shooter.getKp(), 0.000001, 0);
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
 
       @Override
       public void initialize() {
-        
+        m_Shooter.runShooter(0, 3.8);
+        m_Shooter.setMotorMode(IdleMode.kBrake);
       }
     
       // Called every time the scheduler runs while the command is scheduled.
@@ -28,21 +29,18 @@ public class RevShooter extends Command{
       public void execute() {
         //System.out.println("Going up");
         // m_Shooter.runShooter(m_ShooterPID.calculate(targetRPM - m_Shooter.getShooterRPM()));
-        m_Shooter.runShooter(0.85);
         
       }
 
       @Override
         public void end(boolean interrupted) {
-          m_Shooter.stopMotor();
-          
-            //m_Climber.stopMotors();
+          m_Shooter.setMotorMode(IdleMode.kCoast);  //m_Climber.stopMotors();
         }
 
         // Returns true when the command should end.
         @Override
         public boolean isFinished() {
-            return false;
+            return m_Shooter.ampOnTarget();
         }
 
     

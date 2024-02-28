@@ -83,6 +83,10 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
   private PIDController m_PidController;
+  private double error;
+  private double turningKp = 0.025;
+  private double turningKd = 0.000;
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -106,6 +110,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    m_PidController = new PIDController(turningKp, 0, turningKd);
     setAngle(0);
     resetEncoders();
     // All other subsystem initialization
@@ -147,6 +152,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("error", error);
     // System.out.println(m_gyro.getYaw());
     // System.out.println(m_gyro.getAngle());
     SmartDashboard.putBoolean("Color present", color.isPresent());
@@ -172,10 +178,11 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
-    SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
-    SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);
-    SmartDashboard.putNumber("Back Left Pos", m_rearLeft.getPosition().distanceMeters);
-    SmartDashboard.putNumber("Back Right Pos", m_rearRight.getPosition().distanceMeters);
+    // SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
+    // SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);
+    // SmartDashboard.putNumber("Back Left Pos", m_rearLeft.getPosition().distanceMeters);
+    // SmartDashboard.putNumber("Back Right Pos", m_rearRight.getPosition().distanceMeters);
+    SmartDashboard.putNumber("Robot Angle", getHeading() % 360);
   }
 
   /**
@@ -418,16 +425,41 @@ public class DriveSubsystem extends SubsystemBase {
     return Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
   }
 
-  public void aimRobot() {
-    double targetAngle = Math.toDegrees(Math.atan(xDistanceFromSpeaker() / yDistanceFromSpeaker())); // not sure if it's degrees
-    double error = targetAngle - getHeading();
-     drive(0,0,setTurnRate(error),false,false);
-    
+  public double calcAngle() {
+    return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker()));
+  }
+
+  public void aimRobot(double targetAngle) {
+    SmartDashboard.putNumber("Target Robot Angle", targetAngle);
+    double robotAngle = getHeading() % 360;
+    if (robotAngle > 180) {
+      robotAngle -= 360;
+    } else if (robotAngle < -180) {
+      robotAngle += 360;
+    }
+
+    error = targetAngle - robotAngle;
+    drive(0,0,setTurnRate(error),false,false);
+  }
+  
+  public boolean onTarget() {
+    return Math.abs(error) < 1;
   }
 
   private double setTurnRate(double error) {
     return  m_PidController.calculate(error);
+  }
 
+  public void incrementKp(double amount) {
+    turningKp += amount;
+    m_PidController.setP(turningKp);
+    SmartDashboard.putNumber("Turning Kp", turningKp);
+  }
+
+  public void incrementKd(double amount) {
+    turningKd += amount;
+    m_PidController.setD(turningKp);
+    SmartDashboard.putNumber("Turning Kd", turningKd);
   }
 
 }

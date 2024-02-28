@@ -78,7 +78,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
         SmartDashboard.putNumber("Test Angle", testAngle);
-        // SmartDashboard.putString("Arm state", m_ArmStates.toString());
+        SmartDashboard.putString("Arm state", m_ArmStates.toString());
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         SmartDashboard.putNumber("Arm Kp", armKp);
         SmartDashboard.putNumber("Arm Feed Forward", feedForward);
@@ -98,6 +98,7 @@ public class Arm extends SubsystemBase {
                 targetPos = setAngleFromDistance(distanceFromSpeaker());
                 break;
             case AMP:
+                targetPos = ArmConstants.AmpPos;
                 break;
             case TEST:
                 targetPos = testAngle;
@@ -118,6 +119,7 @@ public class Arm extends SubsystemBase {
         if (testAngle > ArmConstants.IntakePos) {
             testAngle = ArmConstants.IntakePos;
         }
+        setStates(ArmStates.SPEAKER);
         return testAngle;
     }
 

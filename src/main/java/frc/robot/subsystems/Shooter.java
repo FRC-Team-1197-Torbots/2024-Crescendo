@@ -18,23 +18,34 @@ public class Shooter extends SubsystemBase {
     private CANSparkFlex TopMotor;
     private CANSparkFlex BottomMotor;
     private double shooterKp = 0.001;
-    private double top = 0.5;
-    private double bot = 0.5;
-    public Shooter() {
+    private double top = 0;
+    private double bot = 4;
+    private double low = 2100;
+    private double high = 2150;
+    public Shooter(Intake intake) {
         TopMotor = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
         BottomMotor = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
+        m_Intake = intake;
     }
 
     @Override
     public void periodic(){
         SmartDashboard.putNumber("Top Flywheel Velocity", TopMotor.getEncoder().getVelocity());
         SmartDashboard.putNumber("Bottom Flywheel Velocity", BottomMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Shooter Kp", shooterKp);
+        SmartDashboard.putNumber("low", low);
+        SmartDashboard.putNumber("high", high);
+        SmartDashboard.putNumber("bot", bot);
+        SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
+        // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
     } 
 
     public void runShooter(double spd){
         TopMotor.set(-spd);
         BottomMotor.set(-spd); 
+    }
+    public void runShooter(double top, double bottom){
+        TopMotor.setVoltage(-top);
+        BottomMotor.setVoltage(-bottom); 
     }
     public void runShooter (){
         TopMotor.set(-top);
@@ -44,11 +55,12 @@ public class Shooter extends SubsystemBase {
         TopMotor.set(0);
         BottomMotor.set(0);
     }
-    public void incrementtop(double amount){
-        top += amount;
-    }
     public void incrementbot(double amount){
         bot += amount;
+    }
+    public void incrementrpm(double amount){
+        low += amount;
+        high += amount;
     }
     public void idleMotor() { 
         TopMotor.set(ShooterConstants.IdleSpeed);
@@ -63,19 +75,27 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getShooterRPM(){
-        return TopMotor.getEncoder().getVelocity();
-    }
-
-    public void getIntakeSubsystem(Intake intake){
-        m_Intake = intake;
+        return BottomMotor.getEncoder().getVelocity();
     }
 
     public boolean getBreakBeamState(){
         return m_Intake.gamePieceStored();
     }
 
+    public void runIntakeShooter(){
+        m_Intake.runIntake(0.5);
+    }
+
+    public void stopIntakeShooter(){
+        m_Intake.stopMotor();
+    }
+    
+
     public boolean onTarget(){
-        return getShooterRPM() < -4500;
+        return Math.abs(getShooterRPM()) > 4500f;
+    }
+    public boolean ampOnTarget(){
+        return Math.abs(getShooterRPM()) > low && Math.abs(getShooterRPM()) < high && Math.abs(TopMotor.getEncoder().getVelocity())< 50;
     }
 
     public void setMotorMode(IdleMode mode){

@@ -24,10 +24,12 @@ import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.Store;
 import frc.robot.Commands.Climber.RunClimber;
+import frc.robot.Commands.Drive.AimRobot;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Intake.TestShoot;
 import frc.robot.Commands.Limelight.ScanAprilTag;
+import frc.robot.Commands.Shooter.AmpShooter;
 import frc.robot.Commands.Shooter.AutoShooter;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Constants.OIConstants;
@@ -47,6 +49,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -72,7 +75,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
-  private final Shooter m_Shooter = new Shooter();
+  private final Shooter m_Shooter = new Shooter(m_Intake);
   public final Arm m_Arm = new Arm(m_robotDrive);
   private final Climber m_Climber = new Climber();
   public final Limelight m_Limelight = new Limelight(m_robotDrive);
@@ -84,7 +87,8 @@ public class RobotContainer {
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
-
+  private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
+  private double speed = 0.7;
   
   //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
@@ -92,6 +96,8 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Add subsystems to different subsystems
+    // m_Arm.getDriveSubsystem(m_robotDrive);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -128,28 +134,60 @@ public class RobotContainer {
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     
+    // m_driverController.x().onTrue(getAutonomousCommand());
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
     .whileTrue(
       new ParallelCommandGroup(
         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
 
-    //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+    //   //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+    // m_driverController.rightBumper().and(atAmpTarget).whileTrue(new SequentialCommandGroup(
+    //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kCoast)),
+    //   new Shoot(m_Intake)));
+    // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
+    //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kBrake)),
+    //   new ParallelCommandGroup(
+    //     new StartEndCommand(
+    //       () -> m_Arm.setStates(ArmStates.AMP),
+    //       () -> m_Arm.setStates(ArmStates.STORE)),
+    //     new RunCommand(() -> m_Shooter.runShooter( 0, 0.35)))));
+
+
+    m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new InstantCommand(() -> m_Arm.setStates(ArmStates.AMP)),
+        new AmpShooter(m_Shooter)),
+      new Shoot(m_Intake),
+      new InstantCommand(() -> System.out.println("The code got here!")),
+      new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
 
     m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
+    /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
+            new StartEndCommand(
+              () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
+              () -> m_Arm.setStates(ArmStates.STORE))),
+            // new AimSpeaker(m_Arm, m_robotDrive),
+            new RevShooter(m_Shooter)
+            // ,new Store(m_Arm)
+            );*/
+    m_driverController.leftTrigger(0.5)
+      .whileTrue(new SequentialCommandGroup(
+        new ScanAprilTag(m_Limelight), // test this
+        new AimRobot(m_robotDrive),
+        new ParallelCommandGroup(
+          new StartEndCommand(
+            () -> m_Arm.setStates(ArmStates.SPEAKER), 
+            () -> m_Arm.setStates(ArmStates.STORE)), 
+          new RevShooter(m_Shooter))));
 
-    m_driverController.leftTrigger(0.5)
-      .whileTrue(new ParallelCommandGroup(new RunArm(m_Arm, ArmStates.SPEAKER),
-          new RevShooter(m_Shooter)));
-    m_driverController.leftTrigger(0.5)
-    .whileTrue(new SequentialCommandGroup(
-      new ScanAprilTag(m_Limelight), // test this
-      new ParallelCommandGroup(
-        new InstantCommand(() -> m_robotDrive.aimRobot(), m_robotDrive), // does nothing
-        new StartEndCommand(
-          () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
-          () -> m_Arm.setStates(ArmStates.STORE)), 
-        new RevShooter(m_Shooter))));
+      // m_driverController.rightBumper().onTrue(
+      //   new SequentialCommandGroup(
+      //     new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)),
+      //     new 
+
+
+      // ))
 
     // m_driverController.leftTrigger(0.5)
     // .whileTrue(new ParallelCommandGroup(
@@ -179,27 +217,32 @@ public class RobotContainer {
           
           
           // PID testing
-          m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.0001)));
-          m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.0001)));
-          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.001)));
-          m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.001)));
+          m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
+          m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.01)));
+          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
+          m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
           
+          // m_driverController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(0.0001)));
+          // m_driverController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(-0.0001)));
+          // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(-0.001)));
+          // m_driverController.povRight().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(0.001)));
           // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
           // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
           m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
           m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
           m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
           m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
-          m_MechController.povUp().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(0.05)));
-          m_MechController.povDown().onTrue(new InstantCommand(() -> m_Intake.incrementIntake(-0.05)));
-          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementtop(-0.05)));
-          m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementtop(0.05)));
-          m_MechController.a().whileTrue(new StartEndCommand( 
-            () -> m_Intake.TestIntake(),
-            () -> m_Intake.stopMotor(),
-            m_Intake));
-          m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
-          m_MechController.rightBumper().onTrue(new Shoot(m_Intake));
+          m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
+          m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
+          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.025)));
+          m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(0.025)));
+          // m_MechController.a().whileTrue(new StartEndCommand( 
+          //   () -> m_Intake.TestIntake(),
+          //   () -> m_Intake.stopMotor(),
+          //   m_Intake));
+          // m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
+          // m_MechController.rightBumper().and(atAmpTarget).onTrue(new Shoot(m_Intake));
+          // m_MechController.rightTrigger(0.5).whileTrue(new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)));
          }
         
         private void registerAutoCommands(){
@@ -215,8 +258,8 @@ public class RobotContainer {
       new AutoArm(m_Arm, ArmStates.INTAKE)));
       NamedCommands.registerCommand("Shoot Sequence", new ParallelCommandGroup(
         new AutoArm(m_Arm, ArmStates.SPEAKER),
-        new AutoShooter(m_Shooter),
-        new Shoot(m_Intake).onlyWhile(atShooterTarget)));
+        new AutoShooter(m_Shooter)
+        ));
       }
       
       private void addAutoPaths(){
@@ -246,7 +289,7 @@ public class RobotContainer {
     catch(Exception e){
       //System.out.println("Error occurs");
       DriverStation.reportWarning("Auto is not selected or invalid", false);
-      return new PathPlannerAuto("2 Note Middle");
+      return new PathPlannerAuto("Test Auto");
     }
     // return new PathPlannerAuto("New Auto");
 
@@ -286,6 +329,7 @@ public class RobotContainer {
         DriveConstants.kDriveKinematics,
 
         // Position controllers
+
         new PIDController(AutoConstants.kPXController, 0, 0),
         new PIDController(AutoConstants.kPYController, 0, 0),
         thetaController,
@@ -310,10 +354,11 @@ public class RobotContainer {
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kCoast);
   }
-
+  
   public void disableInit(){
-    //m_Arm.setMotorMode(IdleMode.kCoast);
+    m_Arm.setMotorMode(IdleMode.kCoast);
     m_robotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
+
   }
 }

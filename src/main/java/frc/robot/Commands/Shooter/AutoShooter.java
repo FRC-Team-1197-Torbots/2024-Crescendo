@@ -25,18 +25,24 @@ public class AutoShooter extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
+        //System.out.println("revving");
         m_Shooter.runShooter(0.85);
+        if(m_Shooter.onTarget()){
+          m_Shooter.runIntakeShooter();
+        }
         //m_Shooter.runShooter(0.85);
       }
 
       @Override
         public void end(boolean interrupted) {
           m_Shooter.stopMotor();
+          m_Shooter.stopIntakeShooter();
         }
 
         // Returns true when the command should end.
         @Override
         public boolean isFinished() {
+            //System.out.println(!m_Shooter.getBreakBeamState());
             return !m_Shooter.getBreakBeamState();
         }
     

@@ -169,7 +169,8 @@ public final class Constants {
     public static final double StorePos = 46; //Need to change these two values later
     public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
-    public static final double TestPos = 114;
+    public static final double TestPos = 106;
+    public static final double AmpPos = 106.05;//106
 
     //Arm PID Constants
     public static final double Arm_kP = 0.1;//around 0.5 degrees of error
