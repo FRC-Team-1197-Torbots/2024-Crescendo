@@ -15,6 +15,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -81,6 +82,7 @@ public class DriveSubsystem extends SubsystemBase {
   private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
+  private PIDController m_PidController;
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -233,6 +235,7 @@ public class DriveSubsystem extends SubsystemBase {
    * Method to drive the robot using joystick info.
    *
    * @param xSpeed        Speed of the robot in the x direction (forward).
+   * 
    * @param ySpeed        Speed of the robot in the y direction (sideways).
    * @param rot           Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the
@@ -417,12 +420,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void aimRobot() {
     double targetAngle = Math.toDegrees(Math.atan(xDistanceFromSpeaker() / yDistanceFromSpeaker())); // not sure if it's degrees
-
-    //goal is to go to target angle:
-    //probably use drive(), set rotation to targetAngle?
-
-    //drive(0, 0, targetAngle, true, true);
+    double error = targetAngle - getHeading();
+     drive(0,0,setTurnRate(error),false,false);
     
+  }
+
+  private double setTurnRate(double error) {
+    return  m_PidController.calculate(error);
+
   }
 
 }

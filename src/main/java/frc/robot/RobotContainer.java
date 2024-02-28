@@ -179,10 +179,10 @@ public class RobotContainer {
           
           
           // PID testing
-          // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.01)));
-          // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.01)));
-          // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementKp(-0.1)));
-          // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementKp(0.1)));
+          m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.0001)));
+          m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.0001)));
+          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.001)));
+          m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.001)));
           
           // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
           // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
