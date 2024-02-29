@@ -52,25 +52,25 @@ public final class Constants {
     public static final double kBackRightChassisAngularOffset = Math.PI/2;
 
     // SPARK MAX CAN IDs
-    public static final int kFrontLeftDrivingCanId = 9; 
-    public static final int kRearLeftDrivingCanId = 7; 
-    public static final int kFrontRightDrivingCanId = 3; 
-    public static final int kRearRightDrivingCanId = 5;
+    // public static final int kFrontLeftDrivingCanId = 9; 
+    // public static final int kRearLeftDrivingCanId = 7; 
+    // public static final int kFrontRightDrivingCanId = 3; 
+    // public static final int kRearRightDrivingCanId = 5;
 
-    public static final int kFrontLeftTurningCanId = 8;
-    public static final int kRearLeftTurningCanId = 6;
-    public static final int kFrontRightTurningCanId = 2;
-    public static final int kRearRightTurningCanId = 4;
+    // public static final int kFrontLeftTurningCanId = 8;
+    // public static final int kRearLeftTurningCanId = 6;
+    // public static final int kFrontRightTurningCanId = 2;
+    // public static final int kRearRightTurningCanId = 4;
 
-    // public static final int kFrontLeftDrivingCanId = 5;
-    // public static final int kRearLeftDrivingCanId = 3;
-    // public static final int kFrontRightDrivingCanId = 7;
-    // public static final int kRearRightDrivingCanId = 9;
+    public static final int kFrontLeftDrivingCanId = 5;
+    public static final int kRearLeftDrivingCanId = 3;
+    public static final int kFrontRightDrivingCanId = 7;
+    public static final int kRearRightDrivingCanId = 9;
 
-    // public static final int kFrontLeftTurningCanId = 4;
-    // public static final int kRearLeftTurningCanId = 2;
-    // public static final int kFrontRightTurningCanId = 6;
-    // public static final int kRearRightTurningCanId = 8;
+    public static final int kFrontLeftTurningCanId = 4;
+    public static final int kRearLeftTurningCanId = 2;
+    public static final int kFrontRightTurningCanId = 6;
+    public static final int kRearRightTurningCanId = 8;
 
 
 
@@ -161,7 +161,7 @@ public final class Constants {
     public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
 
     public static enum ArmStates {
-      STORE, INTAKE, SPEAKER, AMP, TEST
+      STORE, INTAKE, SPEAKER, AMP, TEST, SECONDSPEAKERSHOT, AUTOSPEAKER
     }
 
     //Storing Position values
@@ -169,6 +169,7 @@ public final class Constants {
     public static final double StorePos = 46; //Need to change these two values later
     public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
+    public static final double SecondShotSpeaker = 105;
     public static final double TestPos = 106;
     public static final double AmpPos = 106.05;//106
 

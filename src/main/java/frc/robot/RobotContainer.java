@@ -5,57 +5,38 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Commands.Arm.AimSpeaker;
 import frc.robot.Commands.Arm.AutoArm;
-import frc.robot.Commands.Arm.ManualArm;
 import frc.robot.Commands.Arm.RunArm;
-import frc.robot.Commands.Arm.Store;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Drive.AimRobot;
+import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
-import frc.robot.Commands.Intake.TestShoot;
 import frc.robot.Commands.Limelight.ScanAprilTag;
+import frc.robot.Commands.Limelight.ScanAprilTagAuto;
 import frc.robot.Commands.Shooter.AmpShooter;
-import frc.robot.Commands.Shooter.AutoShooter;
 import frc.robot.Commands.Shooter.RevShooter;
+import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
-import frc.robot.utils.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.time.Instant;
-import java.util.List;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -76,9 +57,9 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
-  public final Arm m_Arm = new Arm(m_robotDrive);
   private final Climber m_Climber = new Climber();
   public final Limelight m_Limelight = new Limelight(m_robotDrive);
+  public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -88,6 +69,7 @@ public class RobotContainer {
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
+  private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
   private double speed = 0.7;
   
   //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
@@ -110,13 +92,13 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true, true),
-            m_robotDrive));
+    new RunCommand(
+      () -> m_robotDrive.drive(
+      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+      true, true),
+      m_robotDrive));
   }
 
   /**
@@ -162,7 +144,7 @@ public class RobotContainer {
       new InstantCommand(() -> System.out.println("The code got here!")),
       new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
 
-    m_driverController.leftTrigger(0.5).and(atShooterTarget).whileTrue(new Shoot(m_Intake));
+    m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
     /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
             new StartEndCommand(
               () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
@@ -222,12 +204,6 @@ public class RobotContainer {
           m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
           m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
           
-          // m_driverController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(0.0001)));
-          // m_driverController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(-0.0001)));
-          // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(-0.001)));
-          // m_driverController.povRight().onTrue(new InstantCommand(() -> m_robotDrive.incrementKd(0.001)));
-          // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.001)));
-          // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.001)));
           m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
           m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
           m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
@@ -246,20 +222,16 @@ public class RobotContainer {
          }
         
         private void registerAutoCommands(){
-          NamedCommands.registerCommand("IntakeDown",(
-            new AutoArm(m_Arm, ArmStates.INTAKE)));
-            NamedCommands.registerCommand("RunIntake", new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
-    NamedCommands.registerCommand("Rev Shooter", new AutoShooter(m_Shooter));
-    NamedCommands.registerCommand("Shoot", new Shoot(m_Intake).onlyWhile(atShooterTarget));
-    NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));
-    
-    NamedCommands.registerCommand("Intake Sequence", new ParallelCommandGroup(
-      new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-      new AutoArm(m_Arm, ArmStates.INTAKE)));
-      NamedCommands.registerCommand("Shoot Sequence", new ParallelCommandGroup(
-        new AutoArm(m_Arm, ArmStates.SPEAKER),
-        new AutoShooter(m_Shooter)
-        ));
+          NamedCommands.registerCommand("Shooter Auto Sequence", new SequentialCommandGroup(new ScanAprilTagAuto(m_Limelight), new ShootAuto(m_Arm, m_Shooter)));
+          NamedCommands.registerCommand("IntakeDown",(new AutoArm(m_Arm, ArmStates.INTAKE)));
+          NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));    
+          NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
+
+          //NamedCommands.registerCommand("Shoot Sequence", new AutoShooter(m_Shooter, m_Arm, ArmStates.SPEAKER));//new ParallelDeadlineGroup(new WaitCommand(2),
+            //new AutoArm(m_Arm, ArmStates.SPEAKER)
+            //new AutoShooter(m_Shooter, m_Arm, ArmStates.SPEAKER)));
+
+          NamedCommands.registerCommand("Test Print Command", new PrintCommand("Moved to next command"));
       }
       
       private void addAutoPaths(){
@@ -281,16 +253,18 @@ public class RobotContainer {
        *
        * @return the command to run in autonomous
        */
-      public Command getAutonomousCommand() {
-        //PathPlannerAuto pathPlannerAuto;
-        try{
+  public Command getAutonomousCommand() {
+
+    return new PathPlannerAuto("4 Note Top");
+        
+    /*try{
       return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
     }
     catch(Exception e){
       //System.out.println("Error occurs");
       DriverStation.reportWarning("Auto is not selected or invalid", false);
-      return new PathPlannerAuto("Test Auto");
-    }
+      
+    }*/
     // return new PathPlannerAuto("New Auto");
 
     /*TrajectoryConfig config = new TrajectoryConfig(
@@ -360,5 +334,13 @@ public class RobotContainer {
     m_robotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
 
+  }
+  public void autoInit(){
+    m_Shooter.setMotorMode(IdleMode.kBrake);
+  }
+
+
+  public ScanAprilTag getScanAprilTag(){
+    return new ScanAprilTag(m_Limelight);
   }
 }

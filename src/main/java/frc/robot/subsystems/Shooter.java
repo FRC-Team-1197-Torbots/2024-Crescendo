@@ -47,10 +47,7 @@ public class Shooter extends SubsystemBase {
         TopMotor.setVoltage(-top);
         BottomMotor.setVoltage(-bottom); 
     }
-    public void runShooter (){
-        TopMotor.set(-top);
-        BottomMotor.set(-bot); 
-    }
+
     public void stopMotor() { 
         TopMotor.set(0);
         BottomMotor.set(0);

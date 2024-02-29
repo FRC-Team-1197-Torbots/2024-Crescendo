@@ -3,16 +3,12 @@ package frc.robot.subsystems;
 import frc.robot.utils.LimelightHelpers;
 
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmConstants.ArmStates;
-import frc.robot.Constants.IntakeConstants;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
@@ -39,8 +35,9 @@ public class Arm extends SubsystemBase {
     private double feedForward;
 
     private DriveSubsystem m_DriveSubsystem;
+    private Limelight m_Limelight;
 
-    public Arm(DriveSubsystem drive) {
+    public Arm(DriveSubsystem drive, Limelight limelight) {
         testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
@@ -70,6 +67,7 @@ public class Arm extends SubsystemBase {
          **************************/
 
         m_DriveSubsystem = drive;
+        m_Limelight = limelight;
     }
 
     @Override
@@ -82,12 +80,16 @@ public class Arm extends SubsystemBase {
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         SmartDashboard.putNumber("Arm Kp", armKp);
         SmartDashboard.putNumber("Arm Feed Forward", feedForward);
+        //SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
         // SmartDashboard.putNumber("Error", error);
 
         switch (m_ArmStates) {
+            case SECONDSPEAKERSHOT:
+                targetPos = ArmConstants.SecondShotSpeaker;
+                break;
             case STORE:
                 targetPos = ArmConstants.StorePos;
                 break;
@@ -97,6 +99,8 @@ public class Arm extends SubsystemBase {
             case SPEAKER:
                 targetPos = setAngleFromDistance(distanceFromSpeaker());
                 break;
+            case AUTOSPEAKER:
+                targetPos = setAngleFromDistance(autoDistanceFromSpeaker());
             case AMP:
                 targetPos = ArmConstants.AmpPos;
                 break;
@@ -214,6 +218,10 @@ public class Arm extends SubsystemBase {
     public double distanceFromSpeaker(){
         return m_DriveSubsystem.distanceFromSpeaker();
     }
+    public double autoDistanceFromSpeaker(){
+        return m_Limelight.distanceFromSpeaker();
+    }
+    
 
     public void setMotorMode(IdleMode mode) {
         ArmMotor1.setIdleMode(mode);

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3491521419562087,
-      "y": 6.183321696172636
+      "x": 0.6825775190011933,
+      "y": 6.591117797620211
     },
-    "rotation": 30.0
+    "rotation": 58.348727113287346
   },
   "command": {
     "type": "sequential",
@@ -14,82 +14,100 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot Sequence"
+            "name": "Shooter Auto Sequence"
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "4NoteTop1"
-          }
-        },
-        {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Intake Sequence"
+                  "pathName": "4NoteTop_1"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "name": "Intake Sequence"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "4NoteTop2"
+            "waitTime": 0.5
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Intake Sequence"
+                  "pathName": "4NoteTop_2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "name": "Intake Sequence"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "4NoteTop3"
+            "waitTime": 0.5
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Intake Sequence"
+                  "pathName": "4NoteTop_3"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot Sequence"
+                  "name": "Intake Sequence"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
           }
         }
       ]

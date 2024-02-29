@@ -12,7 +12,7 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Limelight;
 
 
-public class ScanAprilTag extends Command{
+public class ScanAprilTagAuto extends Command{
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Limelight m_Limelight;
   private double[] botpose_intake;
@@ -23,7 +23,7 @@ public class ScanAprilTag extends Command{
   private double yDistance;
   Optional<Alliance> color = DriverStation.getAlliance();
 
-  public ScanAprilTag(Limelight subsystem) {
+  public ScanAprilTagAuto(Limelight subsystem) {
       m_Limelight = subsystem;
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(subsystem);
@@ -36,31 +36,34 @@ public class ScanAprilTag extends Command{
       botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
       botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
-      if(botpose_shooter[0] != 0){ //check if shooter limelight sees anything
-        coord_x = botpose_shooter[0];
-        coord_y = botpose_shooter[1];
+      if(botpose_intake.length > 0 && botpose_shooter.length > 0) {
+        if(botpose_shooter[0] != 0){ //check if shooter limelight sees anything
+          m_Limelight.setX(botpose_shooter[0]);
+          m_Limelight.setY(botpose_shooter[1]);
         // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){
-          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_shooter[5]))));
-        System.out.println("odometry reset");
-          // }
+        //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+        //   // }
         // else if(botpose_intake[0] != 0){
         //   coord_x = botpose_intake[0];
         //   coord_y = botpose_intake[1];
         //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5]))));
         // }
+        }
+        else if(botpose_intake[0] != 0){ //if shooter limelight sees nothing, check intake limelight
+          m_Limelight.setX(botpose_shooter[0]);
+          m_Limelight.setY(botpose_shooter[1]);
+          // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){ //if distance from speaker is <= max distance
+            // m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5])))); //180 + botpose_intake[5]
+          // }
+          // else if(botpose_shooter[0] != 0){
+          //   coord_x = botpose_shooter[0];
+          //   coord_y = botpose_shooter[1];
+          //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+          // }
+        }
       }
-      else if(botpose_intake[0] != 0){ //if shooter limelight sees nothing, check intake limelight
-        coord_x = botpose_intake[0];
-        coord_y = botpose_intake[1];
-        // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){ //if distance from speaker is <= max distance
-          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_intake[5])))); //180 + botpose_intake[5]
-        // }
-        // else if(botpose_shooter[0] != 0){
-        //   coord_x = botpose_shooter[0];
-        //   coord_y = botpose_shooter[1];
-        //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
-        // }
-      }
+
+      
 
       // m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));//botpose_shooter[5]
       //seannys soodocode
@@ -76,25 +79,6 @@ public class ScanAprilTag extends Command{
     @Override
       public void end(boolean interrupted) {
     }
-
-    private double distanceFromSpeaker(double x, double y) {
-      
-      if (color.isPresent()) {
-          if (color.get() == Alliance.Red) {
-            xDistance = x - Constants.AprilTag4PosX;
-            yDistance = y - Constants.AprilTag4PosY;        
-          }
-          if (color.get() == Alliance.Blue) {
-              xDistance = x - Constants.AprilTag7PosX;
-              yDistance = y - Constants.AprilTag7PosY;
-          }
-      }else{
-        
-      }
-      
-      return Math.hypot(xDistance, yDistance);
-    }
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

@@ -1,6 +1,7 @@
 package frc.robot.Commands.Arm;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants.ArmStates;
 import frc.robot.Constants.IntakeConstants;
@@ -10,6 +11,7 @@ public class AutoArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Arm m_Arm;
     private ArmStates m_ArmStates;
+    
     public AutoArm(Arm subsystem, ArmStates armStates) {
         m_Arm = subsystem;
         m_ArmStates = armStates;
@@ -33,7 +35,9 @@ public class AutoArm extends Command{
 
       @Override
         public void end(boolean interrupted) {
+            //System.out.println("Finished moving arm");
             //m_Arm.setStates(ArmStates.STORE);
+            SmartDashboard.putBoolean("Arm on Target", m_Arm.onTarget());
         
         }
 
