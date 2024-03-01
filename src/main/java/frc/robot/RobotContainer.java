@@ -111,7 +111,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-
+    
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
@@ -122,20 +122,20 @@ public class RobotContainer {
       new ParallelCommandGroup(
         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmStates.INTAKE)));
-
-    //   //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
-    // m_driverController.rightBumper().and(atAmpTarget).whileTrue(new SequentialCommandGroup(
-    //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kCoast)),
-    //   new Shoot(m_Intake)));
-    // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
-    //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kBrake)),
-    //   new ParallelCommandGroup(
+        
+        //   //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
+        // m_driverController.rightBumper().and(atAmpTarget).whileTrue(new SequentialCommandGroup(
+          //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kCoast)),
+          //   new Shoot(m_Intake)));
+          // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
+            //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kBrake)),
+            //   new ParallelCommandGroup(
     //     new StartEndCommand(
     //       () -> m_Arm.setStates(ArmStates.AMP),
     //       () -> m_Arm.setStates(ArmStates.STORE)),
     //     new RunCommand(() -> m_Shooter.runShooter( 0, 0.35)))));
 
-
+    
     m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
       new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setStates(ArmStates.AMP)),
@@ -144,9 +144,10 @@ public class RobotContainer {
       new InstantCommand(() -> System.out.println("The code got here!")),
       new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
 
-    m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
+      m_MechController.rightBumper().onTrue(new Shoot(m_Intake));
+      //m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
     /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
-            new StartEndCommand(
+      new StartEndCommand(
               () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
               () -> m_Arm.setStates(ArmStates.STORE))),
             // new AimSpeaker(m_Arm, m_robotDrive),
@@ -156,7 +157,7 @@ public class RobotContainer {
     m_driverController.leftTrigger(0.5)
       .whileTrue(new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight), // test this
-        new AimRobot(m_robotDrive),
+        // new AimRobot(m_robotDrive),
         new ParallelCommandGroup(
           new StartEndCommand(
             () -> m_Arm.setStates(ArmStates.SPEAKER), 
@@ -217,7 +218,6 @@ public class RobotContainer {
           //   () -> m_Intake.stopMotor(),
           //   m_Intake));
           // m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
-          // m_MechController.rightBumper().and(atAmpTarget).onTrue(new Shoot(m_Intake));
           // m_MechController.rightTrigger(0.5).whileTrue(new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)));
          }
         

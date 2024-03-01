@@ -36,6 +36,8 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("high", high);
         SmartDashboard.putNumber("bot", bot);
         SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
+        SmartDashboard.putBoolean("Shooter RPM on Target", onTarget());
+        
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
     } 
 
@@ -71,10 +73,12 @@ public class Shooter extends SubsystemBase {
         shooterKp += amount;
     }
 
-    public double getShooterRPM(){
+    public double getBottomShooterRPM(){
         return BottomMotor.getEncoder().getVelocity();
     }
-
+    public double getTopShooterRPM(){
+        return TopMotor.getEncoder().getVelocity();
+    }
     public boolean getBreakBeamState(){
         return m_Intake.gamePieceStored();
     }
@@ -88,11 +92,12 @@ public class Shooter extends SubsystemBase {
     }
     
 
+
     public boolean onTarget(){
-        return Math.abs(getShooterRPM()) > 4500f;
+        return Math.abs(getBottomShooterRPM()) > 4750f && Math.abs(getTopShooterRPM()) > 4750;//4500
     }
     public boolean ampOnTarget(){
-        return Math.abs(getShooterRPM()) > low && Math.abs(getShooterRPM()) < high && Math.abs(TopMotor.getEncoder().getVelocity())< 50;
+        return Math.abs(getBottomShooterRPM()) > low && Math.abs(getBottomShooterRPM()) < high && Math.abs(TopMotor.getEncoder().getVelocity())< 50;
     }
 
     public void setMotorMode(IdleMode mode){

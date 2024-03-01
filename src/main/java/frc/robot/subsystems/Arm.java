@@ -78,15 +78,25 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Test Angle", testAngle);
         SmartDashboard.putString("Arm state", m_ArmStates.toString());
         // SmartDashboard.putNumber("Arm speed", armSpeed);
-        SmartDashboard.putNumber("Arm Kp", armKp);
-        SmartDashboard.putNumber("Arm Feed Forward", feedForward);
-        //SmartDashboard.putBoolean("Arm On Target", onTarget());
+        // SmartDashboard.putNumber("Arm Kp", armKp);
+        // SmartDashboard.putNumber("Arm Feed Forward", feedForward);
+        SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
         // SmartDashboard.putNumber("Error", error);
 
         switch (m_ArmStates) {
+            case AUTOTARGET_1:
+                targetPos = 124.7;
+                break;
+            case AUTOTARGET_2:
+                targetPos = 105.2;
+                break;
+            case AUTOTARGET_3:
+                targetPos = 102.011;
+                break;
+            
             case SECONDSPEAKERSHOT:
                 targetPos = ArmConstants.SecondShotSpeaker;
                 break;
@@ -149,7 +159,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        if (Math.abs(error) < 1.5) {//was 2
+        if (error > -3 && error < 1.5) { // if error is between -3 and 1.5
             return true;
         } else {
             return false;

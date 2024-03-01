@@ -86,7 +86,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
   private PIDController m_PidController;
-  private double error;
+  private double angleDelta;
   private double turningKp = 0.025;
   private double turningKd = 0.000;
 
@@ -155,7 +155,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("error", error);
+    //SmartDashboard.putNumber("error", error);
     // System.out.println(m_gyro.getYaw());
     // System.out.println(m_gyro.getAngle());
     SmartDashboard.putBoolean("Color present", color.isPresent());
@@ -424,33 +424,43 @@ public class DriveSubsystem extends SubsystemBase {
       return 0;
   }
 
+  private Translation2d getAprilTagPos() {
+    if (color.isPresent())
+      if (color.get() == Alliance.Red) {
+        return new Translation2d(Constants.AprilTag4PosX,Constants.AprilTag4PosY);
+      }
+      if (color.get() == Alliance.Blue) {
+        return new Translation2d(Constants.AprilTag7PosX,Constants.AprilTag7PosY);
+      }
+    else
+      return null;
+  }
+
   public double distanceFromSpeaker() {
     return Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
   }
 
   public double calcAngle() {
-    return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker()));
+    Translation2d robotPos = getPose().getTranslation();
+    Translation2d aprilTagPos = getAprilTagPos();
+    Translation2d deltaPos = robotPos.minus(aprilTagPos);
+    return deltaPos.getAngle().getDegrees();
+    
+
+    // return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker()));
   }
 
-  public void aimRobot(double targetAngle) {
-    SmartDashboard.putNumber("Target Robot Angle", targetAngle);
-    double robotAngle = getHeading() % 360;
-    if (robotAngle > 180) {
-      robotAngle -= 360;
-    } else if (robotAngle < -180) {
-      robotAngle += 360;
-    }
-
-    error = targetAngle - robotAngle;
-    drive(0,0,setTurnRate(error),false,false);
+  public void aimRobot(double angleDelta) {
+    SmartDashboard.putNumber("angular rate", angleDelta);
+    drive(0,0,setTurnRate(angleDelta),false,false);
   }
   
   public boolean onTarget() {
-    return Math.abs(error) < 1;
+    return Math.abs(angleDelta) < 1;
   }
 
   private double setTurnRate(double error) {
-    return  m_PidController.calculate(error);
+    return m_PidController.calculate(error);
   }
 
   public void incrementKp(double amount) {

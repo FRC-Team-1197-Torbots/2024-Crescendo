@@ -36,7 +36,7 @@ public class AutoIntake extends Command {
         super.initialize();
 
         m_arm.setStates(ArmStates.INTAKE);
-        m_intake.runIntake(IntakeConstants.IntakeSpeed);
+        m_intake.runIntake(0.4);
     }
 
     @Override

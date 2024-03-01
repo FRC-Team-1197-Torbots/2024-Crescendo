@@ -161,7 +161,7 @@ public final class Constants {
     public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
 
     public static enum ArmStates {
-      STORE, INTAKE, SPEAKER, AMP, TEST, SECONDSPEAKERSHOT, AUTOSPEAKER
+      STORE, INTAKE, SPEAKER, AMP, TEST, SECONDSPEAKERSHOT, AUTOSPEAKER, AUTOTARGET_1, AUTOTARGET_2, AUTOTARGET_3
     }
 
     //Storing Position values
@@ -174,7 +174,7 @@ public final class Constants {
     public static final double AmpPos = 106.05;//106
 
     //Arm PID Constants
-    public static final double Arm_kP = 0.1;//around 0.5 degrees of error
+    public static final double Arm_kP = 0.1;//0.1//around 0.5 degrees of error
     public static final double Arm_kI = 0; //0.00001;
     public static final double Arm_kD = 0;
 
