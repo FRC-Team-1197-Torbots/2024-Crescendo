@@ -11,12 +11,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
-import frc.robot.Commands.Drive.AimRobot;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Limelight.ScanAprilTag;
-import frc.robot.Commands.Limelight.ScanAprilTagAuto;
 import frc.robot.Commands.Shooter.AmpShooter;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Commands.Shooter.ShootAuto;
@@ -28,12 +26,10 @@ import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -92,13 +88,13 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
-    new RunCommand(
-      () -> m_robotDrive.drive(
-      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-      -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-      true, true),
-      m_robotDrive));
+      new RunCommand(
+        () -> m_robotDrive.drive(
+        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+        -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+        true, true),
+        m_robotDrive));
   }
 
   /**
@@ -118,23 +114,10 @@ public class RobotContainer {
     
     // m_driverController.x().onTrue(getAutonomousCommand());
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
-    .whileTrue(
-      new ParallelCommandGroup(
-        new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-        new RunArm(m_Arm, ArmStates.INTAKE)));
-        
-        //   //m_driverController.leftBumper().whileTrue(new Shoot(m_Intake));
-        // m_driverController.rightBumper().and(atAmpTarget).whileTrue(new SequentialCommandGroup(
-          //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kCoast)),
-          //   new Shoot(m_Intake)));
-          // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
-            //   new InstantCommand(() -> m_Arm.setMotorMode(IdleMode.kBrake)),
-            //   new ParallelCommandGroup(
-    //     new StartEndCommand(
-    //       () -> m_Arm.setStates(ArmStates.AMP),
-    //       () -> m_Arm.setStates(ArmStates.STORE)),
-    //     new RunCommand(() -> m_Shooter.runShooter( 0, 0.35)))));
-
+      .whileTrue(
+        new ParallelCommandGroup(
+          new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
+          new RunArm(m_Arm, ArmStates.INTAKE)));
     
     m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
       new ParallelCommandGroup(
@@ -144,7 +127,7 @@ public class RobotContainer {
       new InstantCommand(() -> System.out.println("The code got here!")),
       new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
 
-      m_MechController.rightBumper().onTrue(new Shoot(m_Intake));
+      m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
       //m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
     /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
       new StartEndCommand(
@@ -222,7 +205,7 @@ public class RobotContainer {
          }
         
         private void registerAutoCommands(){
-          NamedCommands.registerCommand("Shooter Auto Sequence", new SequentialCommandGroup(new ScanAprilTagAuto(m_Limelight), new ShootAuto(m_Arm, m_Shooter)));
+          NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
           NamedCommands.registerCommand("IntakeDown",(new AutoArm(m_Arm, ArmStates.INTAKE)));
           NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));    
           NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
@@ -255,16 +238,16 @@ public class RobotContainer {
        */
   public Command getAutonomousCommand() {
 
-    return new PathPlannerAuto("4 Note Top");
+     return new PathPlannerAuto("2 Note Mid");
         
-    /*try{
-      return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
-    }
-    catch(Exception e){
-      //System.out.println("Error occurs");
-      DriverStation.reportWarning("Auto is not selected or invalid", false);
+    // try{
+      //return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
+    // }
+    // catch(Exception e){
+    //   //System.out.println("Error occurs");
+    //   DriverStation.reportWarning("Auto is not selected or invalid", false);
       
-    }*/
+    // }
     // return new PathPlannerAuto("New Auto");
 
     /*TrajectoryConfig config = new TrajectoryConfig(
@@ -320,27 +303,28 @@ public class RobotContainer {
     
   }
 
-  
-
   public void teleopInit(){
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kCoast);
+    m_robotDrive.setAutoName(getAutonomousCommand().getName());
+    System.out.println(getAutonomousCommand().getName());
+    System.out.println("teleop init");
   }
-  
-  public void disableInit(){
+ 
+  public void disableInit() {
     m_Arm.setMotorMode(IdleMode.kCoast);
     m_robotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
-
   }
-  public void autoInit(){
+
+  public void autoInit() {
     m_Shooter.setMotorMode(IdleMode.kBrake);
   }
 
 
-  public ScanAprilTag getScanAprilTag(){
+  public ScanAprilTag getScanAprilTag() {
     return new ScanAprilTag(m_Limelight);
   }
 }

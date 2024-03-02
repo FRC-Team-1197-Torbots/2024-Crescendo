@@ -72,6 +72,9 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 6;
     public static final int kRearRightTurningCanId = 8;
 
+    public static final double gyroOffset4NoteBlue = -60.0;
+    public static final double gyroOffset4NoteRed = 60.0;
+
 
 
     public static final boolean kGyroReversed = false;

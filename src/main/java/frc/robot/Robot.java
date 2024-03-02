@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import com.revrobotics.CANSparkBase.IdleMode;
-
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Commands.Limelight.ScanAprilTag;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -20,7 +17,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    SmartDashboard.putData(CommandScheduler.getInstance());
+    //SmartDashboard.putData(CommandScheduler.getInstance());
     CameraServer.startAutomaticCapture();
     m_robotContainer = new RobotContainer();
 
@@ -45,12 +42,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_robotContainer.autoInit();
-    // ScanAprilTag tag = m_robotContainer.getScanAprilTag();
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
-      // tag.schedule();
       m_autonomousCommand.schedule();
     }
   }

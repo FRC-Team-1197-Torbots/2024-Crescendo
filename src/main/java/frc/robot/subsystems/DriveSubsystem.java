@@ -11,8 +11,11 @@ import java.util.Vector;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
@@ -91,15 +94,18 @@ public class DriveSubsystem extends SubsystemBase {
   private double turningKd = 0.000;
 
   // Odometry class for tracking robot pose
+  double[] botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(-m_gyro.getAngle()),
+      Rotation2d.fromDegrees(-m_gyro.getAngle()),//-m_gyro.getAngle()
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      });
+      }
+      // , new Pose2d(0,0,new Rotation2d(Math.toRadians(0)))
+      );
 
   private SwerveDriveKinematics kinematics;
   // private isLocked m_isLocked = isLocked.UNLOCK;
@@ -110,12 +116,13 @@ public class DriveSubsystem extends SubsystemBase {
   private double odometry_x;
   private double odometry_y;
   Optional<Alliance> color = DriverStation.getAlliance();
-
+  private String m_autoName = "2 Note Mid";
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     m_PidController = new PIDController(turningKp, 0, turningKd);
     setAngle(0);
     resetEncoders();
+   
     // All other subsystem initialization
     // ...
     
@@ -153,24 +160,53 @@ public class DriveSubsystem extends SubsystemBase {
     );
   }
 
+  public double gyroWithOffset() {
+    if(!DriverStation.getAlliance().isEmpty()) {
+      double offset;
+      if(DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        offset = GeometryUtil.flipFieldPose(PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName)).getRotation().getDegrees();
+      } else {
+        offset = PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees();
+      }
+      // System.out.println(offset);
+      return (-m_gyro.getAngle() + offset);
+    } else {
+      return 0;
+    }
+    
+    
+  }
+
   @Override
   public void periodic() {
     //SmartDashboard.putNumber("error", error);
     // System.out.println(m_gyro.getYaw());
     // System.out.println(m_gyro.getAngle());
-    SmartDashboard.putBoolean("Color present", color.isPresent());
+    //SmartDashboard.putBoolean("Color present", color.isPresent());
     // SmartDashboard.getNumber("Yaw", m_gyro.getAngle());
     // SmartDashboard.putString("Robot Angle",
     // Rotation2d.fromDegrees(m_gyro.getYaw()).toString());
     // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(-m_gyro.getAngle()),
+    /*if(color.get() == Alliance.Red){
+     m_odometry.update(
+        Rotation2d.fromDegrees(-m_gyro.getAngle()+Constants.DriveConstants.gyroOffset4NoteRed),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
+        }); 
+    }else
+    {
+      m_odometry.update(
+        Rotation2d.fromDegrees(-m_gyro.getAngle()+Constants.DriveConstants.gyroOffset4NoteBlue),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+    }*/
 
     odometry_x = m_odometry.getPoseMeters().getX();
     odometry_y = m_odometry.getPoseMeters().getY();
@@ -204,7 +240,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(-m_gyro.getAngle()),
+        Rotation2d.fromDegrees(gyroWithOffset()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -381,7 +417,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(gyroWithOffset()).getDegrees();
   }
 
   /**
@@ -396,46 +432,60 @@ public class DriveSubsystem extends SubsystemBase {
   public void setMotorMode(IdleMode mode) {
     for (MAXSwerveModule module : modules) {
       module.setMotorMode(mode);
-    }
+    } 
+  }
 
+  public void initializeOdometry(){
+    m_odometry.resetPosition(Rotation2d.fromDegrees(45),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
+        },
+        new Pose2d(botpose_shooter[0],
+        botpose_shooter[1],
+        new Rotation2d(Math.toRadians(90))));//180 + botpose_shooter[5]
   }
 
   private double xDistanceFromSpeaker() {
-    if (color.isPresent())
+    /*if (color.isPresent())
       if (color.get() == Alliance.Red) {
         return odometry_x - Constants.AprilTag4PosX;
       }
       if (color.get() == Alliance.Blue) {
         return odometry_x - Constants.AprilTag7PosX;
       }
-    else
+    else*/
       return 0;
   }
 
   private double yDistanceFromSpeaker() {
-    if (color.isPresent())
+    /*if (color.isPresent())
       if (color.get() == Alliance.Red) {
         return odometry_y - Constants.AprilTag4PosY;
       }
       if (color.get() == Alliance.Blue) {
         return odometry_y - Constants.AprilTag7PosY;
       }
-    else
+    else*/
       return 0;
   }
 
   private Translation2d getAprilTagPos() {
-    if (color.isPresent())
+    /*if (color.isPresent())
       if (color.get() == Alliance.Red) {
         return new Translation2d(Constants.AprilTag4PosX,Constants.AprilTag4PosY);
       }
       if (color.get() == Alliance.Blue) {
         return new Translation2d(Constants.AprilTag7PosX,Constants.AprilTag7PosY);
       }
-    else
+    else*/
       return null;
   }
-
+  public void setAutoName(String autoname){
+    m_autoName = autoname;
+  }
   public double distanceFromSpeaker() {
     return Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
   }

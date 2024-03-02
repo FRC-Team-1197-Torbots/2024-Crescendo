@@ -51,10 +51,10 @@ public class Climber extends SubsystemBase {
                 }
                 break;
             case DOWN:
-                if (leftClimberFlex.getOutputCurrent() > 80 && getRightPosition() < 20) { // Check if the Motor is getting stalled and if it's at a low position to stop the climber
+                if (leftClimberFlex.getOutputCurrent() > 60 && getRightPosition() < 20) { // Check if the Motor is getting stalled and if it's at a low position to stop the climber
                     leftAtBottom = true;
                 }
-                if (rightClimberFlex.getOutputCurrent() > 80 && getRightPosition() < 20) {
+                if (rightClimberFlex.getOutputCurrent() > 60 && getRightPosition() < 20) {
                     rightAtBottom = true;
                 }
                 if (leftAtBottom) {
@@ -120,6 +120,7 @@ public class Climber extends SubsystemBase {
         SmartDashboard.putBoolean("left at Bottom", leftAtBottom);
         SmartDashboard.putBoolean("right at Bottom", rightAtBottom);
         // SmartDashboard.putNumber("Left Climber Ticks", getLeftPosition());
+        
         // SmartDashboard.putNumber("Right Climber Ticks", getRightPosition());
         SmartDashboard.putBoolean("Left at Top", leftAtTop);
         SmartDashboard.putBoolean("Right at Top", rightAtTop);

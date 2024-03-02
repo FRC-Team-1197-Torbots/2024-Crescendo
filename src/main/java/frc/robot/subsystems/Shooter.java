@@ -22,10 +22,15 @@ public class Shooter extends SubsystemBase {
     private double bot = 4;
     private double low = 2100;
     private double high = 2150;
+
+    public int AutoShots;
+
     public Shooter(Intake intake) {
         TopMotor = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
         BottomMotor = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
         m_Intake = intake;
+
+        AutoShots = 0;
     }
 
     @Override
