@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -112,7 +111,6 @@ public class RobotContainer {
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     
-    // m_driverController.x().onTrue(getAutonomousCommand());
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
       .whileTrue(
         new ParallelCommandGroup(
@@ -127,8 +125,8 @@ public class RobotContainer {
       new InstantCommand(() -> System.out.println("The code got here!")),
       new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
 
-      m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
-      //m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
+    m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
+    //m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
     /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
       new StartEndCommand(
               () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
@@ -139,21 +137,13 @@ public class RobotContainer {
             );*/
     m_driverController.leftTrigger(0.5)
       .whileTrue(new SequentialCommandGroup(
-        new ScanAprilTag(m_Limelight), // test this
+        new ScanAprilTag(m_Limelight),
         // new AimRobot(m_robotDrive),
         new ParallelCommandGroup(
           new StartEndCommand(
             () -> m_Arm.setStates(ArmStates.SPEAKER), 
             () -> m_Arm.setStates(ArmStates.STORE)), 
           new RevShooter(m_Shooter))));
-
-      // m_driverController.rightBumper().onTrue(
-      //   new SequentialCommandGroup(
-      //     new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)),
-      //     new 
-
-
-      // ))
 
     // m_driverController.leftTrigger(0.5)
     // .whileTrue(new ParallelCommandGroup(
@@ -168,42 +158,41 @@ public class RobotContainer {
       () -> m_Intake.stopMotor(),
       m_Intake));
       
-      m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
+    m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
       
-      
-      m_MechController.a()
+    m_MechController.a()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.DOWN));
         
-        m_MechController.y()
-        .whileTrue(
-          new RunClimber(m_Climber, ClimberDirection.UP));
+    m_MechController.y()
+      .whileTrue(
+        new RunClimber(m_Climber, ClimberDirection.UP));
           
-          m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
-          
-          
-          // PID testing
-          m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
-          m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.01)));
-          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
-          m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
-          
-          m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
-          m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
-          m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
-          m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
-          m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
-          m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
-          m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.025)));
-          m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(0.025)));
-          // m_MechController.a().whileTrue(new StartEndCommand( 
-          //   () -> m_Intake.TestIntake(),
-          //   () -> m_Intake.stopMotor(),
-          //   m_Intake));
-          // m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
-          // m_MechController.rightTrigger(0.5).whileTrue(new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)));
-         }
-        
+    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
+      
+      
+    // PID testing
+    // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
+    // m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.01)));
+    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
+    // m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
+    
+    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
+    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
+    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
+    // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
+    // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
+    // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
+    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.025)));
+    // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(0.025)));
+    // m_MechController.a().whileTrue(new StartEndCommand( 
+    //   () -> m_Intake.TestIntake(),
+    //   () -> m_Intake.stopMotor(),
+    //   m_Intake));
+    // m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
+    // m_MechController.rightTrigger(0.5).whileTrue(new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)));
+    }
+    
         private void registerAutoCommands(){
           NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
           NamedCommands.registerCommand("IntakeDown",(new AutoArm(m_Arm, ArmStates.INTAKE)));
@@ -238,7 +227,7 @@ public class RobotContainer {
        */
   public Command getAutonomousCommand() {
 
-     return new PathPlannerAuto("2 Note Mid");
+    return new PathPlannerAuto("2 Note Mid");
         
     // try{
       //return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
@@ -249,58 +238,6 @@ public class RobotContainer {
       
     // }
     // return new PathPlannerAuto("New Auto");
-
-    /*TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.kDriveKinematics);
-
-    // An example trajectory to follow. All units in meters.
-    double[] botpose = LimelightHelpers.getBotPose_wpiBlue("limelight");
-
-    // System.out.println("TX: " + botpose[0] + " TY: " + botpose[1]);
-    double goalTX = 14.14; //4.65
-    double goalTY = 5.548; //1.78
-
-    double midTX = (goalTX + botpose[0])/2;
-    double midTY = (goalTY + botpose[1])/2;
-
-
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-
-        new Pose2d(botpose[0], botpose[1], new Rotation2d(0)), //prev 0,0
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(midTX,midTY)),//prev (1,1), (2,-1)
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(goalTX, goalTY, new Rotation2d(0)),//prev 3,0
-        config);
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_robotDrive::getPose, // Functional interface to feed supplier
-        DriveConstants.kDriveKinematics,
-
-        // Position controllers
-
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_robotDrive::setModuleStates,
-        m_robotDrive);
-
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
-    */
-  
-    
   }
 
   public void teleopInit(){
@@ -309,8 +246,6 @@ public class RobotContainer {
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kCoast);
     m_robotDrive.setAutoName(getAutonomousCommand().getName());
-    System.out.println(getAutonomousCommand().getName());
-    System.out.println("teleop init");
   }
  
   public void disableInit() {
@@ -322,7 +257,6 @@ public class RobotContainer {
   public void autoInit() {
     m_Shooter.setMotorMode(IdleMode.kBrake);
   }
-
 
   public ScanAprilTag getScanAprilTag() {
     return new ScanAprilTag(m_Limelight);
