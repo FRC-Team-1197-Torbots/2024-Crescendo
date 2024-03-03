@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
         BottomMotor = new CANSparkFlex(ShooterConstants.BottomMotor, MotorType.kBrushless);
         m_Intake = intake;
 
-        AutoShots = 0;
+        AutoShots = 1;
     }
 
     @Override
@@ -54,7 +54,10 @@ public class Shooter extends SubsystemBase {
         TopMotor.setVoltage(-top);
         BottomMotor.setVoltage(-bottom);
     }
-
+    public void incrementShotCount(){
+        AutoShots++;
+    }
+    
     public void stopMotor() {
         TopMotor.set(0);
         BottomMotor.set(0);

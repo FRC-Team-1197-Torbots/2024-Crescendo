@@ -2,24 +2,55 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.0,
-      "y": 7.0
+      "x": 1.27,
+      "y": 5.54
     },
-    "rotation": 0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "1-inch Test Path"
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "New New Path"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Sequence"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
           }
         }
       ]
     }
   },
-  "folder": "2 Note",
+  "folder": "4 Note",
   "choreoAuto": false
 }

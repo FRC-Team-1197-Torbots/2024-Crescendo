@@ -1,6 +1,7 @@
 package frc.robot.Commands.Intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Intake;
 
 public class RunIntake extends Command{
@@ -31,7 +32,9 @@ public class RunIntake extends Command{
 
       @Override
         public void end(boolean interrupted) {
-            m_Intake.stopMotor();
+          m_Intake.runIntake(-0.1);
+          new WaitCommand(0.1);
+          m_Intake.stopMotor();
         }
 
   // Returns true when the command should end.

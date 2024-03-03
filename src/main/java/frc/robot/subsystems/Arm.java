@@ -90,7 +90,7 @@ public class Arm extends SubsystemBase {
                 targetPos = 124.7;
                 break;
             case AUTOTARGET_2:
-                targetPos = 105.2;
+                targetPos = 101.5;
                 break;
             case AUTOTARGET_3:
                 targetPos = 102.011;
@@ -167,7 +167,7 @@ public class Arm extends SubsystemBase {
     public void resetArm(){
         ArmEncoder.reset();
     }
-    
+
     public void toggleIntake() {
         if (m_ArmStates == ArmStates.INTAKE)
         m_ArmStates = ArmStates.STORE;

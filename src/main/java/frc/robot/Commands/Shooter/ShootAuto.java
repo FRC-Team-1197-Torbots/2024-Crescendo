@@ -32,10 +32,12 @@ public class ShootAuto extends Command {
         switch(m_shooter.AutoShots){
             case 1:
                 m_arm.setStates(ArmStates.AUTOTARGET_1);
+                
                 //ShootCount++;
                 break;
             case 2:
-                m_arm.setStates(ArmStates.AUTOTARGET_3);
+                m_arm.setStates(ArmStates.AUTOTARGET_2); // middle shot angle
+                //m_arm.setStates(ArmStates.AUTOTARGET_3);
                 //ShootCount++;
                 break;
             case 3:
@@ -58,7 +60,7 @@ public class ShootAuto extends Command {
 
         m_shooter.runShooter(0.9f);
 
-        if(m_shooter.onTarget() && m_arm.onTarget()) {
+        if(m_shooter.onTarget()) {
             m_shooter.runIntakeShooter();
             hasShot = true;
         }
@@ -68,7 +70,7 @@ public class ShootAuto extends Command {
     public void end(boolean interrupted) {
         // TODO Auto-generated method stub
         super.end(interrupted);
-
+        m_shooter.incrementShotCount();
         m_shooter.stopIntakeShooter();
         m_shooter.stopMotor();
     }
