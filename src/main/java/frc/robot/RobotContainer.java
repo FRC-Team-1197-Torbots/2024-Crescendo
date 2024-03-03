@@ -128,6 +128,7 @@ public class RobotContainer {
 
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
+    // limelight aiming
     m_driverController.leftTrigger(0.5)
       .whileTrue(new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
@@ -138,13 +139,13 @@ public class RobotContainer {
             () -> m_Arm.setStates(ArmStates.STORE)), 
           new RevShooter(m_Shooter))));
 
-    m_driverController.b()
-      .whileTrue(new SequentialCommandGroup(
-        new ParallelCommandGroup(
-          new StartEndCommand(
-            () -> m_Arm.setStates(ArmStates.UPCLOSESHOT), 
-            () -> m_Arm.setStates(ArmStates.STORE)), 
-          new RevShooter(m_Shooter))));
+    // m_driverController.leftTrigger(0.5)
+    //   .whileTrue(new SequentialCommandGroup(
+    //     new ParallelCommandGroup(
+    //       new StartEndCommand(
+    //         () -> m_Arm.setStates(ArmStates.UPCLOSESHOT), 
+    //         () -> m_Arm.setStates(ArmStates.STORE)), 
+    //       new RevShooter(m_Shooter))));
 
     //ANGLE TEST CODE
     // m_driverController.leftTrigger(0.5)
@@ -249,6 +250,7 @@ public class RobotContainer {
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_robotDrive.resetGyro();
     m_Arm.resetArm();
+    m_Arm.setAutoName(getAutonomousCommand().getName());
   }
 
   public ScanAprilTag getScanAprilTag() {

@@ -44,7 +44,7 @@ public class AutoArm extends Command{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_Arm.onTarget();
+    return m_Arm.autoOnTarget();
     /* 
     if(!m_BreakBeam.get() && m_ArmStates == ArmStates.INTAKE){
         return true;

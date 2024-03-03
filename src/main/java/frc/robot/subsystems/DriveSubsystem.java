@@ -486,7 +486,7 @@ public class DriveSubsystem extends SubsystemBase {
     // return deltaPos.getAngle().getDegrees();
     
 
-    return -1 * Math.toDegrees(Math.PI + Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker()));
+    return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
   public void aimRobot(double angleDelta) {
