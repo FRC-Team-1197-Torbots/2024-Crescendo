@@ -31,8 +31,8 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second 1.2
-    public static final double kMagnitudeSlewRate = 3.4; // percent per second (1 = 100%) 1.8
-    public static final double kRotationalSlewRate = 4.0; // percent per second (1 = 100%) 2.0
+    public static final double kMagnitudeSlewRate = 4.5; // percent per second (1 = 100%) 1.8 //3.4
+    public static final double kRotationalSlewRate = 5.0; // percent per second (1 = 100%) 2.0//4.0
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(25); //26.5
@@ -71,11 +71,6 @@ public final class Constants {
     public static final int kRearLeftTurningCanId = 2;
     public static final int kFrontRightTurningCanId = 6;
     public static final int kRearRightTurningCanId = 8;
-
-    public static final double gyroOffset4NoteBlue = -60.0;
-    public static final double gyroOffset4NoteRed = 60.0;
-
-
 
     public static final boolean kGyroReversed = false;
   }
@@ -117,7 +112,7 @@ public final class Constants {
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
-    public static final double kTurningP = 1; //1
+    public static final double kTurningP = 1; 
     public static final double kTurningI = 0;
     public static final double kTurningD = 0;
     public static final double kTurningFF = 0;
@@ -164,7 +159,7 @@ public final class Constants {
     public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
 
     public static enum ArmStates {
-      STORE, INTAKE, SPEAKER, AMP, TEST, SECONDSPEAKERSHOT, AUTOSPEAKER, AUTOTARGET_1, AUTOTARGET_2, AUTOTARGET_3
+      STORE, INTAKE, SPEAKER, AMP, TEST, SECONDSPEAKERSHOT, AUTOSPEAKER, AUTOTARGET_1, AUTOTARGET_2, AUTOTARGET_3, UPCLOSESHOT
     }
 
     //Storing Position values
@@ -222,7 +217,7 @@ public final class Constants {
     public static final double OuttakeSpeed = -0.9;
 
     //Digital Input Constants
-    public static final int breakBeam = 9;
+    public static final int breakBeam = 0;
   }
 
   public static final class ShooterConstants {

@@ -31,7 +31,7 @@ public class ScanAprilTagAuto extends Command{
 
     @Override
     public void initialize() {
-      System.out.println("ScanAprilTag run!");
+      //System.out.println("ScanAprilTag run!");
       
       botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
       botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");

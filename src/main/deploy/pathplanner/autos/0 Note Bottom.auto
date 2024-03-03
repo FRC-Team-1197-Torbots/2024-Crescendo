@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.41,
+      "y": 2.12
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomTaxi"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "4 Note",
+  "choreoAuto": false
+}

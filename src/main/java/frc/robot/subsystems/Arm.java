@@ -72,15 +72,14 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // SmartDashboard.putNumber("Arm Position Encoder", ArmEncoder.get());
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
-        SmartDashboard.putNumber("Test Angle", testAngle);
+        SmartDashboard.putBoolean("Arm On Target", onTarget());
         SmartDashboard.putString("Arm state", m_ArmStates.toString());
+        //SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
-        // SmartDashboard.putNumber("Arm Feed Forward", feedForward);
-        SmartDashboard.putBoolean("Arm On Target", onTarget());
+        
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
@@ -117,12 +116,13 @@ public class Arm extends SubsystemBase {
             case TEST:
                 targetPos = testAngle;
                 break;
+            case UPCLOSESHOT:
+                targetPos = 119;
         }
 
         error = targetPos - ticksToDegrees(ArmEncoder.get());
         armVoltage = setArmOutput();
         runArm(armVoltage);
-
     }
 
     public double setAngleFromDistance(double distance) {
@@ -140,8 +140,6 @@ public class Arm extends SubsystemBase {
     public void runArm(double voltage) {
         ArmMotor1.setVoltage(voltage);
         ArmMotor2.setVoltage(voltage);
-        //ArmMotor1.set(spd);
-        //ArmMotor2.set(spd);
     }
 
     public void stopMotor() {
@@ -159,17 +157,52 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        if (error > -3 && error < 1.5) { // if error is between -3 and 1.5
-            return true;
-        } else {
-            return false;
-        }
+        return error > -3 && error < 1.5; // if error is between -3 and 1.5
     }
 
     public void setAngle(double angle) {
         testAngle = angle;
     }
 
+    public void resetArm(){
+        ArmEncoder.reset();
+    }
+    
+    public void toggleIntake() {
+        if (m_ArmStates == ArmStates.INTAKE)
+        m_ArmStates = ArmStates.STORE;
+        else
+        m_ArmStates = ArmStates.INTAKE;
+    }
+    
+    public double getAngularVelo() {
+        return ArmEncoder.getRate() / ArmConstants.TICKS_PER_DEGREE;
+    }
+
+    public double setArmOutput() {
+        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
+    }
+
+    public double ticksToDegrees(double ticks) {
+        return ticks / ArmConstants.TICKS_PER_DEGREE;
+    }
+    
+    public void getPose() {
+        LimelightHelpers.getBotPose(getName());
+    }
+    
+    public double distanceFromSpeaker(){
+        return m_DriveSubsystem.distanceFromSpeaker();
+    }
+    public double autoDistanceFromSpeaker(){
+        return m_Limelight.distanceFromSpeaker();
+    }
+    
+    public void setMotorMode(IdleMode mode) {
+        ArmMotor1.setIdleMode(mode);
+        ArmMotor2.setIdleMode(mode);
+    }
+    //TEST CODE
     public void incrementAngle(double amount) {
         testAngle += amount;
     }
@@ -195,46 +228,5 @@ public class Arm extends SubsystemBase {
     public void incrementKd(double amount) {
         armKd += amount;
         m_PIDController.setD(armKd);
-    }
-
-
-    public void toggleIntake() {
-        if (m_ArmStates == ArmStates.INTAKE)
-            m_ArmStates = ArmStates.STORE;
-        else
-            m_ArmStates = ArmStates.INTAKE;
-    }
-
-    public double getAngularVelo() {
-        return ArmEncoder.getRate() / ArmConstants.TICKS_PER_DEGREE;
-    }
-
-    public double setArmOutput() {
-
-        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
-        // (Math.toRadians(targetPos),
-        // Math.toRadians(ArmConstants.MaxAngularVelo),
-        // Math.toRadians(ArmConstants.MaxAngularAccel));
-    }
-
-    public double ticksToDegrees(double ticks) {
-        return ticks / ArmConstants.TICKS_PER_DEGREE;
-    }
-
-    public void getPose() {
-        LimelightHelpers.getBotPose(getName());
-    }
-
-    public double distanceFromSpeaker(){
-        return m_DriveSubsystem.distanceFromSpeaker();
-    }
-    public double autoDistanceFromSpeaker(){
-        return m_Limelight.distanceFromSpeaker();
-    }
-    
-
-    public void setMotorMode(IdleMode mode) {
-        ArmMotor1.setIdleMode(mode);
-        ArmMotor2.setIdleMode(mode);
     }
 }

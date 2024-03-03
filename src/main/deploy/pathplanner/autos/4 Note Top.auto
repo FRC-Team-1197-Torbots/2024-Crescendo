@@ -78,37 +78,6 @@
           "data": {
             "name": "Shooter Auto Sequence"
           }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "4NoteTop_3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Sequence"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shooter Auto Sequence"
-          }
         }
       ]
     }

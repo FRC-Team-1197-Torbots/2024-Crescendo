@@ -64,6 +64,7 @@ public class AutoShooter extends Command{
         public boolean isFinished() {
             //super.isFinished();
             return !m_Shooter.getBreakBeamState();
+            // return true;
         }
     
 }

@@ -20,7 +20,7 @@ public class AmpShooter extends Command{
 
       @Override
       public void initialize() {
-        m_Shooter.runShooter(0, 3.8);
+        m_Shooter.runShooter(0, 4.2);
         m_Shooter.setMotorMode(IdleMode.kBrake);
       }
     

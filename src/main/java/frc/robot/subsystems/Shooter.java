@@ -11,17 +11,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 public class Shooter extends SubsystemBase {
     private Intake m_Intake;
 
     private CANSparkFlex TopMotor;
     private CANSparkFlex BottomMotor;
     private double shooterKp = 0.001;
-    private double top = 0;
-    private double bot = 4;
+    private double TopFlyWheelTestVoltage = 0;
+    private double BotFlyWheelTestVoltage = 4;
     private double low = 2100;
-    private double high = 2150;
+    private double high = 2500;
 
     public int AutoShots;
 
@@ -34,83 +33,88 @@ public class Shooter extends SubsystemBase {
     }
 
     @Override
-    public void periodic(){
+    public void periodic() {
         SmartDashboard.putNumber("Top Flywheel Velocity", TopMotor.getEncoder().getVelocity());
         SmartDashboard.putNumber("Bottom Flywheel Velocity", BottomMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("low", low);
-        SmartDashboard.putNumber("high", high);
-        SmartDashboard.putNumber("bot", bot);
+        // SmartDashboard.putNumber("low", low);
+        // SmartDashboard.putNumber("high", high);
+        // SmartDashboard.putNumber("bot", bot);
         SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
         SmartDashboard.putBoolean("Shooter RPM on Target", onTarget());
-        
+
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
-    } 
+    }
 
-    public void runShooter(double spd){
+    public void runShooter(double spd) {
         TopMotor.set(-spd);
-        BottomMotor.set(-spd); 
-    }
-    public void runShooter(double top, double bottom){
-        TopMotor.setVoltage(-top);
-        BottomMotor.setVoltage(-bottom); 
+        BottomMotor.set(-spd);
     }
 
-    public void stopMotor() { 
+    public void runShooter(double top, double bottom) {
+        TopMotor.setVoltage(-top);
+        BottomMotor.setVoltage(-bottom);
+    }
+
+    public void stopMotor() {
         TopMotor.set(0);
         BottomMotor.set(0);
     }
-    public void incrementbot(double amount){
-        bot += amount;
-    }
-    public void incrementrpm(double amount){
-        low += amount;
-        high += amount;
-    }
-    public void idleMotor() { 
+
+    public void idleMotor() {
         TopMotor.set(ShooterConstants.IdleSpeed);
         BottomMotor.set(ShooterConstants.IdleSpeed);
+    }
+
+    public double getBottomShooterRPM() {
+        return BottomMotor.getEncoder().getVelocity();
+    }
+
+    public double getTopShooterRPM() {
+        return TopMotor.getEncoder().getVelocity();
+    }
+
+    public boolean getBreakBeamState() {
+        return m_Intake.gamePieceStored();
+    }
+
+    public void runIntakeShooter() {
+        m_Intake.runIntake(0.5);
+    }
+
+    public void stopIntakeShooter() {
+        m_Intake.stopMotor();
+    }
+
+    public boolean onTarget() {
+        return Math.abs(getBottomShooterRPM()) > 4500 && Math.abs(getTopShooterRPM()) > 4500;// 4750
+    }
+
+    public boolean ampOnTarget() {
+        return Math.abs(getBottomShooterRPM()) > low && Math.abs(getBottomShooterRPM()) < high
+                && Math.abs(TopMotor.getEncoder().getVelocity()) < 50;
+    }
+
+    public void setMotorMode(IdleMode mode) {
+        TopMotor.setIdleMode(mode);
+        BottomMotor.setIdleMode(mode);
+    }
+
+    // TEST CODE
+    public void incrementbot(double amount) {
+        BotFlyWheelTestVoltage += amount;
+    }
+
+    public void incrementrpm(double amount) {
+        low += amount;
+        high += amount;
     }
 
     public double getKp() {
         return shooterKp;
     }
+
     public void incrementKp(double amount) {
         shooterKp += amount;
     }
 
-    public double getBottomShooterRPM(){
-        return BottomMotor.getEncoder().getVelocity();
-    }
-    public double getTopShooterRPM(){
-        return TopMotor.getEncoder().getVelocity();
-    }
-    public boolean getBreakBeamState(){
-        return m_Intake.gamePieceStored();
-    }
-
-    public void runIntakeShooter(){
-        m_Intake.runIntake(0.5);
-    }
-
-    public void stopIntakeShooter(){
-        m_Intake.stopMotor();
-    }
-    
-
-
-    public boolean onTarget(){
-        return Math.abs(getBottomShooterRPM()) > 4750f && Math.abs(getTopShooterRPM()) > 4750;//4500
-    }
-    public boolean ampOnTarget(){
-        return Math.abs(getBottomShooterRPM()) > low && Math.abs(getBottomShooterRPM()) < high && Math.abs(TopMotor.getEncoder().getVelocity())< 50;
-    }
-
-    public void setMotorMode(IdleMode mode){
-        TopMotor.setIdleMode(mode);
-        BottomMotor.setIdleMode(mode);
-    }
-
-
-
-    
 }

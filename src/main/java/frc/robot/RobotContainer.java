@@ -33,8 +33,12 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.util.List;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 /*
@@ -66,8 +70,6 @@ public class RobotContainer {
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
   private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
   private double speed = 0.7;
-  
-  //private final Trigger gamePieceStored = new Trigger(m_Shooter::breakBeamState);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -122,19 +124,10 @@ public class RobotContainer {
         new InstantCommand(() -> m_Arm.setStates(ArmStates.AMP)),
         new AmpShooter(m_Shooter)),
       new Shoot(m_Intake),
-      new InstantCommand(() -> System.out.println("The code got here!")),
       new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
 
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
-    //m_driverController.leftTrigger(0.5).and(atShooterTarget).and(atArmTarget).whileTrue(new Shoot(m_Intake));
-    /*m_driverController.leftTrigger(0.5).whileTrue(new ParallelCommandGroup(
-      new StartEndCommand(
-              () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
-              () -> m_Arm.setStates(ArmStates.STORE))),
-            // new AimSpeaker(m_Arm, m_robotDrive),
-            new RevShooter(m_Shooter)
-            // ,new Store(m_Arm)
-            );*/
+
     m_driverController.leftTrigger(0.5)
       .whileTrue(new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
@@ -145,6 +138,15 @@ public class RobotContainer {
             () -> m_Arm.setStates(ArmStates.STORE)), 
           new RevShooter(m_Shooter))));
 
+    m_driverController.b()
+      .whileTrue(new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new StartEndCommand(
+            () -> m_Arm.setStates(ArmStates.UPCLOSESHOT), 
+            () -> m_Arm.setStates(ArmStates.STORE)), 
+          new RevShooter(m_Shooter))));
+
+    //ANGLE TEST CODE
     // m_driverController.leftTrigger(0.5)
     // .whileTrue(new ParallelCommandGroup(
     //   new StartEndCommand(
@@ -189,35 +191,29 @@ public class RobotContainer {
     //   () -> m_Intake.TestIntake(),
     //   () -> m_Intake.stopMotor(),
     //   m_Intake));
-    // m_MechController.leftTrigger(0.5).whileTrue(new RunCommand(() -> m_Shooter.runShooter()));
     // m_MechController.rightTrigger(0.5).whileTrue(new RunCommand(() -> m_Arm.setStates(ArmStates.TEST)));
     }
     
-        private void registerAutoCommands(){
-          NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
-          NamedCommands.registerCommand("IntakeDown",(new AutoArm(m_Arm, ArmStates.INTAKE)));
-          NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));    
-          NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
+    private void registerAutoCommands() {
+      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
+      NamedCommands.registerCommand("IntakeDown",(new AutoArm(m_Arm, ArmStates.INTAKE)));
+      NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));    
+      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
+    }
+    
 
-          //NamedCommands.registerCommand("Shoot Sequence", new AutoShooter(m_Shooter, m_Arm, ArmStates.SPEAKER));//new ParallelDeadlineGroup(new WaitCommand(2),
-            //new AutoArm(m_Arm, ArmStates.SPEAKER)
-            //new AutoShooter(m_Shooter, m_Arm, ArmStates.SPEAKER)));
-
-          NamedCommands.registerCommand("Test Print Command", new PrintCommand("Moved to next command"));
-      }
+    private void addAutoPaths() {
+      positionChooser.addOption("Top (AMP)", "Top");
+      positionChooser.addOption("Middle (SPEAKER)", "Middle");
+      positionChooser.addOption("Bottom (STATION)", "Bottom");
       
-      private void addAutoPaths(){
-        positionChooser.addOption("Top (AMP)", "Top");
-        positionChooser.addOption("Middle (SPEAKER)", "Middle");
-        positionChooser.addOption("Bottom (STATION)", "Bottom");
-        
-        autoNameChooser.addOption("4 Note", "4 Note");
-        autoNameChooser.addOption("2 Note", "2 Note");
-        
-        SmartDashboard.putData("Positioning", positionChooser);
-        SmartDashboard.putData("Auto Choice", autoNameChooser);
-        //autoChooser.addOption("4 Note Auto", );
-      }
+      autoNameChooser.addOption("4 Note", "4 Note");
+      autoNameChooser.addOption("2 Note", "2 Note");
+      autoNameChooser.addOption("0 Note", "0 Note");
+      
+      SmartDashboard.putData("Positioning", positionChooser);
+      SmartDashboard.putData("Auto Choice", autoNameChooser);
+    }
       
       /**
        * 
@@ -226,26 +222,21 @@ public class RobotContainer {
        * @return the command to run in autonomous
        */
   public Command getAutonomousCommand() {
-
-    return new PathPlannerAuto("2 Note Mid");
-        
-    // try{
-      //return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
-    // }
-    // catch(Exception e){
-    //   //System.out.println("Error occurs");
-    //   DriverStation.reportWarning("Auto is not selected or invalid", false);
-      
-    // }
-    // return new PathPlannerAuto("New Auto");
+    return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
   }
 
-  public void teleopInit(){
+  public void teleopInit() {
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kCoast);
-    m_robotDrive.setAutoName(getAutonomousCommand().getName());
+    //m_robotDrive.setAutoName(getAutonomousCommand().getName());
+
+    //Get end point
+    //conver to pose2d
+    //m_robotDrive.resetOdometry();
+
+    
   }
  
   public void disableInit() {
@@ -256,6 +247,8 @@ public class RobotContainer {
 
   public void autoInit() {
     m_Shooter.setMotorMode(IdleMode.kBrake);
+    m_robotDrive.resetGyro();
+    m_Arm.resetArm();
   }
 
   public ScanAprilTag getScanAprilTag() {

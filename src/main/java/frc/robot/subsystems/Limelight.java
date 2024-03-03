@@ -53,26 +53,28 @@ public class Limelight extends SubsystemBase{
     }
 
     private double xDistanceFromSpeaker() {
-    if (color.isPresent())
-      if (color.get() == Alliance.Red) {
-        return limelight_x - Constants.AprilTag4PosX;
-      }
-      if (color.get() == Alliance.Blue) {
-        return limelight_x - Constants.AprilTag7PosX;
-      }
-    else
+    // if (!DriverStation.getAlliance().isEmpty()){
+    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    //     return limelight_x - Constants.AprilTag4PosX;
+    //   }
+    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    //     return limelight_x - Constants.AprilTag7PosX;
+    //   }
+    //   return 0;
+    // } else
       return 0;
   }
 
   private double yDistanceFromSpeaker() {
-    if (color.isPresent())
-      if (color.get() == Alliance.Red) {
-        return limelight_y - Constants.AprilTag4PosY;
-      }
-      if (color.get() == Alliance.Blue) {
-        return limelight_y - Constants.AprilTag7PosY;
-      }
-    else
+    // if (!DriverStation.getAlliance().isEmpty()){
+    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    //     return limelight_y - Constants.AprilTag4PosY;
+    //   }
+    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    //     return limelight_y - Constants.AprilTag7PosY;
+    //   }
+    //   return 0;
+    // } else
       return 0;
   }
 

@@ -26,7 +26,7 @@ public class Shoot extends Command{
 
       @Override
         public void end(boolean interrupted) {
-            System.out.println("The program finished shoot command");
+            // System.out.println("The program finished shoot command");
             m_intake.stopMotor();
         }
 

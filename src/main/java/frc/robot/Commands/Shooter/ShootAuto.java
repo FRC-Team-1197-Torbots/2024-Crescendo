@@ -78,6 +78,7 @@ public class ShootAuto extends Command {
     public boolean isFinished() {
         // TODO Auto-generated method stub
         return !m_shooter.getBreakBeamState();
+        // return true;
     }
     
 }

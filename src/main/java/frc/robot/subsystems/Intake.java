@@ -12,38 +12,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 public class Intake extends SubsystemBase {
 
     private double testspeed = 0;
     private CANSparkMax MotorA;
     private DigitalInput m_BreakBeam;
-    private boolean isOuttaking;
-    // private Debouncer debounce = new Debouncer(0.2);
+
     public Intake() {
         MotorA = new CANSparkMax(IntakeConstants.IntakeMotor, MotorType.kBrushless);
         MotorA.setIdleMode(IdleMode.kBrake);
         m_BreakBeam = new DigitalInput(IntakeConstants.breakBeam);
-        isOuttaking = false;
-        
-
-    } 
-
-    public void runIntake(double spd) {
-        MotorA.set(-spd);
-    }
-    public void TestIntake(){
-        MotorA.set(testspeed);
-    }
-    public void incrementIntake(double amount){
-        testspeed += amount;
-    }
-    public void stopMotor() { 
-        MotorA.set(0);
-    }
-
-    public boolean gamePieceStored() {
-        return !m_BreakBeam.get();
     }
 
     @Override
@@ -51,7 +29,29 @@ public class Intake extends SubsystemBase {
         SmartDashboard.putBoolean("Break beam", gamePieceStored());
         SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
     }
-    public void setMotorMode(IdleMode mode){
+
+    public void runIntake(double spd) {
+        MotorA.set(-spd);
+    }
+
+    public void stopMotor() {
+        MotorA.set(0);
+    }
+
+    public boolean gamePieceStored() {
+        return !m_BreakBeam.get();
+        // return false;
+    }
+
+    public void setMotorMode(IdleMode mode) {
         MotorA.setIdleMode(mode);
+    }
+
+    public void testIntake() {
+        MotorA.set(testspeed);
+    }
+
+    public void incrementIntake(double amount) {
+        testspeed += amount;
     }
 }

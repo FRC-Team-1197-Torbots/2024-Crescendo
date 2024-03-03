@@ -20,7 +20,7 @@ public class Climber extends SubsystemBase {
     private ClimberDirection m_ClimberDirection;
 
     public Climber() {
-        //Spark Flex Instantiations
+        // Spark Flex Instantiations
         leftClimberFlex = new CANSparkFlex(ClimberConstants.LeftClimberMotor, MotorType.kBrushless);
         rightClimberFlex = new CANSparkFlex(ClimberConstants.RightClimberMotor, MotorType.kBrushless);
 
@@ -34,12 +34,35 @@ public class Climber extends SubsystemBase {
         rightClimberFlex.setIdleMode(mode);
     }
 
+    @Override
+    public void periodic() {
+        // SmartDashboard.putNumber("Left Climber Current",
+        // leftClimberFlex.getOutputCurrent());
+        // SmartDashboard.putNumber("Right Climber Current",
+        // rightClimberFlex.getOutputCurrent());
+
+        SmartDashboard.putBoolean("left at Bottom", leftAtBottom);
+        SmartDashboard.putBoolean("right at Bottom", rightAtBottom);
+
+        // SmartDashboard.putNumber("Left Climber Ticks", getLeftPosition());
+        // SmartDashboard.putNumber("Right Climber Ticks", getRightPosition());
+
+        SmartDashboard.putBoolean("Left at Top", leftAtTop);
+        SmartDashboard.putBoolean("Right at Top", rightAtTop);
+        // SmartDashboard.putNumber("Left Voltage", leftClimberFlex.getBusVoltage());
+        // SmartDashboard.putNumber("Right Voltage", rightClimberFlex.getBusVoltage());
+
+        // left max is -172.2
+        // right max is -177.5
+    }
+
     public void runMotors(ClimberDirection direction) {
         m_ClimberDirection = direction;
 
         switch (m_ClimberDirection) {
             case UP:
-                if (getLeftPosition() >= ClimberConstants.LeftClimberTopPos) { //Stop the Motors when it reaches the top position
+                if (getLeftPosition() >= ClimberConstants.LeftClimberTopPos) { // Stop the Motors when it reaches the
+                                                                               // top position
                     leftClimberFlex.set(0);
                 } else {
                     leftClimberFlex.set(ClimberConstants.ClimberUpSpeed);
@@ -51,7 +74,10 @@ public class Climber extends SubsystemBase {
                 }
                 break;
             case DOWN:
-                if (leftClimberFlex.getOutputCurrent() > 60 && getRightPosition() < 20) { // Check if the Motor is getting stalled and if it's at a low position to stop the climber
+                if (leftClimberFlex.getOutputCurrent() > 60 && getRightPosition() < 20) { // Check if the Motor is
+                                                                                          // getting stalled and if it's
+                                                                                          // at a low position to stop
+                                                                                          // the climber
                     leftAtBottom = true;
                 }
                 if (rightClimberFlex.getOutputCurrent() > 60 && getRightPosition() < 20) {
@@ -87,48 +113,26 @@ public class Climber extends SubsystemBase {
         rightAtTop = false;
     }
 
-    public double getLeftPosition(){
+    public double getLeftPosition() {
         return leftClimberFlex.getEncoder().getPosition();
     }
 
-    public double getRightPosition(){
+    public double getRightPosition() {
         return rightClimberFlex.getEncoder().getPosition();
     }
 
-    public void resetPosition(){
+    public void resetPosition() {
         leftClimberFlex.getEncoder().setPosition(0);
         rightClimberFlex.getEncoder().setPosition(0);
     }
 
-    public boolean atEndPos(ClimberDirection dir){
-        if(dir == ClimberDirection.UP){
+    public boolean atEndPos(ClimberDirection dir) {
+        if (dir == ClimberDirection.UP) {
             return rightAtTop && leftAtTop;
-        }
-        else {
+        } else {
             return rightAtBottom && leftAtBottom;
         }
 
-    }
-
-
-
-    @Override
-    public void periodic() {
-        // SmartDashboard.putNumber("Left Climber Current", leftClimberFlex.getOutputCurrent());
-        // SmartDashboard.putNumber("Right Climber Current", rightClimberFlex.getOutputCurrent());
-
-        SmartDashboard.putBoolean("left at Bottom", leftAtBottom);
-        SmartDashboard.putBoolean("right at Bottom", rightAtBottom);
-        // SmartDashboard.putNumber("Left Climber Ticks", getLeftPosition());
-        
-        // SmartDashboard.putNumber("Right Climber Ticks", getRightPosition());
-        SmartDashboard.putBoolean("Left at Top", leftAtTop);
-        SmartDashboard.putBoolean("Right at Top", rightAtTop);
-        // SmartDashboard.putNumber("Left Voltage", leftClimberFlex.getBusVoltage());
-        // SmartDashboard.putNumber("Right Voltage", rightClimberFlex.getBusVoltage());
-
-        // left max is -172.2
-        // right max is -177.5
     }
 
 }
