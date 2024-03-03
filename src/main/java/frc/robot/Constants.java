@@ -158,10 +158,6 @@ public final class Constants {
     public static final int encoderChannelB = 8;
     public static final double TICKS_PER_DEGREE = 2911.0 / 81.0;
 
-    public static enum ArmStates {
-      STORE, INTAKE, SPEAKER, AMP, TEST, SECONDSPEAKERSHOT, AUTOSPEAKER, AUTOTARGET_1, AUTOTARGET_2, AUTOTARGET_3, UPCLOSESHOT
-    }
-
     //Storing Position values
     // 66.2
     public static final double StorePos = 46; //Need to change these two values later
@@ -170,6 +166,13 @@ public final class Constants {
     public static final double SecondShotSpeaker = 105;
     public static final double TestPos = 106;
     public static final double AmpPos = 106.05;//106
+    public static final double SubwooferPos = 119;
+    
+    // Auto arm angles
+    public static final double[] TwoNoteMidTargets = {119.0, 101.5};
+    public static final double[] ThreeNoteMidTargets = {4,5,5,4};
+    public static final double[] OneNoteTopTargets = {107.367};
+    public static final double[] OneNoteBottomTargets = {107.888};
 
     //Arm PID Constants
     public static final double Arm_kP = 0.1;//0.1//around 0.5 degrees of error
@@ -179,6 +182,7 @@ public final class Constants {
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;
     public static final double MaxAngularAccel = 120;
+
 
     // Arm aiming constants
     // // polynomial

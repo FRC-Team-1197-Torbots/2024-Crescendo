@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.39,
+      "y": 6.92
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1NoteTop_1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1NoteTop_2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Finished Autos",
+  "choreoAuto": false
+}

@@ -1,13 +1,11 @@
 package frc.robot.Commands.Arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ArmConstants.ArmStates;
 import frc.robot.subsystems.Arm;
 
 public class ManualArm extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Arm m_Arm;
-    private ArmStates m_ArmStates;
     private double m_Speed;
     public ManualArm(Arm subsystem, double speed) {
         m_Arm = subsystem;

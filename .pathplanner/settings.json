@@ -3,9 +3,10 @@
   "robotLength": 0.635,
   "holonomicMode": true,
   "pathFolders": [
+    "1 Note Bottom",
     "2 Note Middle",
     "4 Note Top",
-    "1 Note Bottom"
+    "1 Note Top"
   ],
   "autoFolders": [
     "Finished Autos"

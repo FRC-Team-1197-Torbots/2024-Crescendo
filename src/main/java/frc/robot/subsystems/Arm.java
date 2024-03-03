@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ArmConstants.ArmStates;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -19,20 +18,20 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor1;
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
-    private ArmConstants.ArmStates m_ArmStates;
 
     private double targetPos;
     private double armKp;
     private double armKi;
     private double armKd;
     private double armVoltage;
-    private TrapezoidProfile.Constraints m_Constraints;
+    // private TrapezoidProfile.Constraints m_Constraints;
     // private ProfiledPIDController m_armPIDController;
     private PIDController m_PIDController;
-    private ArmFeedforward m_ArmFeedforward;
+    // private ArmFeedforward m_ArmFeedforward;
     private double error;
     private double testAngle;
-    private double feedForward;
+    // private double feedForward;
+    public double[] autoTargets;
 
     private DriveSubsystem m_DriveSubsystem;
     private Limelight m_Limelight;
@@ -47,16 +46,15 @@ public class Arm extends SubsystemBase {
 
         ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
         ArmEncoder.reset();
-        m_ArmStates = ArmStates.STORE;
-        m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
+        // m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
         armKp = ArmConstants.Arm_kP;
         armKi = ArmConstants.Arm_kI;
         armKd = ArmConstants.Arm_kD;
-        feedForward = 0.001;
+        // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
         // ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
-        m_ArmFeedforward = new ArmFeedforward(0.1, 0.66, 1.30, 0.02); // ks value might need to change
+        // m_ArmFeedforward = new ArmFeedforward(0.1, 0.66, 1.30, 0.02); // ks value might need to change
         /****************************
          * 
          * 
@@ -75,65 +73,33 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
         SmartDashboard.putBoolean("Arm On Target", onTarget());
-        SmartDashboard.putString("Arm state", m_ArmStates.toString());
-        //SmartDashboard.putNumber("Test Angle", testAngle);
+        // SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
-        
+
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
         // SmartDashboard.putNumber("Error", error);
-
-        switch (m_ArmStates) {
-            case AUTOTARGET_1:
-                targetPos = 124.7;
-                break;
-            case AUTOTARGET_2:
-                targetPos = 101.5;
-                break;
-            case AUTOTARGET_3:
-                targetPos = 102.011;
-                break;
-            
-            case SECONDSPEAKERSHOT:
-                targetPos = ArmConstants.SecondShotSpeaker;
-                break;
-            case STORE:
-                targetPos = ArmConstants.StorePos;
-                break;
-            case INTAKE:
-                targetPos = ArmConstants.IntakePos;
-                break;
-            case SPEAKER:
-                targetPos = setAngleFromDistance(distanceFromSpeaker());
-                break;
-            case AUTOSPEAKER:
-                targetPos = setAngleFromDistance(autoDistanceFromSpeaker());
-            case AMP:
-                targetPos = ArmConstants.AmpPos;
-                break;
-            case TEST:
-                targetPos = testAngle;
-                break;
-            case UPCLOSESHOT:
-                targetPos = 119;
-        }
-
+    
         error = targetPos - ticksToDegrees(ArmEncoder.get());
         armVoltage = setArmOutput();
         runArm(armVoltage);
     }
 
-    public double setAngleFromDistance(double distance) {
-        double testAngle = ArmConstants.A *Math.log(distance) + ArmConstants.B;
+    public void setTargetAngle(double target) {
+        targetPos = target;
+    }
+    
+    public double setAngleFromDistance() {
+        double distance = distanceFromSpeaker();
+        double testAngle = ArmConstants.A * Math.log(distance) + ArmConstants.B;
         if (testAngle < ArmConstants.StorePos) {
             testAngle = ArmConstants.StorePos;
         }
         if (testAngle > ArmConstants.IntakePos) {
             testAngle = ArmConstants.IntakePos;
         }
-        setStates(ArmStates.SPEAKER);
         return testAngle;
     }
 
@@ -152,29 +118,43 @@ public class Arm extends SubsystemBase {
         ArmMotor2.set(-0.01);
     }
 
-    public void setStates(ArmStates states) {
-        m_ArmStates = states;
-    }
-
     public boolean onTarget() {
-        return error > -3 && error < 1.5; // if error is between -3 and 1.5
+        return error > -3 && error < 1.5; // if error is between -5 and 1
     }
 
-    public void setAngle(double angle) {
-        testAngle = angle;
+    public boolean autoOnTarget() {
+        return error > -4 && error < 1; // if error is between -5 and 1
     }
 
-    public void resetArm(){
+    public void setAutoTargets(String autoName) {
+        switch (autoName) {
+            case("2 Note Middle"):
+                autoTargets = ArmConstants.TwoNoteMidTargets;
+                break;
+            case("1 Note Top"):
+                autoTargets = ArmConstants.OneNoteTopTargets;
+                break;
+            case("1 Note Bottom"):
+                autoTargets = ArmConstants.OneNoteBottomTargets;
+                break;
+        } 
+    }
+
+    // public void setAngle(double angle) {
+    //     testAngle = angle;
+    // }
+
+    public void resetArm() {
         ArmEncoder.reset();
     }
 
     public void toggleIntake() {
-        if (m_ArmStates == ArmStates.INTAKE)
-        m_ArmStates = ArmStates.STORE;
+        if(targetPos == ArmConstants.IntakePos)
+            targetPos = ArmConstants.StorePos;
         else
-        m_ArmStates = ArmStates.INTAKE;
+            targetPos = ArmConstants.IntakePos;
     }
-    
+
     public double getAngularVelo() {
         return ArmEncoder.getRate() / ArmConstants.TICKS_PER_DEGREE;
     }
@@ -186,29 +166,27 @@ public class Arm extends SubsystemBase {
     public double ticksToDegrees(double ticks) {
         return ticks / ArmConstants.TICKS_PER_DEGREE;
     }
-    
+
     public void getPose() {
         LimelightHelpers.getBotPose(getName());
     }
-    
-    public double distanceFromSpeaker(){
+
+    public double distanceFromSpeaker() {
         return m_DriveSubsystem.distanceFromSpeaker();
     }
-    public double autoDistanceFromSpeaker(){
+
+    public double autoDistanceFromSpeaker() {
         return m_Limelight.distanceFromSpeaker();
     }
-    
+
     public void setMotorMode(IdleMode mode) {
         ArmMotor1.setIdleMode(mode);
         ArmMotor2.setIdleMode(mode);
     }
-    //TEST CODE
+
+    // TEST CODE
     public void incrementAngle(double amount) {
         testAngle += amount;
-    }
-
-    public void incrementFeedForward(double amount) {
-        feedForward += amount;
     }
 
     public double getKp() {

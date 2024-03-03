@@ -19,8 +19,8 @@ import frc.robot.Commands.Shooter.AmpShooter;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.ArmConstants.ArmStates;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -117,35 +117,35 @@ public class RobotContainer {
       .whileTrue(
         new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-          new RunArm(m_Arm, ArmStates.INTAKE)));
+          new RunArm(m_Arm, ArmConstants.IntakePos)));
     
     m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
       new ParallelCommandGroup(
-        new InstantCommand(() -> m_Arm.setStates(ArmStates.AMP)),
+        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new AmpShooter(m_Shooter)),
       new Shoot(m_Intake),
-      new InstantCommand(() -> m_Arm.setStates(ArmStates.STORE))));
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
 
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
     // limelight aiming
-    m_driverController.leftTrigger(0.5)
-      .whileTrue(new SequentialCommandGroup(
-        new ScanAprilTag(m_Limelight),
-        // new AimRobot(m_robotDrive),
-        new ParallelCommandGroup(
-          new StartEndCommand(
-            () -> m_Arm.setStates(ArmStates.SPEAKER), 
-            () -> m_Arm.setStates(ArmStates.STORE)), 
-          new RevShooter(m_Shooter))));
-
     // m_driverController.leftTrigger(0.5)
     //   .whileTrue(new SequentialCommandGroup(
+    //     new ScanAprilTag(m_Limelight),
+    //     // new AimRobot(m_robotDrive),
     //     new ParallelCommandGroup(
     //       new StartEndCommand(
-    //         () -> m_Arm.setStates(ArmStates.UPCLOSESHOT), 
-    //         () -> m_Arm.setStates(ArmStates.STORE)), 
+    //         () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
+    //         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
     //       new RevShooter(m_Shooter))));
+
+    m_driverController.leftTrigger(0.5)
+      .whileTrue(new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new StartEndCommand(
+            () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
+            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
+          new RevShooter(m_Shooter))));
 
     //ANGLE TEST CODE
     // m_driverController.leftTrigger(0.5)
@@ -197,12 +197,9 @@ public class RobotContainer {
     
     private void registerAutoCommands() {
       NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
-      NamedCommands.registerCommand("IntakeDown",(new AutoArm(m_Arm, ArmStates.INTAKE)));
-      NamedCommands.registerCommand("Aim at Speaker", new AutoArm(m_Arm, ArmStates.SPEAKER));    
       NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
     }
     
-
     private void addAutoPaths() {
       positionChooser.addOption("Top (AMP)", "Top");
       positionChooser.addOption("Middle (SPEAKER)", "Middle");
@@ -250,7 +247,7 @@ public class RobotContainer {
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_robotDrive.resetGyro();
     m_Arm.resetArm();
-    m_Arm.setAutoName(getAutonomousCommand().getName());
+    m_Arm.setAutoTargets(getAutonomousCommand().getName());
   }
 
   public ScanAprilTag getScanAprilTag() {
