@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "New New Path"
+                  "pathName": "2NoteMiddle_1"
                 }
               },
               {
@@ -51,6 +51,6 @@
       ]
     }
   },
-  "folder": "4 Note",
+  "folder": "Finished Autos",
   "choreoAuto": false
 }
