@@ -20,8 +20,8 @@ public class AmpShooter extends Command{
 
       @Override
       public void initialize() {
-        m_Shooter.runShooter(0, 4.2);
-        m_Shooter.setMotorMode(IdleMode.kBrake);
+        m_Shooter.runShooter(0, 4.25);
+        m_Shooter.setMotorMode(IdleMode.kCoast);
       }
     
       // Called every time the scheduler runs while the command is scheduled.
@@ -34,7 +34,7 @@ public class AmpShooter extends Command{
 
       @Override
         public void end(boolean interrupted) {
-          m_Shooter.setMotorMode(IdleMode.kCoast);  //m_Climber.stopMotors();
+          m_Shooter.setMotorMode(IdleMode.kBrake);  //m_Climber.stopMotors();
         }
 
         // Returns true when the command should end.

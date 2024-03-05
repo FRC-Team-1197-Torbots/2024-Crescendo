@@ -19,7 +19,7 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
 
-    private double targetPos;
+    private double targetPos = ArmConstants.StorePos;
     private double armKp;
     private double armKi;
     private double armKd;
@@ -72,7 +72,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
-        SmartDashboard.putBoolean("Arm On Target", onTarget());
+        // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
@@ -127,6 +127,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setAutoTargets(String autoName) {
+        SmartDashboard.putString("Auto Selected", autoName);
         switch (autoName) {
             case("2 Note Middle"):
                 autoTargets = ArmConstants.TwoNoteMidTargets;
@@ -137,7 +138,14 @@ public class Arm extends SubsystemBase {
             case("1 Note Bottom"):
                 autoTargets = ArmConstants.OneNoteBottomTargets;
                 break;
+            case("3 Note Middle"):
+                autoTargets = ArmConstants.ThreeNoteMidTargets;
+                break;
+            default:
+                autoTargets = ArmConstants.Nothing;
+                break;
         } 
+        SmartDashboard.putNumberArray("Auto targets", autoTargets);
     }
 
     // public void setAngle(double angle) {

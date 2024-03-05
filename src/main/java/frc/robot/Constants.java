@@ -169,10 +169,11 @@ public final class Constants {
     public static final double SubwooferPos = 119;
     
     // Auto arm angles
-    public static final double[] TwoNoteMidTargets = {119.0, 101.5};
-    public static final double[] ThreeNoteMidTargets = {4,5,5,4};
+    public static final double[] TwoNoteMidTargets = {ArmConstants.SubwooferPos, 103};
+    public static final double[] ThreeNoteMidTargets = {ArmConstants.SubwooferPos, 101.5, 102.011};
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] OneNoteBottomTargets = {107.888};
+    public static final double[] Nothing = {ArmConstants.StorePos};
 
     //Arm PID Constants
     public static final double Arm_kP = 0.1;//0.1//around 0.5 degrees of error
@@ -217,7 +218,7 @@ public final class Constants {
 
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
-    public static final double IntakeSpeed = 0.6;
+    public static final double IntakeSpeed = 0.45;
     public static final double OuttakeSpeed = -0.9;
 
     //Digital Input Constants

@@ -4,22 +4,16 @@
 
 package frc.robot.subsystems;
 
-import java.util.Optional;
-import java.util.Vector;
-
 //import com.ctre.phoenix
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +26,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -105,7 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
   private Field2d m_field2d = new Field2d();
   private double odometry_x;
   private double odometry_y;
-  Optional<Alliance> color = DriverStation.getAlliance();
+  //Optional<Alliance> color = DriverStation.getAlliance();
   private String m_autoName = "2 Note Mid";
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -236,9 +229,11 @@ public class DriveSubsystem extends SubsystemBase {
         },
         pose);
   }
+
   public void resetGyro(){
     m_gyro.reset();
   }
+  
   public ChassisSpeeds getSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
@@ -445,12 +440,12 @@ public class DriveSubsystem extends SubsystemBase {
       if (color.get() == Alliance.Blue) {
         return odometry_x - Constants.AprilTag7PosX;
       }
-    else*/
+    else
       return 0;
   }
 
   private double yDistanceFromSpeaker() {
-    /*if (color.isPresent())
+    if (color.isPresent())
       if (color.get() == Alliance.Red) {
         return odometry_y - Constants.AprilTag4PosY;
       }
@@ -476,7 +471,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_autoName = autoname;
   }
   public double distanceFromSpeaker() {
-    return Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
+    return 0; // Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
   }
 
   public double calcAngle() {
@@ -486,7 +481,7 @@ public class DriveSubsystem extends SubsystemBase {
     // return deltaPos.getAngle().getDegrees();
     
 
-    return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
+    return 0; // -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
   public void aimRobot(double angleDelta) {

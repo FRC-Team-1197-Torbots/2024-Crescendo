@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase {
         // SmartDashboard.putNumber("low", low);
         // SmartDashboard.putNumber("high", high);
         // SmartDashboard.putNumber("bot", bot);
-        SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
+        // SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
         SmartDashboard.putBoolean("Shooter RPM on Target", onTarget());
 
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);

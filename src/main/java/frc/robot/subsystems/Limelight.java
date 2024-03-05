@@ -1,21 +1,15 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utils.LimelightHelpers;
 
 public class Limelight extends SubsystemBase{
     double pose_x;
     double pose_y;
     private double[] botpose1;
-    Optional<Alliance> color = DriverStation.getAlliance();
+    //Optional<Alliance> color = DriverStation.getAlliance();
 
     private DriveSubsystem m_DriveSubsystem;
     private double limelight_x;
@@ -26,8 +20,8 @@ public class Limelight extends SubsystemBase{
 
     @Override
     public void periodic(){
-        botpose1 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
-        double[] botpose2 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
+        // botpose1 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
+        // double[] botpose2 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
         // if(botpose1[0] != 0){
             
@@ -53,28 +47,28 @@ public class Limelight extends SubsystemBase{
     }
 
     private double xDistanceFromSpeaker() {
-    // if (!DriverStation.getAlliance().isEmpty()){
-    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-    //     return limelight_x - Constants.AprilTag4PosX;
-    //   }
-    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-    //     return limelight_x - Constants.AprilTag7PosX;
-    //   }
-    //   return 0;
-    // } else
+    if (!DriverStation.getAlliance().isEmpty()){
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        return limelight_x - Constants.AprilTag4PosX;
+      }
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+        return limelight_x - Constants.AprilTag7PosX;
+      }
+      return 0;
+    } else
       return 0;
   }
 
   private double yDistanceFromSpeaker() {
-    // if (!DriverStation.getAlliance().isEmpty()){
-    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-    //     return limelight_y - Constants.AprilTag4PosY;
-    //   }
-    //   if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
-    //     return limelight_y - Constants.AprilTag7PosY;
-    //   }
-    //   return 0;
-    // } else
+    if (!DriverStation.getAlliance().isEmpty()){
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        return limelight_y - Constants.AprilTag4PosY;
+      }
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+        return limelight_y - Constants.AprilTag7PosY;
+      }
+      return 0;
+    } else
       return 0;
   }
 

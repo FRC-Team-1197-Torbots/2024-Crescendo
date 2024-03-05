@@ -20,16 +20,15 @@ public class ShootAuto extends Command {
 
     public ShootAuto(Arm arm, Shooter shooter) {
         m_arm = arm;
-        m_Shooter = shooter;      
-        shots = m_Shooter.AutoShots;    
-        autoTargets = m_arm.autoTargets;
+        m_Shooter = shooter;       
     }
 
     @Override
     public void initialize() {
         
         super.initialize();
-
+        autoTargets = m_arm.autoTargets;
+        shots = m_Shooter.AutoShots;   
         if (shots < autoTargets.length)
             m_arm.setTargetAngle(autoTargets[shots]);
     }
@@ -47,7 +46,6 @@ public class ShootAuto extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        // TODO Auto-generated method stub
         super.end(interrupted);
         m_Shooter.incrementShotCount();
         m_Shooter.stopIntakeShooter();

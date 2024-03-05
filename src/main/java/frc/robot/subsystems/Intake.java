@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("Break beam", gamePieceStored());
-        SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
+        // SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
     }
 
     public void runIntake(double spd) {

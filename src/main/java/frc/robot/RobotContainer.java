@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.time.Instant;
 import java.util.List;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -70,6 +71,7 @@ public class RobotContainer {
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
   private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
   private double speed = 0.7;
+  private boolean inTeleop = false;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -110,7 +112,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
+    // beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
@@ -119,16 +121,16 @@ public class RobotContainer {
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos)));
     
-    m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-        new AmpShooter(m_Shooter)),
-      new Shoot(m_Intake),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
+    // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
+    //   new ParallelCommandGroup(
+    //     new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+    //     new AmpShooter(m_Shooter)),
+    //   new Shoot(m_Intake),
+    //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
 
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
-    // limelight aiming
+    // // limelight aiming
     // m_driverController.leftTrigger(0.5)
     //   .whileTrue(new SequentialCommandGroup(
     //     new ScanAprilTag(m_Limelight),
@@ -198,6 +200,7 @@ public class RobotContainer {
     private void registerAutoCommands() {
       NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
       NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
+      NamedCommands.registerCommand("Arm to Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
     }
     
     private void addAutoPaths() {
@@ -205,8 +208,9 @@ public class RobotContainer {
       positionChooser.addOption("Middle (SPEAKER)", "Middle");
       positionChooser.addOption("Bottom (STATION)", "Bottom");
       
-      autoNameChooser.addOption("4 Note", "4 Note");
+      autoNameChooser.addOption("3 Note", "3 Note");
       autoNameChooser.addOption("2 Note", "2 Note");
+      autoNameChooser.addOption("1 Note", "1 Note");
       autoNameChooser.addOption("0 Note", "0 Note");
       
       SmartDashboard.putData("Positioning", positionChooser);
@@ -224,10 +228,12 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
+    inTeleop = true;
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
-    m_Shooter.setMotorMode(IdleMode.kCoast);
+    m_Shooter.setMotorMode(IdleMode.kBrake);
+    // m_Shooter.setMotorMode(IdleMode.kCoast);
     //m_robotDrive.setAutoName(getAutonomousCommand().getName());
 
     //Get end point

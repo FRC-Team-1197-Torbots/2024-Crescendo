@@ -1,14 +1,7 @@
 package frc.robot.Commands.Limelight;
 
-import java.util.Optional;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.LimelightHelpers;
-import frc.robot.Constants;
 import frc.robot.subsystems.Limelight;
 
 
@@ -21,7 +14,7 @@ public class ScanAprilTagAuto extends Command{
   private double coord_y;
   private double xDistance;
   private double yDistance;
-  Optional<Alliance> color = DriverStation.getAlliance();
+  //Optional<Alliance> color = DriverStation.getAlliance();
 
   public ScanAprilTagAuto(Limelight subsystem) {
       m_Limelight = subsystem;
