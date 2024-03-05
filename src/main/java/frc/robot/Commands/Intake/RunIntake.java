@@ -32,9 +32,6 @@ public class RunIntake extends Command{
 
       @Override
         public void end(boolean interrupted) {
-          m_Intake.runIntake(-0.1);
-          new WaitCommand(0.1);
-          m_Intake.stopMotor();
         }
 
   // Returns true when the command should end.

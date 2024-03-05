@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -115,12 +116,24 @@ public class RobotContainer {
     // beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     
-    m_driverController.rightTrigger(0.5).and(beamTrigger.negate())
+    //Intake Routines
+    m_driverController.rightTrigger(0.5).and(beamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
       .whileTrue(
         new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-          new RunArm(m_Arm, ArmConstants.IntakePos)));
+          new RunArm(m_Arm, ArmConstants.IntakePos),
+          new RunCommand(()-> m_Shooter.runShooter(-0.4))));
     
+    // m_driverController.rightTrigger(0.5).and(beamTrigger.negate())//Runs Intake then backspins it for 0.2 seconds
+    //   .whileTrue(
+    //     new SequentialCommandGroup(
+    //       new ParallelCommandGroup(
+    //         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
+    //         new RunArm(m_Arm, ArmConstants.IntakePos)),
+    //       new RunCommand(() -> m_Intake.runIntake(-0.2)),
+    //       new WaitCommand(-0.2),
+    //       new InstantCommand(() -> m_Intake.stopMotor())));
+
     // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
     //   new ParallelCommandGroup(
     //     new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
