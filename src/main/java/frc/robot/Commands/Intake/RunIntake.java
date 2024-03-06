@@ -8,10 +8,12 @@ public class RunIntake extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Intake m_Intake;
     private final double m_Speed;
+    private WaitCommand wait;
     //private double m_Speed;
     public RunIntake(Intake subsystem, double spd) {
         m_Intake = subsystem;
         m_Speed = spd;
+        
         //m_Speed = speed;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
@@ -19,7 +21,7 @@ public class RunIntake extends Command{
 
       @Override
       public void initialize() {
-    
+        m_Intake.setFinishedIntake(false);
         
       }
     
@@ -32,8 +34,22 @@ public class RunIntake extends Command{
 
       @Override
         public void end(boolean interrupted) {
+          m_Intake.stopMotor();
+          // if(!m_Intake.finishedIntaking){
+          //   m_Intake.runIntake(-0.5);
+          //   wait = new WaitCommand(1);
+          //   try{wait.wait();}
+          //   catch(Exception e){
+          //     System.out.println(e.toString());
+          //   }
+          //   //wait.wait();
+          //   m_Intake.stopMotor();
+          //     System.out.println("Intake has ended");
+          // }
+          m_Intake.setFinishedIntake(true);
+          System.out.println("Intake command finished");
         }
-
+      
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

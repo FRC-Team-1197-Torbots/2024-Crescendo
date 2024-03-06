@@ -71,6 +71,7 @@ public class RobotContainer {
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
   private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
+  private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
   private double speed = 0.7;
   private boolean inTeleop = false;
 
@@ -116,45 +117,80 @@ public class RobotContainer {
     // beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     
-    //Intake Routines
+    // Intake Routines
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
       .whileTrue(
         new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos),
-          new RunCommand(()-> m_Shooter.runShooter(-0.4))));
-    
+          new StartEndCommand(
+            () -> m_Shooter.runShooter(-0.4), 
+            () -> m_Shooter.stopMotor())));
+          
     // m_driverController.rightTrigger(0.5).and(beamTrigger.negate())//Runs Intake then backspins it for 0.2 seconds
     //   .whileTrue(
     //     new SequentialCommandGroup(
     //       new ParallelCommandGroup(
     //         new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-    //         new RunArm(m_Arm, ArmConstants.IntakePos)),
-    //       new RunCommand(() -> m_Intake.runIntake(-0.2)),
-    //       new WaitCommand(-0.2),
-    //       new InstantCommand(() -> m_Intake.stopMotor())));
-
+    //         new RunArm(m_Arm, ArmConstants.IntakePos),
+    //         () -> m_Shooter.runShooter(-0.4))));
+    m_driverController.rightTrigger()
+      .onTrue(
+        new InstantCommand(() -> m_Intake.setFinishedIntake(false)));
+          // new RunCommand(() -> m_Intake.runIntake(-0.2)),
+          // new WaitCommand(0.5),
+          // new InstantCommand(() -> m_Intake.stopMotor())));
+    intakeFinished.onTrue(
+      new SequentialCommandGroup(
+        new PrintCommand("null"),
+        new RunCommand(() -> m_Intake.runIntake(-0.2)).withTimeout(0.1),
+        // new WaitCommand(0.5),
+        new InstantCommand(() -> m_Intake.stopMotor())));
+    
+    // m_driverController.rightTrigger()
+    //   .onFalse(
+        // new SequentialCommandGroup(
+          // new ParallelCommandGroup
+          // (
+          // new RunCommand(() -> m_Intake.runIntake(-0.2)).withTimeout(0.5), 
+          // new WaitCommand(0.5)),
+          // new InstantCommand(() -> m_Intake.stopMotor())));
     // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
     //   new ParallelCommandGroup(
     //     new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
     //     new AmpShooter(m_Shooter)),
     //   new Shoot(m_Intake),
     //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
+    m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+        new AmpShooter(m_Shooter)),
+      // new Shoot(m_Intake),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
 
+      
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
-    // // limelight aiming
+    // limelight aiming
+    m_driverController.leftTrigger(0.5)
+      .whileTrue(new SequentialCommandGroup(
+        new ScanAprilTag(m_Limelight),
+        // new AimRobot(m_robotDrive),
+        new ParallelCommandGroup(
+          new StartEndCommand(
+            () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
+            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+          new RevShooter(m_Shooter))));
+
     // m_driverController.leftTrigger(0.5)
     //   .whileTrue(new SequentialCommandGroup(
-    //     new ScanAprilTag(m_Limelight),
-    //     // new AimRobot(m_robotDrive),
     //     new ParallelCommandGroup(
     //       new StartEndCommand(
-    //         () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
-    //         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+    //         () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
+    //         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
     //       new RevShooter(m_Shooter))));
 
-    m_driverController.leftTrigger(0.5)
+m_driverController.leftTrigger(0.5)
       .whileTrue(new SequentialCommandGroup(
         new ParallelCommandGroup(
           new StartEndCommand(
@@ -201,8 +237,8 @@ public class RobotContainer {
     // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
     // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
-    // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.025)));
-    // m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(0.025)));
+    m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.25)));
+    m_MechController.povRight().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(0.25)));
     // m_MechController.a().whileTrue(new StartEndCommand( 
     //   () -> m_Intake.TestIntake(),
     //   () -> m_Intake.stopMotor(),
@@ -220,7 +256,9 @@ public class RobotContainer {
       positionChooser.addOption("Top (AMP)", "Top");
       positionChooser.addOption("Middle (SPEAKER)", "Middle");
       positionChooser.addOption("Bottom (STATION)", "Bottom");
-      
+
+
+      autoNameChooser.addOption("4 Note", "4 Note");
       autoNameChooser.addOption("3 Note", "3 Note");
       autoNameChooser.addOption("2 Note", "2 Note");
       autoNameChooser.addOption("1 Note", "1 Note");

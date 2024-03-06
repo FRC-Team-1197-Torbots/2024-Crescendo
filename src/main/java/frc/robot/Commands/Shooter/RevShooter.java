@@ -13,7 +13,7 @@ public class RevShooter extends Command{
     private double targetRPM = -4000;
     public RevShooter(Shooter subsystem) {
         m_Shooter = subsystem;
-        m_ShooterPID = new PIDController(m_Shooter.getKp(), 0.000001, 0);
+        m_ShooterPID = new PIDController(m_Shooter.getKp(), 0.0001, 0);
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -27,8 +27,9 @@ public class RevShooter extends Command{
       @Override
       public void execute() {
         //System.out.println("Going up");
-        // m_Shooter.runShooter(m_ShooterPID.calculate(targetRPM - m_Shooter.getShooterRPM()));
+        //m_Shooter.runShooter(m_ShooterPID.calculate(targetRPM - m_Shooter.getAverageShooterRPM()));
         m_Shooter.runShooter(0.85);
+
         
       }
 

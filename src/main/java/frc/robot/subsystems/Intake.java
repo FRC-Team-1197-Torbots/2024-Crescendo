@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
 
-    private double testspeed = 0;
+    private double testspeed = 4.2;
     private CANSparkMax MotorA;
     private DigitalInput m_BreakBeam;
-
+    public boolean finishedIntaking;
     public Intake() {
         MotorA = new CANSparkMax(IntakeConstants.IntakeMotor, MotorType.kBrushless);
         MotorA.setIdleMode(IdleMode.kBrake);
@@ -26,6 +26,7 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("Finished Intaking state", finishedIntakeState());
         SmartDashboard.putBoolean("Break beam", gamePieceStored());
         // SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
     }
@@ -36,6 +37,14 @@ public class Intake extends SubsystemBase {
 
     public void stopMotor() {
         MotorA.set(0);
+    }
+
+    public void setFinishedIntake(boolean finished){
+        finishedIntaking = finished;
+    }
+    
+    public boolean finishedIntakeState(){
+        return finishedIntaking;
     }
 
     public boolean gamePieceStored() {

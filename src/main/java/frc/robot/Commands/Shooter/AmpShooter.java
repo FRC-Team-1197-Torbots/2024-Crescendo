@@ -20,7 +20,7 @@ public class AmpShooter extends Command{
 
       @Override
       public void initialize() {
-        m_Shooter.runShooter(0, 4.25);
+        m_Shooter.runShooter(0, m_Shooter.BotFlyWheelTestVoltage);
         m_Shooter.setMotorMode(IdleMode.kCoast);
       }
     

@@ -18,7 +18,7 @@ public class Shooter extends SubsystemBase {
     private CANSparkFlex BottomMotor;
     private double shooterKp = 0.001;
     private double TopFlyWheelTestVoltage = 0;
-    private double BotFlyWheelTestVoltage = 4;
+    public double BotFlyWheelTestVoltage = 4.2;
     private double low = 2100;
     private double high = 2500;
 
@@ -41,11 +41,13 @@ public class Shooter extends SubsystemBase {
         // SmartDashboard.putNumber("bot", bot);
         // SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
         SmartDashboard.putBoolean("Shooter RPM on Target", onTarget());
-
+        SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
     }
 
     public void runShooter(double spd) {
+        // TopMotor.setVoltage(spd);
+        // BottomMotor.setVoltage(spd);
         TopMotor.set(-spd);
         BottomMotor.set(-spd);
     }
@@ -69,12 +71,16 @@ public class Shooter extends SubsystemBase {
         BottomMotor.set(ShooterConstants.IdleSpeed);
     }
 
-    public double getBottomShooterRPM() {
+    private double getBottomShooterRPM() {
         return BottomMotor.getEncoder().getVelocity();
     }
 
-    public double getTopShooterRPM() {
+    private double getTopShooterRPM() {
         return TopMotor.getEncoder().getVelocity();
+    }
+
+    public double getAverageShooterRPM(){
+        return (getBottomShooterRPM() + getTopShooterRPM()) / 2;
     }
 
     public boolean getBreakBeamState() {
