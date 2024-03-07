@@ -253,6 +253,7 @@ m_driverController.leftTrigger(0.5)
       NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(3));
       //NamedCommands.registerCommand("Shoot and Limelight Aim", new RunArm(m_Arm, 114.2).alongWith(new ShootAuto));
       NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(3));
+      NamedCommands.registerCommand("Temporary Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
       NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
         new InstantCommand(() -> m_Shooter.stopMotor())));
