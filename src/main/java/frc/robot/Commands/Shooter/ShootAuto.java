@@ -49,7 +49,7 @@ public class ShootAuto extends Command {
         super.end(interrupted);
         m_Shooter.incrementShotCount();
         m_Shooter.stopIntakeShooter();
-        m_Shooter.stopMotor();
+        m_Shooter.idleMotor();
     }
 
     @Override

@@ -28,11 +28,11 @@ public final class Constants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
     public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kMaxAngularSpeed = 2.5 * Math.PI; // radians per second / 2
 
-    public static final double kDirectionSlewRate = 2.0; // radians per second 1.2
-    public static final double kMagnitudeSlewRate = 4.5; // percent per second (1 = 100%) 1.8 //3.4
-    public static final double kRotationalSlewRate = 5.0; // percent per second (1 = 100%) 2.0//4.0
+    public static final double kDirectionSlewRate = 3; // radians per second 2 / 2.5, 3
+    public static final double kMagnitudeSlewRate = 5.1; // percent per second (1 = 100%) 1.8 //4.9, 5.5
+    public static final double kRotationalSlewRate = 6.0; // percent per second (1 = 100%) 2.0//5.0, 6.0
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(25); //26.5
@@ -105,7 +105,7 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    public static final double kDrivingP = 0.04;
+    public static final double kDrivingP = 0.04; //0.04 // 0.02
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
     public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
@@ -122,7 +122,7 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 35; // amps // 50
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
@@ -133,7 +133,7 @@ public final class Constants {
 
   public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3; 
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
@@ -164,16 +164,17 @@ public final class Constants {
     public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
     public static final double SecondShotSpeaker = 105;
-    public static final double TestPos = 106;
+    public static final double TestPos = 119;
     public static final double AmpPos = 106.05;//106
-    public static final double SubwooferPos = 119;
+    public static final double SubwooferPos = 113.2;
     
     // Auto arm angles
     public static final double[] TwoNoteMidTargets = {ArmConstants.SubwooferPos, 103};
     public static final double[] ThreeNoteMidTargets = {ArmConstants.SubwooferPos, 101.5, 102.011};
+    public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] OneNoteBottomTargets = {107.888};
-    public static final double[] Nothing = {ArmConstants.StorePos};
+    public static final double[] StoreTargets = {ArmConstants.StorePos};
 
     //Arm PID Constants
     public static final double Arm_kP = 0.1;//0.1//around 0.5 degrees of error

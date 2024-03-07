@@ -31,6 +31,10 @@ public class Intake extends SubsystemBase {
         // SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
     }
 
+    public void setIntakeVoltage(double voltage) {
+        MotorA.setVoltage(-voltage);
+    }
+
     public void runIntake(double spd) {
         MotorA.set(-spd);
     }

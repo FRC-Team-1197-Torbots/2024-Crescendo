@@ -29,7 +29,7 @@ public class Arm extends SubsystemBase {
     private PIDController m_PIDController;
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
-    private double testAngle;
+    public double testAngle;
     // private double feedForward;
     public double[] autoTargets;
 
@@ -73,7 +73,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
-        // SmartDashboard.putNumber("Test Angle", testAngle);
+        SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
 
@@ -141,8 +141,11 @@ public class Arm extends SubsystemBase {
             case("3 Note Middle"):
                 autoTargets = ArmConstants.ThreeNoteMidTargets;
                 break;
+            case("4 Note Top"):
+                autoTargets = ArmConstants.FourNoteTopTargets;
+                break;
             default:
-                autoTargets = ArmConstants.Nothing;
+                autoTargets = ArmConstants.StoreTargets;
                 break;
         } 
         SmartDashboard.putNumberArray("Auto targets", autoTargets);

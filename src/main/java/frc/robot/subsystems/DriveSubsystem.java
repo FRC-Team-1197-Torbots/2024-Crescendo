@@ -99,9 +99,10 @@ public class DriveSubsystem extends SubsystemBase {
   private double odometry_x;
   private double odometry_y;
   //Optional<Alliance> color = DriverStation.getAlliance();
-  private String m_autoName = "2 Note Mid";
+  private String m_autoName = "4 Note Top";
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
     m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(gyroWithOffset()),//-m_gyro.getAngle()
@@ -115,7 +116,7 @@ public class DriveSubsystem extends SubsystemBase {
       //new Pose2d(0,0,new Rotation2d(Math.toRadians(0)))
     );
 
-    m_PidController = new PIDController(turningKp, 0, turningKd);
+    // m_PidController = new PIDController(turningKp, 0, turningKd);
     setAngle(0);
     resetEncoders();
    
@@ -154,6 +155,21 @@ public class DriveSubsystem extends SubsystemBase {
         },
         this // Reference to this subsystem to set requirements
     );
+  }
+
+  public double getAutoStartingAngle() {
+     if (!DriverStation.getAlliance().isEmpty()) {
+      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+        SmartDashboard.putNumber("Red angle", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+        return 180 + GeometryUtil.flipFieldPose(PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName)).getRotation().getDegrees();
+      } else {
+        SmartDashboard.putNumber("Blue angle", 180 + PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+        return PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees();
+  
+      }
+    } else {
+      return 0;
+    }
   }
 
   public double gyroWithOffset() {

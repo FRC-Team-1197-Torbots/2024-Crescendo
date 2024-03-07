@@ -10,7 +10,6 @@ public class RevShooter extends Command{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Shooter m_Shooter;
     private PIDController m_ShooterPID;
-    private double targetRPM = -4000;
     public RevShooter(Shooter subsystem) {
         m_Shooter = subsystem;
         m_ShooterPID = new PIDController(m_Shooter.getKp(), 0.0001, 0);
@@ -21,6 +20,7 @@ public class RevShooter extends Command{
       @Override
       public void initialize() {
         
+        m_Shooter.resetTimer();
       }
     
       // Called every time the scheduler runs while the command is scheduled.
