@@ -144,6 +144,9 @@ public class Arm extends SubsystemBase {
             case("4 Note Top"):
                 autoTargets = ArmConstants.FourNoteTopTargets;
                 break;
+            case("5 Note Top"):
+                autoTargets = ArmConstants.FourNoteTopTargets;
+                break;
             default:
                 autoTargets = ArmConstants.StoreTargets;
                 break;

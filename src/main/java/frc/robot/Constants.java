@@ -166,15 +166,16 @@ public final class Constants {
     public static final double SecondShotSpeaker = 105;
     public static final double TestPos = 119;
     public static final double AmpPos = 106.05;//106
-    public static final double SubwooferPos = 113.2;
+    public static final double SubwooferPos = 118; //113.2
     
     // Auto arm angles
-    public static final double[] TwoNoteMidTargets = {ArmConstants.SubwooferPos, 103};
-    public static final double[] ThreeNoteMidTargets = {ArmConstants.SubwooferPos, 101.5, 102.011};
-    public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
+    public static final double[] TwoNoteMidTargets = {SubwooferPos, 103};
+    public static final double[] ThreeNoteMidTargets = {SubwooferPos, 101.5, 102.011};
+    public static final double[] FourNoteTopTargets = {SubwooferPos, 100.5, 101.5, 98};
+    public static final double[] FiveNoteTopTargets = {SubwooferPos, 100.5, 101.5, 98, 71};
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] OneNoteBottomTargets = {107.888};
-    public static final double[] StoreTargets = {ArmConstants.StorePos};
+    public static final double[] StoreTargets = {StorePos};
 
     //Arm PID Constants
     public static final double Arm_kP = 0.1;//0.1//around 0.5 degrees of error

@@ -1,0 +1,85 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.75,
+      "y": 6.61
+    },
+    "rotation": 58.41
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Top 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Top 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Top 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Top 4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 Note Top 5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Auto End"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Finished Autos",
+  "choreoAuto": false
+}

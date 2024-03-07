@@ -55,7 +55,7 @@ public class RobotContainer {
 
   private SendableChooser<String> autoNameChooser = new SendableChooser<>();
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
   private final Climber m_Climber = new Climber();
@@ -250,9 +250,9 @@ m_driverController.leftTrigger(0.5)
     }
     
     private void registerAutoCommands() {
-      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter));
+      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(3));
       //NamedCommands.registerCommand("Shoot and Limelight Aim", new RunArm(m_Arm, 114.2).alongWith(new ShootAuto));
-      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake));
+      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(3));
       NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
         new InstantCommand(() -> m_Shooter.stopMotor())));
@@ -263,7 +263,7 @@ m_driverController.leftTrigger(0.5)
       positionChooser.addOption("Middle (SPEAKER)", "Middle");
       positionChooser.addOption("Bottom (STATION)", "Bottom");
 
-
+      autoNameChooser.addOption("5 Note", "5 Note");
       autoNameChooser.addOption("4 Note", "4 Note");
       autoNameChooser.addOption("3 Note", "3 Note");
       autoNameChooser.addOption("2 Note", "2 Note");

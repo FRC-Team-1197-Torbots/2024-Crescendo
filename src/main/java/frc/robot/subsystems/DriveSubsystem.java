@@ -99,9 +99,10 @@ public class DriveSubsystem extends SubsystemBase {
   private double odometry_x;
   private double odometry_y;
   //Optional<Alliance> color = DriverStation.getAlliance();
-  private String m_autoName = "4 Note Top";
+  private String m_autoName;
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  public DriveSubsystem(String autoName) {
+    m_autoName = autoName;
     SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
     m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -117,7 +118,7 @@ public class DriveSubsystem extends SubsystemBase {
     );
 
     // m_PidController = new PIDController(turningKp, 0, turningKd);
-    setAngle(0);
+    //setAngle(0);
     resetEncoders();
    
     // All other subsystem initialization
