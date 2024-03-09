@@ -520,8 +520,6 @@ public class DriveSubsystem extends SubsystemBase {
   }
   
   public boolean closeToTarget() {
-    if(Math.abs(calcAngle()) < 10)
-                System.out.println(true);
     return Math.abs(calcAngle()) < 10;
     
   }

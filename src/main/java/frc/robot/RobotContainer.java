@@ -184,7 +184,7 @@ public class RobotContainer {
         new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive)));
         
     m_driverController.leftTrigger(0.5).and(speakerOnTarget).whileTrue(
-        new SequentialCommandGroup(
+      new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
         new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive),
