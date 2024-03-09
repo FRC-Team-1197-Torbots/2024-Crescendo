@@ -222,18 +222,18 @@ public class RobotContainer {
     //     () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
     //     () -> m_Arm.setStates(ArmStates.STORE)), 
     //     new RevShooter(m_Shooter)));
-    m_driverController.a().whileTrue(new StartEndCommand( 
+    m_driverController.b().whileTrue(new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(),
       m_Intake));
       
-    m_driverController.y().onTrue(new ScanAprilTag(m_Limelight));
+    m_driverController.x().onTrue(new ScanAprilTag(m_Limelight));
       
-    m_MechController.a()
+    m_driverController.a()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.DOWN));
         
-    m_MechController.y()
+    m_driverController.y()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.UP));
           
