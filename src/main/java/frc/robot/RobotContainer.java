@@ -9,6 +9,7 @@ import edu.wpi.first.math.proto.Wpimath;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Commands.DoNothing;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
@@ -99,7 +100,7 @@ public class RobotContainer {
         () -> m_robotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-        -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+        -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), // m_robotDrive.setTurnRate(m_robotDrive.calcAngle())
         true, true),
         m_robotDrive));
   }
@@ -177,14 +178,16 @@ public class RobotContainer {
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
 
-    // limelight aiming
     m_driverController.leftTrigger(0.5).and(speakerOnTarget.negate())
       .whileTrue(new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
-        new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive)));
+        new StartEndCommand(
+          () -> m_robotDrive.aidanAimRobot(),
+          () -> m_robotDrive.drive(0, 0, 0, true, true), m_robotDrive)));
         
     m_driverController.leftTrigger(0.5).and(speakerOnTarget).whileTrue(
       new SequentialCommandGroup(
+        new DoNothing().withTimeout(2), // 0.2
         new ScanAprilTag(m_Limelight),
         new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive),

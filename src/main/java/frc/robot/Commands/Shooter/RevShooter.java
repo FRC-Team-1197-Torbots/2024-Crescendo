@@ -36,7 +36,7 @@ public class RevShooter extends Command{
       @Override
         public void end(boolean interrupted) {
           m_Shooter.stopMotor();
-          
+          m_Shooter.stopTimer();
             //m_Climber.stopMotors();
         }
 

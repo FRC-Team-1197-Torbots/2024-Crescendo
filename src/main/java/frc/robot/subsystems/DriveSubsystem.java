@@ -520,11 +520,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
   
   public boolean closeToTarget() {
-    return Math.abs(calcAngle()) < 10;
+    return Math.abs(calcAngle()) < 8;
     
   }
 
-  private double setTurnRate(double error) {
+  public double setTurnRate(double error) {
     return m_PidController.calculate(error);
   }
 

@@ -61,6 +61,11 @@ public class Shooter extends SubsystemBase {
         timer.reset();
     }
 
+    public void stopTimer() {
+        timer.reset();
+        timer.stop();
+    }
+
     public void runShooter(double top, double bottom) {
         TopMotor.setVoltage(-top);
         BottomMotor.setVoltage(-bottom);
