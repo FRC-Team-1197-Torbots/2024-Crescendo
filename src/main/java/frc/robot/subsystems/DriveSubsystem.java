@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 //import com.ctre.phoenix
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -26,6 +28,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -83,8 +86,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private PIDController m_PidController;
   private double angleDelta;
-  private double turningKp = 0.025;
-  private double turningKd = 0.000;
+  private double turningKp = 0.02;
+  private double turningKd = 0.001;
 
   // Odometry class for tracking robot pose
   double[] botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
@@ -98,12 +101,25 @@ public class DriveSubsystem extends SubsystemBase {
   private Field2d m_field2d = new Field2d();
   private double odometry_x;
   private double odometry_y;
-  //Optional<Alliance> color = DriverStation.getAlliance();
-  private String m_autoName;
+  private boolean isRedAlliance;
+  Optional<Alliance> color = DriverStation.getAlliance();
+  private String m_autoName = "0 Note Bottom";
+
+  // Robot's Unit Vector
+
+  // Vector from robot's position to speaker
+
+  // Coordinates of robot
+  private double[] m_RobotCoords = new double[2];
+
   /** Creates a new DriveSubsystem. */
-  public DriveSubsystem(String autoName) {
-    m_autoName = autoName;
-    SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+  public DriveSubsystem() {
+    //m_autoName = autoName;
+    //SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+    isRedAlliance = isRedAlliance();
+    System.out.println("Red Alliance: " + isRedAlliance);
+    
+
     m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
       Rotation2d.fromDegrees(gyroWithOffset()),//-m_gyro.getAngle()
@@ -117,8 +133,11 @@ public class DriveSubsystem extends SubsystemBase {
       //new Pose2d(0,0,new Rotation2d(Math.toRadians(0)))
     );
 
-    // m_PidController = new PIDController(turningKp, 0, turningKd);
-    //setAngle(0);
+
+    m_RobotCoords[0] = m_odometry.getPoseMeters().getX();
+    m_RobotCoords[1] = m_odometry.getPoseMeters().getY();
+
+    m_PidController = new PIDController(turningKp, 0, turningKd);
     resetEncoders();
    
     // All other subsystem initialization
@@ -158,7 +177,12 @@ public class DriveSubsystem extends SubsystemBase {
     );
   }
 
-  public double getAutoStartingAngle() {
+  private boolean isRedAlliance(){
+    return DriverStation.getAlliance().get() == Alliance.Red;
+  }
+
+  public double getAutoStartingAngle(String autoName) {
+    m_autoName = autoName;
      if (!DriverStation.getAlliance().isEmpty()) {
       if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
         SmartDashboard.putNumber("Red angle", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
@@ -196,8 +220,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putString("Auto Name", m_autoName);
-    SmartDashboard.putNumber("Gyro Angle", m_gyro.getAngle());
-    SmartDashboard.putNumber("Gyro Offset", gyroWithOffset());
+    SmartDashboard.putNumber("Angle from speaker", calcAngle());
     m_odometry.update(new Rotation2d(Math.toRadians(gyroWithOffset())), new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -207,10 +230,14 @@ public class DriveSubsystem extends SubsystemBase {
 
     odometry_x = m_odometry.getPoseMeters().getX();
     odometry_y = m_odometry.getPoseMeters().getY();
+    m_RobotCoords[0] = odometry_x;
+    m_RobotCoords[1] = odometry_y;
+
     SmartDashboard.putNumber("Odometry X", odometry_x);
     SmartDashboard.putNumber("Odometry Y", odometry_y);
 
     SmartDashboard.putData("Robot Field", m_field2d);
+    SmartDashboard.putBoolean("Period", closeToTarget());
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
@@ -449,65 +476,54 @@ public class DriveSubsystem extends SubsystemBase {
         new Rotation2d(Math.toRadians(90))));//180 + botpose_shooter[5]
   }
 
-  private double xDistanceFromSpeaker() {
-    /*if (color.isPresent())
-      if (color.get() == Alliance.Red) {
-        return odometry_x - Constants.AprilTag4PosX;
-      }
-      if (color.get() == Alliance.Blue) {
-        return odometry_x - Constants.AprilTag7PosX;
-      }
-    else
-      return 0;
-  }
-
-  private double yDistanceFromSpeaker() {
+  private Translation2d getAprilTagPos() {
     if (color.isPresent())
       if (color.get() == Alliance.Red) {
-        return odometry_y - Constants.AprilTag4PosY;
+        return Constants.redSpeakerCoords;
       }
       if (color.get() == Alliance.Blue) {
-        return odometry_y - Constants.AprilTag7PosY;
+        return Constants.blueSpeakerCoords;
       }
-    else*/
-      return 0;
-  }
-
-  private Translation2d getAprilTagPos() {
-    /*if (color.isPresent())
-      if (color.get() == Alliance.Red) {
-        return new Translation2d(Constants.AprilTag4PosX,Constants.AprilTag4PosY);
-      }
-      if (color.get() == Alliance.Blue) {
-        return new Translation2d(Constants.AprilTag7PosX,Constants.AprilTag7PosY);
-      }
-    else*/
-      return null;
+    else
+      return new Translation2d();
   }
   public void setAutoName(String autoname){
     m_autoName = autoname;
   }
   public double distanceFromSpeaker() {
-    return 0; // Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
+    return getPose().getTranslation().getDistance(getAprilTagPos());
   }
 
   public double calcAngle() {
-    // Translation2d robotPos = getPose().getTranslation();
-    // Translation2d aprilTagPos = getAprilTagPos();
-    // Translation2d deltaPos = robotPos.minus(aprilTagPos);
-    // return deltaPos.getAngle().getDegrees();
-    
+    Translation2d robotPos = getPose().getTranslation();
+    Translation2d deltaPos = getAprilTagPos().minus(robotPos);
+    double deltaAngle = (getPose().getRotation().getDegrees() - Math.toDegrees(Math.atan(deltaPos.getY() / deltaPos.getX())));
+    if (color.isPresent())
+      if (color.get() == Alliance.Red)
+        deltaAngle -= 180;
+    deltaAngle %= 360;
 
-    return 0; // -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
+    if (deltaAngle > 180)
+      return deltaAngle - 360;
+    else if (deltaAngle < -180)
+      return deltaAngle + 360;
+    else
+      return deltaAngle;
+
+
+    // return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
-  public void aimRobot(double angleDelta) {
-    SmartDashboard.putNumber("angular rate", angleDelta);
-    drive(0,0,setTurnRate(angleDelta),false,false);
+  public void aidanAimRobot() {
+    angleDelta = calcAngle();
+    drive(0,0, setTurnRate(angleDelta),false,false);
   }
   
-  public boolean onTarget() {
-    return Math.abs(angleDelta) < 1;
+  public boolean closeToTarget() {
+    if(Math.abs(calcAngle()) < 10)
+                System.out.println(true);
+    return Math.abs(calcAngle()) < 10;
+    
   }
 
   private double setTurnRate(double error) {

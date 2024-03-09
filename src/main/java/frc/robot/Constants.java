@@ -164,15 +164,15 @@ public final class Constants {
     public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
     public static final double SecondShotSpeaker = 105;
-    public static final double TestPos = 119;
+    public static final double TestPos = 96;
     public static final double AmpPos = 106.05;//106
-    public static final double SubwooferPos = 118; //113.2
+    public static final double SubwooferPos = 113.5; //
     
     // Auto arm angles
-    public static final double[] TwoNoteMidTargets = {SubwooferPos, 103};
-    public static final double[] ThreeNoteMidTargets = {SubwooferPos, 101.5, 102.011};
-    public static final double[] FourNoteTopTargets = {SubwooferPos, 100.5, 101.5, 98};
-    public static final double[] FiveNoteTopTargets = {SubwooferPos, 100.5, 101.5, 98, 71};
+    public static final double[] TwoNoteMidTargets = {118, 103};
+    public static final double[] ThreeNoteMidTargets = {118, 101.5, 102.011};
+    public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
+    public static final double[] FiveNoteTopTargets = {118, 100.5, 101.5, 98, 71};
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] OneNoteBottomTargets = {107.888};
     public static final double[] StoreTargets = {StorePos};
@@ -242,5 +242,7 @@ public final class Constants {
   public static final double AprilTag7PosX = -0.0381;//-1.5in
   public static final double AprilTag7PosY = 5.547868;//218.42in
 
-  public static final double maxSpeakerDistance = 3.3;
+  public static final Translation2d blueSpeakerCoords = new Translation2d(AprilTag7PosX, AprilTag7PosY); 
+  public static final Translation2d redSpeakerCoords = new Translation2d(AprilTag4PosX, AprilTag4PosY); 
+  public static final double maxSpeakerDistance = 16; // too big
 }

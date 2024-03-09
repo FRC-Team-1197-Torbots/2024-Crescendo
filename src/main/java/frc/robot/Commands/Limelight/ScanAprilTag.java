@@ -1,9 +1,14 @@
 package frc.robot.Commands.Limelight;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.Constants;
 import frc.robot.subsystems.Limelight;
 
 
@@ -16,7 +21,7 @@ public class ScanAprilTag extends Command{
   private double coord_y;
   private double xDistance;
   private double yDistance;
-  //Optional<Alliance> color = DriverStation.getAlliance();
+  Optional<Alliance> color = DriverStation.getAlliance();
 
   public ScanAprilTag(Limelight subsystem) {
       m_Limelight = subsystem;
@@ -26,33 +31,34 @@ public class ScanAprilTag extends Command{
 
     @Override
     public void initialize() {
+      System.out.println("Scanning");
       botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
       botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 
       if(botpose_shooter.length > 0 && botpose_intake.length > 0) {
-        if(botpose_shooter[0] != 0){ //check if shooter limelight sees anything
+        if(botpose_shooter[0] != 0) { //check if shooter limelight sees anything
         coord_x = botpose_shooter[0];
         coord_y = botpose_shooter[1];
-        // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){
+        if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){
           m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_shooter[5]))));
-          // }
-        // else if(botpose_intake[0] != 0){
-        //   coord_x = botpose_intake[0];
-        //   coord_y = botpose_intake[1];
-        //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5]))));
-        // }
+        }
+        else if(botpose_intake[0] != 0){
+          coord_x = botpose_intake[0];
+          coord_y = botpose_intake[1];
+          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5]))));
+          }
         }
         else if(botpose_intake[0] != 0){ //if shooter limelight sees nothing, check intake limelight
           coord_x = botpose_intake[0];
           coord_y = botpose_intake[1];
-          // if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){ //if distance from speaker is <= max distance
+         if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){ //if distance from speaker is <= max distance
             m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_intake[5])))); //180 + botpose_intake[5]
-          // }
-          // else if(botpose_shooter[0] != 0){
-          //   coord_x = botpose_shooter[0];
-          //   coord_y = botpose_shooter[1];
-          //   m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
-          // }
+          }
+          else if(botpose_shooter[0] != 0){
+            coord_x = botpose_shooter[0];
+            coord_y = botpose_shooter[1];
+            m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+          }
         }
       } else {
         System.err.println("Couldn't find the limelights");
@@ -77,7 +83,7 @@ public class ScanAprilTag extends Command{
 
     private double distanceFromSpeaker(double x, double y) {
       
-      /*if (color.isPresent()) {
+      if (color.isPresent()) {
           if (color.get() == Alliance.Red) {
             xDistance = x - Constants.AprilTag4PosX;
             yDistance = y - Constants.AprilTag4PosY;        
@@ -88,7 +94,7 @@ public class ScanAprilTag extends Command{
           }
       }else{
         
-      }*/
+      }
       
       return Math.hypot(xDistance, yDistance);
     }

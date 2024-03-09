@@ -47,7 +47,7 @@ public class RunIntake extends Command{
           //     System.out.println("Intake has ended");
           // }
           m_Intake.setFinishedIntake(true);
-          System.out.println("Intake command finished");
+          //System.out.println("Intake command finished");
         }
       
   // Returns true when the command should end.

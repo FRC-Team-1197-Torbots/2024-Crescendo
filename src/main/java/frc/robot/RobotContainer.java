@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.proto.Wpimath;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -55,7 +57,7 @@ public class RobotContainer {
 
   private SendableChooser<String> autoNameChooser = new SendableChooser<>();
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
   private final Climber m_Climber = new Climber();
@@ -67,13 +69,13 @@ public class RobotContainer {
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
+  private final Trigger speakerOnTarget = new Trigger(m_robotDrive::closeToTarget);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
   private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
   private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
   private double speed = 0.7;
-  private boolean inTeleop = false;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -174,16 +176,23 @@ public class RobotContainer {
       
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
-    // // limelight aiming
-    // m_driverController.leftTrigger(0.5)
-    //   .whileTrue(new SequentialCommandGroup(
-    //     new ScanAprilTag(m_Limelight),
-    //     // new AimRobot(m_robotDrive),
-    //     new ParallelCommandGroup(
-    //       new StartEndCommand(
-    //         () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
-    //         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-    //       new RevShooter(m_Shooter))));
+
+    // limelight aiming
+    m_driverController.leftTrigger(0.5).and(speakerOnTarget.negate())
+      .whileTrue(new SequentialCommandGroup(
+        new ScanAprilTag(m_Limelight),
+        new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive)));
+        
+    m_driverController.leftTrigger(0.5).and(speakerOnTarget).whileTrue(
+        new SequentialCommandGroup(
+        new ScanAprilTag(m_Limelight),
+        new ParallelCommandGroup(
+          new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive),
+          new StartEndCommand(
+            () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
+            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+          new RevShooter(m_Shooter))));
+      
 
     // m_driverController.leftTrigger(0.5)
     //   .whileTrue(new SequentialCommandGroup(
@@ -193,13 +202,14 @@ public class RobotContainer {
     //         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
     //       new RevShooter(m_Shooter))));
 
-m_driverController.leftTrigger(0.5)
-      .whileTrue(new SequentialCommandGroup(
-        new ParallelCommandGroup(
-          new StartEndCommand(
-            () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
-            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-          new RevShooter(m_Shooter))));
+    // Manual arm control
+    // m_driverController.leftTrigger(0.5)
+    //       .whileTrue(new SequentialCommandGroup(
+    //         new ParallelCommandGroup(
+    //           new StartEndCommand(
+    //             () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), //ArmConstants.SubwooferPos
+    //             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
+    //           new RevShooter(m_Shooter))));
 
     //ANGLE TEST CODE
     // m_driverController.leftTrigger(0.5)
@@ -209,7 +219,6 @@ m_driverController.leftTrigger(0.5)
     //     () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
     //     () -> m_Arm.setStates(ArmStates.STORE)), 
     //     new RevShooter(m_Shooter)));
-
     m_driverController.a().whileTrue(new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(),
@@ -250,9 +259,9 @@ m_driverController.leftTrigger(0.5)
     }
     
     private void registerAutoCommands() {
-      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(3));
+      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
       //NamedCommands.registerCommand("Shoot and Limelight Aim", new RunArm(m_Arm, 114.2).alongWith(new ShootAuto));
-      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(3));
+      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(5));
       NamedCommands.registerCommand("Temporary Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
       NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
@@ -282,11 +291,16 @@ m_driverController.leftTrigger(0.5)
        * @return the command to run in autonomous
        */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());  
+    try{
+      return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
+    }
+    catch(Exception e){
+      return new PathPlannerAuto("0 Note Bottom");
+    }
+      
   }
 
   public void teleopInit() {
-    inTeleop = true;
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
@@ -312,7 +326,7 @@ m_driverController.leftTrigger(0.5)
     m_Arm.setAutoTargets(getAutonomousCommand().getName());
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.resetAutoShots();
-    m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle());
+    m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
   }
 
   public ScanAprilTag getScanAprilTag() {
