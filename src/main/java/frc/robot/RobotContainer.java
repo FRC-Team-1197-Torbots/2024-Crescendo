@@ -9,7 +9,6 @@ import edu.wpi.first.math.proto.Wpimath;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Commands.DoNothing;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
@@ -187,8 +186,7 @@ public class RobotContainer {
         
     m_driverController.leftTrigger(0.5).and(speakerOnTarget).whileTrue(
       new SequentialCommandGroup(
-        new DoNothing().withTimeout(2), // 0.2
-        new ScanAprilTag(m_Limelight),
+        new WaitCommand(2).andThen(new ScanAprilTag(m_Limelight)), // 0.2
         new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive),
           new StartEndCommand(

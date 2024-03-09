@@ -16,6 +16,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +27,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -35,6 +37,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.utils.VectorGen;
+import frc.robot.utils.VectorTools;
 import frc.utils.SwerveUtils;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -495,28 +499,18 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double calcAngle() {
-    Translation2d robotPos = getPose().getTranslation();
-    Translation2d deltaPos = getAprilTagPos().minus(robotPos);
-    double deltaAngle = (getPose().getRotation().getDegrees() - Math.toDegrees(Math.atan(deltaPos.getY() / deltaPos.getX())));
-    if (color.isPresent())
-      if (color.get() == Alliance.Red)
-        deltaAngle -= 180;
-    deltaAngle %= 360;
+    VectorGen robotVector = new VectorGen(getHeading());
+    VectorGen deltaVector = new VectorGen(getPose().getTranslation(), getAprilTagPos());
 
-    if (deltaAngle > 180)
-      return deltaAngle - 360;
-    else if (deltaAngle < -180)
-      return deltaAngle + 360;
-    else
-      return deltaAngle;
-
-
+    return VectorTools.getAngle(robotVector, deltaVector);
     // return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
   public void aidanAimRobot() {
     angleDelta = calcAngle();
-    drive(0,0, setTurnRate(angleDelta),false,false);
+    ChassisSpeeds.discretize(0, 0, setTurnRate(angleDelta), 0.02);
+
+    //drive(0,0, setTurnRate(angleDelta),false,false);
   }
   
   public boolean closeToTarget() {
