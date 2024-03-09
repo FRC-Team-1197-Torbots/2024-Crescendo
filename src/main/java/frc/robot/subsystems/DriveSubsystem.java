@@ -245,7 +245,7 @@ public class DriveSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);
     // SmartDashboard.putNumber("Back Left Pos", m_rearLeft.getPosition().distanceMeters);
     // SmartDashboard.putNumber("Back Right Pos", m_rearRight.getPosition().distanceMeters);
-    SmartDashboard.putNumber("Robot Angle", getHeading() % 360);
+    SmartDashboard.putNumber("Robot angular velocity", getSpeeds().omegaRadiansPerSecond);
   }
 
   /**
