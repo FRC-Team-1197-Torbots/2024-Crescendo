@@ -237,15 +237,16 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Odometry Y", odometry_y);
 
     SmartDashboard.putData("Robot Field", m_field2d);
-    SmartDashboard.putBoolean("Period", closeToTarget());
+    SmartDashboard.putBoolean("Period", facingSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
+    SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
     m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
     // SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
     // SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);
     // SmartDashboard.putNumber("Back Left Pos", m_rearLeft.getPosition().distanceMeters);
     // SmartDashboard.putNumber("Back Right Pos", m_rearRight.getPosition().distanceMeters);
-    SmartDashboard.putNumber("Robot angular velocity", getSpeeds().omegaRadiansPerSecond);
+    // SmartDashboard.putNumber("Robot angular velocity", getSpeeds().omegaRadiansPerSecond);
   }
 
   /**
@@ -514,14 +515,17 @@ public class DriveSubsystem extends SubsystemBase {
     // return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
-  public void aidanAimRobot() {
+  public void aimRobot() {
     angleDelta = calcAngle();
     drive(0,0, setTurnRate(angleDelta),false,false);
   }
   
-  public boolean closeToTarget() {
+  public boolean facingSpeaker() {
     return Math.abs(calcAngle()) < 8;
-    
+  }
+
+  public boolean closeToSpeaker() {
+    return distanceFromSpeaker() < 3.1;
   }
 
   public double setTurnRate(double error) {

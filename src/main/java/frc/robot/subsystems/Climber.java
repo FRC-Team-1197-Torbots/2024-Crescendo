@@ -44,11 +44,11 @@ public class Climber extends SubsystemBase {
         // SmartDashboard.putBoolean("left at Bottom", leftAtBottom);
         // SmartDashboard.putBoolean("right at Bottom", rightAtBottom);
 
-        // SmartDashboard.putNumber("Left Climber Ticks", getLeftPosition());
-        // SmartDashboard.putNumber("Right Climber Ticks", getRightPosition());
+        SmartDashboard.putNumber("Left Climber Ticks", getLeftPosition());
+        SmartDashboard.putNumber("Right Climber Ticks", getRightPosition());
 
-        // SmartDashboard.putBoolean("Left at Top", leftAtTop);
-        // SmartDashboard.putBoolean("Right at Top", rightAtTop);
+        SmartDashboard.putBoolean("Left at Top", leftAtTop);
+        SmartDashboard.putBoolean("Right at Top", rightAtTop);
         // SmartDashboard.putNumber("Left Voltage", leftClimberFlex.getBusVoltage());
         // SmartDashboard.putNumber("Right Voltage", rightClimberFlex.getBusVoltage());
 

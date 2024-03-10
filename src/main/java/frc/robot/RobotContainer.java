@@ -13,6 +13,7 @@ import frc.robot.Commands.DoNothing;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Climber.RunClimber;
+import frc.robot.Commands.Drive.AimAtSpeaker;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -70,7 +72,8 @@ public class RobotContainer {
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
-  private final Trigger speakerOnTarget = new Trigger(m_robotDrive::closeToTarget);
+  private final Trigger speakerOnTarget = new Trigger(m_robotDrive::facingSpeaker);
+  private final Trigger closeToSpeaker = new Trigger(m_robotDrive::closeToSpeaker);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
@@ -100,7 +103,8 @@ public class RobotContainer {
         () -> m_robotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-        -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), // m_robotDrive.setTurnRate(m_robotDrive.calcAngle())
+        -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
+        // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
   }
@@ -177,20 +181,13 @@ public class RobotContainer {
       
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
-
-    m_driverController.leftTrigger(0.5).and(speakerOnTarget.negate())
-      .whileTrue(new SequentialCommandGroup(
-        new ScanAprilTag(m_Limelight),
-        new StartEndCommand(
-          () -> m_robotDrive.aidanAimRobot(),
-          () -> m_robotDrive.drive(0, 0, 0, true, true), m_robotDrive)));
-        
-    m_driverController.leftTrigger(0.5).and(speakerOnTarget).whileTrue(
+    m_driverController.leftTrigger(0.5).whileTrue(
       new SequentialCommandGroup(
-        new DoNothing().withTimeout(2), // 0.2
         new ScanAprilTag(m_Limelight),
+        new AimAtSpeaker(m_robotDrive),
+        new ScanAprilTag(m_Limelight).onlyIf(closeToSpeaker),
         new ParallelCommandGroup(
-          new RunCommand(() -> m_robotDrive.aidanAimRobot(),m_robotDrive),
+          new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive).onlyIf(closeToSpeaker),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
@@ -246,10 +243,10 @@ public class RobotContainer {
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
     // m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
     
-    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.5)));
-    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.5)));
-    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
-    // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.25)));
+    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.25)));
+    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
+    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
     // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.25)));

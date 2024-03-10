@@ -196,8 +196,8 @@ public final class Constants {
     // public static final double M = -6.77;
     // public static final double B = 121;
     // logarithmic
-    public static final double A = -20.3;
-    public static final double B = 123;
+    public static final double A = -18.7;
+    public static final double B = 122;
   }
 
   public static final class ClimberConstants{
