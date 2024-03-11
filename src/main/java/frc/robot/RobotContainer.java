@@ -24,6 +24,7 @@ import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.BlinkinConstatnts;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -66,6 +67,7 @@ public class RobotContainer {
   private final Climber m_Climber = new Climber();
   public final Limelight m_Limelight = new Limelight(m_robotDrive);
   public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
+  public final Blinkin m_Blinkin = new Blinkin();
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -233,20 +235,23 @@ public class RobotContainer {
     m_driverController.y()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.UP));
-          
+        
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
       
-      
+    m_MechController.y().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstatnts.Red)));
+
+    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstatnts.White)));
+
     // PID testing
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
     // m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.01)));
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
     // m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
     
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.25)));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.25)));
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
-    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
+    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(0.25)));
+    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-0.25)));
+    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(-10)));
+    // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementAngle(10)));
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
     // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.25)));

@@ -237,6 +237,21 @@ public final class Constants {
 
   }
 
+  public static final class BlinkinConstatnts {
+    public static final int Blinkin = 1; 
+    public static final double Red = 0.61;
+    public static final double White = 0.93;
+    public static final double Black = 0.99;
+    public static final double Blue = 0.87;
+    public static final double Green = 0.77;
+    public static final double Rainbow = -0.99;
+    public static final double Orange = 0.65;
+    public static final double Violet = 0.91;
+    public static final double Gold = 0.67;
+    public static final double Yellow = 0.69;
+    public static final double Pink = 0.57;
+  }
+
   public static final double AprilTag4PosX = 16.579;  
   public static final double AprilTag4PosY = 5.548;
   public static final double AprilTag7PosX = -0.0381;//-1.5in
@@ -245,4 +260,6 @@ public final class Constants {
   public static final Translation2d blueSpeakerCoords = new Translation2d(AprilTag7PosX, AprilTag7PosY); 
   public static final Translation2d redSpeakerCoords = new Translation2d(AprilTag4PosX, AprilTag4PosY); 
   public static final double maxSpeakerDistance = 16; // too big
+
+  
 }
