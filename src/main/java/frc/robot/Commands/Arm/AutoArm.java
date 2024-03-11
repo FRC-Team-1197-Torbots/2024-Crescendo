@@ -3,25 +3,34 @@ package frc.robot.Commands.Arm;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Shooter;
 
 public class AutoArm extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private final Arm m_Arm;
+  private final Shooter m_Shooter;
   private double m_targetAngle;
+  
+  private boolean armReachedTarget = false;
+  private double[] autoTargets;
+  private int shots;
 
-  public AutoArm(Arm subsystem, double target) {
+  public AutoArm(Arm subsystem, Shooter shooter_subsystem) {//, double target
     m_Arm = subsystem;
-    m_targetAngle = target;
+    m_Shooter = shooter_subsystem;
+    // m_targetAngle = target;
     // m_Speed = speed;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(subsystem, shooter_subsystem);
   }
 
   @Override
   public void initialize() {
     m_Arm.setTargetAngle(m_targetAngle);
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.

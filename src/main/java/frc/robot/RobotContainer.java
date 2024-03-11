@@ -265,9 +265,10 @@ public class RobotContainer {
     
     private void registerAutoCommands() {
       NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
+      // NamedCommands.registerCommand("Set Arm to Target", new AutoArm(m_Arm, m_Shooter).withTimeout(5));
       //NamedCommands.registerCommand("Shoot and Limelight Aim", new RunArm(m_Arm, 114.2).alongWith(new ShootAuto));
       NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(5));
-      NamedCommands.registerCommand("Temporary Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
+      NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
       NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
         new InstantCommand(() -> m_Shooter.stopMotor())));
@@ -275,6 +276,7 @@ public class RobotContainer {
     
     private void addAutoPaths() {
       positionChooser.addOption("Top (AMP)", "Top");
+      positionChooser.addOption("Top to Center", "Top to Center");
       positionChooser.addOption("Middle (SPEAKER)", "Middle");
       positionChooser.addOption("Bottom (STATION)", "Bottom");
 
