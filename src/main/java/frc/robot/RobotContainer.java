@@ -24,7 +24,7 @@ import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.BlinkinConstatnts;
+import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -67,7 +67,7 @@ public class RobotContainer {
   private final Climber m_Climber = new Climber();
   public final Limelight m_Limelight = new Limelight(m_robotDrive);
   public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
-  public final Blinkin m_Blinkin = new Blinkin();
+  public final Blinkin m_Blinkin = new Blinkin(m_Intake);
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -125,6 +125,8 @@ public class RobotContainer {
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     // beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
+    beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
+    beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     
     // Intake Routines
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
@@ -173,15 +175,20 @@ public class RobotContainer {
     //     new AmpShooter(m_Shooter)),
     //   new Shoot(m_Intake),
     //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
-    m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-        new AmpShooter(m_Shooter)),
-      // new Shoot(m_Intake),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
+
+    
+    // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
+    //   new ParallelCommandGroup(
+    //     new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+    //     new AmpShooter(m_Shooter)),
+    //   // new Shoot(m_Intake),
+    //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
 
       
-    m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
+    m_driverController.leftBumper().and(atShooterTarget).onTrue(
+      new SequentialCommandGroup(
+        new Shoot(m_Intake),
+        new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White))));
 
     m_driverController.leftTrigger(0.5).whileTrue(
       new SequentialCommandGroup(
@@ -196,13 +203,13 @@ public class RobotContainer {
           new RevShooter(m_Shooter))));
       
 
-    // m_driverController.leftTrigger(0.5)
-    //   .whileTrue(new SequentialCommandGroup(
-    //     new ParallelCommandGroup(
-    //       new StartEndCommand(
-    //         () -> m_Arm.setTargetAngle(m_Arm.testAngle), 
-    //         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-    //       new RevShooter(m_Shooter))));
+    m_driverController.rightBumper()
+      .whileTrue(new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new StartEndCommand(
+            () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
+            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
+          new RevShooter(m_Shooter))));
 
     // Manual arm control
     // m_driverController.leftTrigger(0.5)
@@ -221,6 +228,7 @@ public class RobotContainer {
     //     () -> m_Arm.setAngleFromDistance(m_robotDrive.distanceFromSpeaker()), 
     //     () -> m_Arm.setStates(ArmStates.STORE)), 
     //     new RevShooter(m_Shooter)));
+    
     m_driverController.b().whileTrue(new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(),
@@ -235,12 +243,12 @@ public class RobotContainer {
     m_driverController.y()
       .whileTrue(
         new RunClimber(m_Climber, ClimberDirection.UP));
-        
+
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
       
-    m_MechController.y().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstatnts.Red)));
+    m_MechController.y().onTrue(new InstantCommand(() -> m_Blinkin.setColor(-0.43)));
 
-    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstatnts.White)));
+    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White)));
 
     // PID testing
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
@@ -267,7 +275,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
       // NamedCommands.registerCommand("Set Arm to Target", new AutoArm(m_Arm, m_Shooter).withTimeout(5));
       //NamedCommands.registerCommand("Shoot and Limelight Aim", new RunArm(m_Arm, 114.2).alongWith(new ShootAuto));
-      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(5));
+      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
       NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
       NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
@@ -308,6 +316,7 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
+    m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
@@ -323,12 +332,14 @@ public class RobotContainer {
   }
  
   public void disableInit() {
+    m_Blinkin.setColor(BlinkinConstants.Orange);
     m_Arm.setMotorMode(IdleMode.kCoast);
     m_robotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
   }
 
   public void autoInit() {
+    m_Blinkin.setColor(BlinkinConstants.Pink);
     m_Arm.resetArm();
     m_Arm.setAutoTargets(getAutonomousCommand().getName());
     m_Shooter.setMotorMode(IdleMode.kBrake);

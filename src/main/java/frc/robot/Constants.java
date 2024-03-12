@@ -171,7 +171,7 @@ public final class Constants {
     // Auto arm angles
     public static final double[] TwoNoteMidTargets = {118, 103};
     public static final double[] ThreeNoteMidTargets = {118, 101.5, 102.011};
-    public static final double[] ThreeNoteTopCenterTargets = {118, 103.1, 97.6};
+    public static final double[] ThreeNoteTopCenterTargets = {118, 100.1, 97.6};
     public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
     public static final double[] FiveNoteTopTargets = {118, 100.5, 101.5, 98, 71};
     public static final double[] OneNoteTopTargets = {107.367};
@@ -218,9 +218,6 @@ public final class Constants {
       UP, DOWN
     }
   }
-  public static enum LEDState {
-    RED, WHITE, BLUE, RAINBOW, DISABLED
-  }
 
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
@@ -241,7 +238,7 @@ public final class Constants {
 
   }
 
-  public static final class BlinkinConstatnts {
+  public static final class BlinkinConstants {
     public static final int Blinkin = 1; 
     public static final double Red = 0.61;
     public static final double White = 0.93;

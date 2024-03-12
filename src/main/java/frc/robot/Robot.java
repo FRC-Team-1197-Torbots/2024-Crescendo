@@ -21,7 +21,6 @@ public class Robot extends TimedRobot {
     //SmartDashboard.putData(CommandScheduler.getInstance());
     //CameraServer.startAutomaticCapture();
     m_robotContainer = new RobotContainer();
-
   }
 
   @Override

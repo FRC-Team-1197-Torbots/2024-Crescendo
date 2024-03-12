@@ -85,6 +85,12 @@
           "data": {
             "name": "Shooter Auto Sequence"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Auto End"
+          }
         }
       ]
     }
