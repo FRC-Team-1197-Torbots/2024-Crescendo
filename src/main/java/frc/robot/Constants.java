@@ -161,7 +161,7 @@ public final class Constants {
     //Storing Position values
     // 66.2
     public static final double StorePos = 46; //Need to change these two values later
-    public static final double IntakePos = 144;
+    public static final double IntakePos = 144.5;//144
     public static final double SpeakerPos = 114.2; //53
     public static final double SecondShotSpeaker = 105;
     public static final double TestPos = 96;
@@ -222,7 +222,7 @@ public final class Constants {
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
     public static final double IntakeSpeed = 0.45;
-    public static final double OuttakeSpeed = -0.9;
+    public static final double OuttakeSpeed = -1;
 
     //Digital Input Constants
     public static final int breakBeam = 0;

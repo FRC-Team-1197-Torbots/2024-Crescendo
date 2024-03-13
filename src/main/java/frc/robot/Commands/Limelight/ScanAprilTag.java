@@ -9,22 +9,26 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.utils.LimelightHelpers;
 import frc.robot.Constants;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Limelight;
 
 
 public class ScanAprilTag extends Command{
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Limelight m_Limelight;
+  // private final DriveSubsystem m_robotDrive;
   private double[] botpose_intake;
   private double[] botpose_shooter;
   private double coord_x;
   private double coord_y;
+  private double angle;
   private double xDistance;
   private double yDistance;
   Optional<Alliance> color = DriverStation.getAlliance();
 
   public ScanAprilTag(Limelight subsystem) {
       m_Limelight = subsystem;
+      // m_robotDrive = drive;
       // Use addRequirements() here to declare subsystem dependencies.
       addRequirements(subsystem);
     }
@@ -38,12 +42,15 @@ public class ScanAprilTag extends Command{
         if(botpose_shooter[0] != 0) { //check if shooter limelight sees anything
         coord_x = botpose_shooter[0];
         coord_y = botpose_shooter[1];
+        angle = botpose_shooter[5];
         if(distanceFromSpeaker(coord_x, coord_y) <= Constants.maxSpeakerDistance){
-          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_shooter[5]))));
+          m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + angle))));
+          // m_robotDrive.setAngle(180+angle);
         }
         else if(botpose_intake[0] != 0){
           coord_x = botpose_intake[0];
           coord_y = botpose_intake[1];
+          angle = botpose_shooter[5];
           m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + botpose_intake[5]))));
           }
         }
@@ -57,6 +64,7 @@ public class ScanAprilTag extends Command{
             coord_x = botpose_shooter[0];
             coord_y = botpose_shooter[1];
             m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(botpose_shooter[5]))));
+            
           }
         }
       } else {

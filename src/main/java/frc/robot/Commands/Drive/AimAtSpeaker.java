@@ -33,7 +33,7 @@ public class AimAtSpeaker extends Command{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_RobotDrive.facingSpeaker() && m_RobotDrive.getSpeeds().omegaRadiansPerSecond < 0.2;
+    return m_RobotDrive.facingSpeaker() && Math.toRadians(Math.abs(m_RobotDrive.m_gyro.getRate())) < 0.2; //m_RobotDrive.getSpeeds().omegaRadiansPerSecond < 0.2
   }
     
 }
