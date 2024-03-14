@@ -125,8 +125,8 @@ public class RobotContainer {
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     // beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
-    // beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
-    // beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
+    beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
+    beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     
     // Intake Routines
     m_driverController.rightTrigger(0.5).and(beamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
@@ -197,7 +197,7 @@ public class RobotContainer {
         new ScanAprilTag(m_Limelight).onlyIf(closeToSpeaker),
         new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive).onlyIf(closeToSpeaker),
-          // new Shoot(m_Intake).onlyIf(atShooterTarget),
+          // new Shoot(m_Intake).onlyIf(m_Shooter::onTarget),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
@@ -224,13 +224,13 @@ public class RobotContainer {
           new RevShooter(m_Shooter))));
 
     // Manual arm control
-    // m_driverController.leftTrigger(0.5)
-    //       .whileTrue(new SequentialCommandGroup(
-    //         new ParallelCommandGroup(
-    //           new StartEndCommand(
-    //             () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), //ArmConstants.SubwooferPos
-    //             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-    //           new RevShooter(m_Shooter))));
+    m_driverController.x()
+          .whileTrue(new SequentialCommandGroup(
+            new ParallelCommandGroup(
+              new StartEndCommand(
+                () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), //ArmConstants.SubwooferPos
+                () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
+              new RevShooter(m_Shooter))));
 
     //ANGLE TEST CODE
     // m_driverController.leftTrigger(0.5)

@@ -161,7 +161,7 @@ public final class Constants {
     //Storing Position values
     // 66.2
     public static final double StorePos = 46; //Need to change these two values later
-    public static final double IntakePos = 144.5;//144
+    public static final double IntakePos = 144;
     public static final double SpeakerPos = 114.2; //53
     public static final double SecondShotSpeaker = 105;
     public static final double TestPos = 96;
@@ -169,13 +169,18 @@ public final class Constants {
     public static final double SubwooferPos = 113.5; //
     
     // Auto arm angles
-    public static final double[] TwoNoteMidTargets = {118, 103};
-    public static final double[] ThreeNoteMidTargets = {118, 101.5, 102.011};
+    public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] ThreeNoteTopCenterTargets = {118, 100.1, 97.6};
     public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
     public static final double[] FiveNoteTopTargets = {118, 100.5, 101.5, 98, 71};
-    public static final double[] OneNoteTopTargets = {107.367};
+
+    public static final double[] TwoNoteMiddleTargets = {118, 103};
+    public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
+    public static final double[] FourNoteMiddleTargets = {118, 98.5, 101.5, 97.5};
+
     public static final double[] OneNoteBottomTargets = {107.888};
+    public static final double[] FourNoteBottomTargets = {118, 100.5, 101.5, 98};
+
     public static final double[] StoreTargets = {StorePos};
 
     //Arm PID Constants
@@ -226,6 +231,7 @@ public final class Constants {
 
     //Digital Input Constants
     public static final int breakBeam = 0;
+    public static final int breakBeam2 = 5;
   }
 
   public static final class ShooterConstants {

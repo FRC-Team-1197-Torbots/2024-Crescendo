@@ -130,7 +130,7 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putString("Auto Selected", autoName);
         switch (autoName) {
             case("2 Note Middle"):
-                autoTargets = ArmConstants.TwoNoteMidTargets;
+                autoTargets = ArmConstants.TwoNoteMiddleTargets;
                 break;
             case("1 Note Top"):
                 autoTargets = ArmConstants.OneNoteTopTargets;
@@ -139,13 +139,19 @@ public class Arm extends SubsystemBase {
                 autoTargets = ArmConstants.OneNoteBottomTargets;
                 break;
             case("3 Note Middle"):
-                autoTargets = ArmConstants.ThreeNoteMidTargets;
+                autoTargets = ArmConstants.ThreeNoteMiddleTargets;
                 break;
             case("3 Note Top to Center"):
                 autoTargets = ArmConstants.ThreeNoteTopCenterTargets;
                 break;
             case("4 Note Top"):
                 autoTargets = ArmConstants.FourNoteTopTargets;
+                break;
+            case("4 Note Bottom"):
+                autoTargets = ArmConstants.FourNoteBottomTargets;
+                break;
+            case("4 Note Middle"):
+                autoTargets = ArmConstants.FourNoteMiddleTargets;
                 break;
             case("5 Note Top"):
                 autoTargets = ArmConstants.FourNoteTopTargets;

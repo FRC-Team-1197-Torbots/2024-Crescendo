@@ -3,7 +3,7 @@
   "startingPose": {
     "position": {
       "x": 1.3140196323188638,
-      "y": 5.527514849608872
+      "y": 5.67
     },
     "rotation": 0
   },
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4NoteMiddle3"
+                  "pathName": "4NoteMiddle5Closer"
                 }
               },
               {
