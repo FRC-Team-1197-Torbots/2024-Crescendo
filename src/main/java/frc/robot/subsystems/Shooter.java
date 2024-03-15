@@ -116,6 +116,10 @@ public class Shooter extends SubsystemBase {
         return atTargetRPM || timer.hasElapsed(3); // 4500
     }
 
+    public boolean onTargetAuto() {
+        return Math.abs(getBottomShooterRPM()) > 3900 && Math.abs(getTopShooterRPM()) > 3900; // 4200
+    }
+
     public boolean ampOnTarget() {
         return Math.abs(getBottomShooterRPM()) > low && Math.abs(getBottomShooterRPM()) < high
                 && Math.abs(TopMotor.getEncoder().getVelocity()) < 50;

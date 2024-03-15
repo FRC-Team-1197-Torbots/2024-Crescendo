@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.proto.Wpimath;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import java.sql.Driver;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -224,13 +226,13 @@ public class RobotContainer {
           new RevShooter(m_Shooter))));
 
     // Manual arm control
-    m_driverController.x()
-          .whileTrue(new SequentialCommandGroup(
-            new ParallelCommandGroup(
-              new StartEndCommand(
-                () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), //ArmConstants.SubwooferPos
-                () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-              new RevShooter(m_Shooter))));
+    // m_driverController.x()
+    //       .whileTrue(new SequentialCommandGroup(
+    //         new ParallelCommandGroup(
+    //           new StartEndCommand(
+    //             () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), //ArmConstants.SubwooferPos
+    //             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
+    //           new RevShooter(m_Shooter))));
 
     //ANGLE TEST CODE
     // m_driverController.leftTrigger(0.5)
@@ -306,9 +308,9 @@ public class RobotContainer {
       autoNameChooser.addOption("2 Note", "2 Note");
       autoNameChooser.addOption("1 Note", "1 Note");
       autoNameChooser.addOption("0 Note", "0 Note");
-      
       SmartDashboard.putData("Positioning", positionChooser);
       SmartDashboard.putData("Auto Choice", autoNameChooser);
+      SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().get().toString());
     }
       
       /**
@@ -319,7 +321,12 @@ public class RobotContainer {
        */
   public Command getAutonomousCommand() {
     try{
-      return new PathPlannerAuto(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
+      String autoName = autoNameChooser.getSelected() + " " + positionChooser.getSelected();
+      if (autoName.contains("4 Note Middle")) 
+        return new PathPlannerAuto(autoName + " " + DriverStation.getAlliance().get());
+      else
+        return new PathPlannerAuto(autoName);
+
     }
     catch(Exception e){
       return new PathPlannerAuto("0 Note Bottom");
@@ -327,21 +334,25 @@ public class RobotContainer {
       
   }
 
-  public void teleopInit() {
+  public void teleopInit() { 
     m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
+    m_Arm.setTargetAngle(ArmConstants.StorePos);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
+    m_Shooter.stopMotor();
+
     // m_Shooter.setMotorMode(IdleMode.kCoast);
     //m_robotDrive.setAutoName(getAutonomousCommand().getName());
 
     //Get end point
     //conver to pose2d
     //m_robotDrive.resetOdometry();
+  }
 
     
-  }
+  
  
   public void disableInit() {
     m_Blinkin.setColor(BlinkinConstants.Orange);
@@ -353,7 +364,7 @@ public class RobotContainer {
   public void autoInit() {
     m_Blinkin.setColor(BlinkinConstants.Pink);
     m_Arm.resetArm();
-    m_Arm.setAutoTargets(getAutonomousCommand().getName());
+    m_Arm.setAutoTargets(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.resetAutoShots();
     m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
