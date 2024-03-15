@@ -82,6 +82,14 @@ public class Shooter extends SubsystemBase {
         BottomMotor.set(0);
     }
 
+    public void finishIntake(){
+        if(getBreakBeamState()){
+            idleMotor();
+        }else{
+            stopMotor();
+        }
+    }
+
     public void idleMotor() {
         TopMotor.set(ShooterConstants.IdleSpeed);
         BottomMotor.set(ShooterConstants.IdleSpeed);
