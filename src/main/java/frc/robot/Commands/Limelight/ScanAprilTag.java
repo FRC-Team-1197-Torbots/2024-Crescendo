@@ -47,7 +47,7 @@ public class ScanAprilTag extends Command{
           m_Limelight.resetOdometry(new Pose2d(coord_x, coord_y, new Rotation2d(Math.toRadians(180 + angle))));
           // m_robotDrive.setAngle(180+angle);
         }
-        else if(botpose_intake[0] != 0){
+        else if(botpose_intake[0] != 0) {
           coord_x = botpose_intake[0];
           coord_y = botpose_intake[1];
           angle = botpose_shooter[5];

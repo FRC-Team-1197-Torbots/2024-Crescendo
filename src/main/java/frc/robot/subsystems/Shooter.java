@@ -19,9 +19,9 @@ public class Shooter extends SubsystemBase {
     private CANSparkFlex BottomMotor;
     private double shooterKp = 0.001;
     private double TopFlyWheelTestVoltage = 0;
-    public double BotFlyWheelTestVoltage = 4.2;
-    private double low = 2100;
-    private double high = 2500;
+    public double BotFlyWheelTestVoltage = 4.5;
+    private double low = 2200;
+    private double high = 2800;
     private boolean atTargetRPM;
     public int AutoShots;
 

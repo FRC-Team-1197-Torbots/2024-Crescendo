@@ -171,12 +171,13 @@ public class RobotContainer {
             // m_Intake.runIntake(-0.2)).withTimeout(0.5), 
           // new WaitCommand(0.5)),
           // new InstantCommand(() -> m_Intake.stopMotor())));
-    // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
-    //   new ParallelCommandGroup(
-    //     new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-    //     new AmpShooter(m_Shooter)),
-    //   new Shoot(m_Intake),
-    //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
+
+    m_driverController.x().whileTrue(new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+        new AmpShooter(m_Shooter)),
+      new Shoot(m_Intake),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
 
     
     // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
@@ -245,24 +246,21 @@ public class RobotContainer {
     
     m_driverController.b().whileTrue(new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-      () -> m_Intake.stopMotor(),
-      m_Intake));
-      
-    m_driverController.x().onTrue(new ScanAprilTag(m_Limelight));
-      
+      () -> m_Intake.stopMotor(), m_Intake));  
+    
     m_driverController.a()
-      .whileTrue(
-        new RunClimber(m_Climber, ClimberDirection.DOWN));
+    .whileTrue(
+      new RunClimber(m_Climber, ClimberDirection.DOWN));
         
     m_driverController.y()
-      .whileTrue(
-        new RunClimber(m_Climber, ClimberDirection.UP));
-
-    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
-      
-    m_MechController.y().onTrue(new InstantCommand(() -> m_Blinkin.setColor(-0.43)));
-
-    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White)));
+    .whileTrue(
+      new RunClimber(m_Climber, ClimberDirection.UP));
+        
+    m_MechController.x().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Blue)));
+    
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red)));
+          
+        // m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
 
     // PID testing
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
