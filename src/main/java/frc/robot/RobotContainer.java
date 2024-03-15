@@ -188,18 +188,17 @@ public class RobotContainer {
     //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
 
       
-    m_driverController.leftBumper().and(atShooterTarget).onTrue(
-      new SequentialCommandGroup(
-        new Shoot(m_Intake),
-        new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White))));
+    m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
     m_driverController.leftTrigger(0.5).whileTrue(
       new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
         new AimAtSpeaker(m_robotDrive),
-        new ScanAprilTag(m_Limelight).onlyIf(closeToSpeaker),
+        new ScanAprilTag(m_Limelight),
+        // new ScanAprilTag(m_Limelight).onlyIf(closeToSpeaker),
         new ParallelCommandGroup(
-          new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive).onlyIf(closeToSpeaker),
+          new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive),
+          // new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive).onlyIf(closeToSpeaker),
           // new Shoot(m_Intake).onlyIf(m_Shooter::onTarget),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
@@ -257,8 +256,12 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
         
     m_MechController.x().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Blue)));
-    
+  
     m_MechController.b().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red)));
+
+    m_MechController.y().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White)));
+
+    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green)));
           
         // m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
 

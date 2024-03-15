@@ -70,10 +70,12 @@ public class Shooter extends SubsystemBase {
         TopMotor.setVoltage(-top);
         BottomMotor.setVoltage(-bottom);
     }
+
     public void resetAutoShots() {
         AutoShots = 0;
     }
-    public void incrementShotCount(){
+
+    public void incrementShotCount() {
         AutoShots++;
     }
 
@@ -82,10 +84,10 @@ public class Shooter extends SubsystemBase {
         BottomMotor.set(0);
     }
 
-    public void finishIntake(){
-        if(getBreakBeamState()){
+    public void finishIntake() {
+        if (getBreakBeamState()) {
             idleMotor();
-        }else{
+        } else {
             stopMotor();
         }
     }
@@ -103,7 +105,7 @@ public class Shooter extends SubsystemBase {
         return TopMotor.getEncoder().getVelocity();
     }
 
-    public double getAverageShooterRPM(){
+    public double getAverageShooterRPM() {
         return (getBottomShooterRPM() + getTopShooterRPM()) / 2;
     }
 
