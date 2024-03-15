@@ -174,6 +174,7 @@ public final class Constants {
     public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
     public static final double[] FiveNoteTopTargets = {118, 100.5, 101.5, 98, 71};
 
+    public static final double[] TwoNoteTopTargets = {118, 97.6};
     public static final double[] TwoNoteMiddleTargets = {118, 103};
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
     public static final double[] FourNoteMiddleTargets = {118, 98.5, 101.5, 97.5};
