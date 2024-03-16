@@ -166,7 +166,7 @@ public final class Constants {
     public static final double SecondShotSpeaker = 105;
     public static final double TestPos = 96;
     public static final double AmpPos = 106.05;//106
-    public static final double SubwooferPos = 113.5; //
+    public static final double SubwooferPos = 116; //
     
     // Auto arm angles
     public static final double[] OneNoteTopTargets = {107.367};
@@ -178,6 +178,7 @@ public final class Constants {
     public static final double[] TwoNoteMiddleTargets = {118, 103};
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
     public static final double[] FourNoteMiddleTargets = {118, 98.5, 101.5, 97.5};
+    public static final double[] FiveNoteMiddleTargets = {118, 98.5, 101.5, 99, 96.937};
 
     public static final double[] OneNoteBottomTargets = {107.888};
     public static final double[] FourNoteBottomTargets = {118, 100.5, 101.5, 98};
@@ -203,8 +204,8 @@ public final class Constants {
     // public static final double M = -6.77;
     // public static final double B = 121;
     // logarithmic
-    public static final double A = -18.7;
-    public static final double B = 122;
+    public static final double AngleEquationA = -18.7;
+    public static final double AngleEquationB = 122;
   }
 
   public static final class ClimberConstants{

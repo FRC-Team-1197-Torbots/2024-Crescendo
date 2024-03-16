@@ -93,7 +93,7 @@ public class Arm extends SubsystemBase {
     
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
-        double testAngle = ArmConstants.A * Math.log(distance) + ArmConstants.B;
+        double testAngle = ArmConstants.AngleEquationA * Math.log(distance) + ArmConstants.AngleEquationB;
         if (testAngle < ArmConstants.StorePos) {
             testAngle = ArmConstants.StorePos;
         }
@@ -155,6 +155,9 @@ public class Arm extends SubsystemBase {
                 break;
             case("5 Note Top"):
                 autoTargets = ArmConstants.FourNoteTopTargets;
+                break;
+            case("5 Note Middle"):
+                autoTargets = ArmConstants.FiveNoteMiddleTargets;
                 break;
             default:
                 autoTargets = ArmConstants.StoreTargets;

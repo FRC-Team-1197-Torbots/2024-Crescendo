@@ -75,6 +75,6 @@ public class Intake extends SubsystemBase {
     }
 
     public boolean intakeMoving(){
-        return MotorA.getEncoder().getVelocity() >= 200;
+        return Math.abs(MotorA.getEncoder().getVelocity()) >= 200;
     }
 }

@@ -173,12 +173,12 @@ public class RobotContainer {
           // new WaitCommand(0.5)),
           // new InstantCommand(() -> m_Intake.stopMotor())));
 
-    m_driverController.x().whileTrue(new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-        new AmpShooter(m_Shooter)),
-      new Shoot(m_Intake),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
+    // m_driverController.x().whileTrue(new SequentialCommandGroup(
+    //   new ParallelCommandGroup(
+    //     new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+    //     new AmpShooter(m_Shooter)),
+    //   new Shoot(m_Intake),
+    //   new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
       
 
     
@@ -257,7 +257,7 @@ public class RobotContainer {
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.UP));
                   
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
+    // m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
     m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
 
     // PID testing
