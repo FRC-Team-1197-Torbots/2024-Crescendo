@@ -32,6 +32,8 @@ public class Intake extends SubsystemBase {
         // SmartDashboard.putBoolean("Break beam", gamePieceStored());
         SmartDashboard.putBoolean("Break beam1", !m_BreakBeam.get());
         SmartDashboard.putBoolean("Break beam2", m_BreakBeam2.get());
+        SmartDashboard.putBoolean("Intake Spinning?", intakeMoving());
+        SmartDashboard.putNumber("Intake Velocity", MotorA.getEncoder().getVelocity());
         // SmartDashboard.putNumber("Intake Outtake Speed", testspeed);
     }
 
@@ -70,5 +72,9 @@ public class Intake extends SubsystemBase {
 
     public void incrementIntake(double amount) {
         testspeed += amount;
+    }
+
+    public boolean intakeMoving(){
+        return MotorA.getEncoder().getVelocity() >= 200;
     }
 }

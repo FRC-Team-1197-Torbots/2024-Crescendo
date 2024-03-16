@@ -28,6 +28,7 @@ public class Shoot extends Command{
         public void end(boolean interrupted) {
             // System.out.println("The program finished shoot command");
             m_intake.stopMotor();
+            
         }
 
   // Returns true when the command should end.

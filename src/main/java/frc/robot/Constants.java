@@ -227,7 +227,7 @@ public final class Constants {
 
   public static final class IntakeConstants{
     public static final int IntakeMotor = 10;
-    public static final double IntakeSpeed = 0.45;
+    public static final double IntakeSpeed = 0.6;
     public static final double OuttakeSpeed = -1;
 
     //Digital Input Constants

@@ -49,7 +49,7 @@ public class ShootAuto extends Command {
     @Override
     public boolean isFinished() {
         // TODO Auto-generated method stub
-        return !m_Shooter.getBreakBeamState();
+        return !m_Shooter.gamePieceStored();
         // return true;
     }
     

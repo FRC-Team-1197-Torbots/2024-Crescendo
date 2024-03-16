@@ -19,9 +19,9 @@ public class Shooter extends SubsystemBase {
     private CANSparkFlex BottomMotor;
     private double shooterKp = 0.001;
     private double TopFlyWheelTestVoltage = 0;
-    public double BotFlyWheelTestVoltage = 4.5;
-    private double low = 2200;
-    private double high = 2800;
+    public double BotFlyWheelTestVoltage = 4.3;
+    private double low = 2100;
+    private double high = 2600;
     private boolean atTargetRPM;
     public int AutoShots;
 
@@ -38,14 +38,13 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Top Flywheel Velocity", TopMotor.getEncoder().getVelocity());
         SmartDashboard.putNumber("Bottom Flywheel Velocity", BottomMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("Timer", timer.get());
-        SmartDashboard.putBoolean("Has elapsed 5 seconds", timer.hasElapsed(5));
         // SmartDashboard.putNumber("low", low);
         // SmartDashboard.putNumber("high", high);
         // SmartDashboard.putNumber("bot", bot);
         // SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
         SmartDashboard.putBoolean("Shooter RPM on Target", atTargetRPM);
-        SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
+        // SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
+        SmartDashboard.putBoolean("Amp Mode", motorStopped());
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
     }
 
@@ -85,7 +84,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void finishIntake() {
-        if (getBreakBeamState()) {
+        if (gamePieceStored()) {
             idleMotor();
         } else {
             stopMotor();
@@ -109,7 +108,7 @@ public class Shooter extends SubsystemBase {
         return (getBottomShooterRPM() + getTopShooterRPM()) / 2;
     }
 
-    public boolean getBreakBeamState() {
+    public boolean gamePieceStored() {
         return m_Intake.gamePieceStored();
     }
 
@@ -132,7 +131,7 @@ public class Shooter extends SubsystemBase {
 
     public boolean ampOnTarget() {
         return Math.abs(getBottomShooterRPM()) > low && Math.abs(getBottomShooterRPM()) < high
-                && Math.abs(TopMotor.getEncoder().getVelocity()) < 50;
+                && Math.abs(TopMotor.getEncoder().getVelocity()) < 500;
     }
 
     public void setMotorMode(IdleMode mode) {
@@ -158,4 +157,7 @@ public class Shooter extends SubsystemBase {
         shooterKp += amount;
     }
 
+    public boolean motorStopped(){
+        return Math.abs(TopMotor.getEncoder().getVelocity()) < 50 && Math.abs(BottomMotor.getEncoder().getVelocity()) < 50 && gamePieceStored();
+    }
 }

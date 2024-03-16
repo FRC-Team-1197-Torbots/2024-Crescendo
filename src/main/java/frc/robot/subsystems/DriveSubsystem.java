@@ -116,8 +116,6 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     //m_autoName = autoName;
     //SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
-    isRedAlliance = isRedAlliance();
-    System.out.println("Red Alliance: " + isRedAlliance);
     
 
     m_odometry = new SwerveDriveOdometry(
@@ -175,10 +173,6 @@ public class DriveSubsystem extends SubsystemBase {
         },
         this // Reference to this subsystem to set requirements
     );
-  }
-
-  private boolean isRedAlliance(){
-    return DriverStation.getAlliance().get() == Alliance.Red;
   }
 
   public double getAutoStartingAngle(String autoName) {

@@ -70,6 +70,7 @@ public class RobotContainer {
   public final Limelight m_Limelight = new Limelight(m_robotDrive);
   public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
   public final Blinkin m_Blinkin = new Blinkin(m_Intake);
+  
 
   // The driver's controller
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -178,6 +179,7 @@ public class RobotContainer {
         new AmpShooter(m_Shooter)),
       new Shoot(m_Intake),
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
+      
 
     
     // m_driverController.rightBumper().whileTrue(new SequentialCommandGroup(
@@ -254,16 +256,8 @@ public class RobotContainer {
     m_driverController.y()
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.UP));
-        
-    m_MechController.x().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Blue)));
-  
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red)));
-
-    m_MechController.y().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White)));
-
-    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green)));
-          
-        // m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.toggleIntake())); 
+                  
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
 
     // PID testing
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
