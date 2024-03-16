@@ -258,6 +258,7 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
                   
     m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
+    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
 
     // PID testing
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));

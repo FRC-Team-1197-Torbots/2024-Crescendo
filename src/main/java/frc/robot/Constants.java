@@ -258,6 +258,12 @@ public final class Constants {
     public static final double Gold = 0.67;
     public static final double Yellow = 0.69;
     public static final double Pink = 0.57;
+    public static final double Aidan1 = 0.23;
+    public static final double Aidan2 = 0.83;
+    public static final double Aidan3 = -0.89;
+    public static final double Aidan4 = -0.19;
+
+
   }
 
   public static final double AprilTag4PosX = 16.579;  
