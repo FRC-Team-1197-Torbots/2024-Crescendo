@@ -177,10 +177,11 @@ public final class Constants {
     public static final double[] TwoNoteTopTargets = {118, 97.6};
     public static final double[] TwoNoteMiddleTargets = {118, 103};
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
-    public static final double[] FourNoteMiddleTargets = {118, 98.5, 101.5, 97.5};
+    public static final double[] FourNoteMiddleTargetsRed = {118, 98.5, 101.5, 99.5};
+    public static final double[] FourNoteMiddleTargetsBlue = {118, 98.5, 101.5, 99};
     public static final double[] FiveNoteMiddleTargets = {118, 98.5, 101.5, 99, 96.937};
 
-    public static final double[] OneNoteBottomTargets = {107.888};
+    public static final double[] OneNoteBottomTargets = {118}; //Old: 107.888
     public static final double[] FourNoteBottomTargets = {118, 100.5, 101.5, 98};
 
     public static final double[] StoreTargets = {StorePos};

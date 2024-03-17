@@ -2,19 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.45,
-      "y": 4.16
+      "x": 0.6933452953924437,
+      "y": 4.438407050851191
     },
-    "rotation": 0
+    "rotation": -59.338115171611754
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "1NoteBottom_1"
+            "waitTime": 6.0
           }
         },
         {
@@ -24,22 +24,15 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "1NoteBottom_2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Sequence"
-                }
-              }
-            ]
+            "name": "Store"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New 1NoteBottom_1"
           }
         }
       ]

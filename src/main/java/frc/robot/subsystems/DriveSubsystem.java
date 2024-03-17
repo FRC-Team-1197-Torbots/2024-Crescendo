@@ -179,16 +179,20 @@ public class DriveSubsystem extends SubsystemBase {
     m_autoName = autoName;
      if (!DriverStation.getAlliance().isEmpty()) {
       if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        SmartDashboard.putNumber("Red angle", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+        // SmartDashboard.putNumber("Red angle", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
         return 180 + GeometryUtil.flipFieldPose(PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName)).getRotation().getDegrees();
       } else {
-        SmartDashboard.putNumber("Blue angle", 180 + PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+        // SmartDashboard.putNumber("Blue angle", 180 + PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
         return PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees();
   
       }
     } else {
       return 0;
     }
+  }
+
+  public void getAlliance() {
+    color = DriverStation.getAlliance();
   }
 
   public double gyroWithOffset() {
@@ -213,8 +217,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putString("Auto Name", m_autoName);
-    SmartDashboard.putNumber("Angle from speaker", calcAngle());
+    // SmartDashboard.putString("Auto Name", m_autoName);
+    // SmartDashboard.putNumber("Angle from speaker", calcAngle());
     m_odometry.update(new Rotation2d(Math.toRadians(gyroWithOffset())), new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -231,9 +235,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Odometry Y", odometry_y);
 
     SmartDashboard.putData("Robot Field", m_field2d);
-    SmartDashboard.putBoolean("Period", facingSpeaker());
-    SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
-    SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
+    // SmartDashboard.putBoolean("Period", facingSpeaker());
+    // SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
+    // SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
     m_field2d.setRobotPose(m_odometry.getPoseMeters());
 
     // SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
@@ -484,6 +488,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
   public void setAutoName(String autoname){
     m_autoName = autoname;
+    SmartDashboard.putString("Auto Name", m_autoName);
   }
   public double distanceFromSpeaker() {
     return getPose().getTranslation().getDistance(getAprilTagPos());

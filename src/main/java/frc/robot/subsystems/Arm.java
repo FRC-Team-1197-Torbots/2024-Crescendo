@@ -71,9 +71,9 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
-        SmartDashboard.putNumber("Target Angle", targetPos);
+        // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
-        SmartDashboard.putNumber("Test Angle", testAngle);
+        // SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
 
@@ -150,8 +150,11 @@ public class Arm extends SubsystemBase {
             case("4 Note Bottom"):
                 autoTargets = ArmConstants.FourNoteBottomTargets;
                 break;
-            case("4 Note Middle"):
-                autoTargets = ArmConstants.FourNoteMiddleTargets;
+            case("4 Note Middle Red"):
+                autoTargets = ArmConstants.FourNoteMiddleTargetsRed;
+                break;
+            case("4 Note Middle Blue"):
+                autoTargets = ArmConstants.FourNoteMiddleTargetsBlue;
                 break;
             case("5 Note Top"):
                 autoTargets = ArmConstants.FourNoteTopTargets;
@@ -163,7 +166,7 @@ public class Arm extends SubsystemBase {
                 autoTargets = ArmConstants.StoreTargets;
                 break;
         } 
-        SmartDashboard.putNumberArray("Auto targets", autoTargets);
+        // SmartDashboard.putNumberArray("Auto targets", autoTargets);
     }
 
     // public void setAngle(double angle) {
@@ -175,7 +178,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void toggleIntake() {
-        if(targetPos == ArmConstants.IntakePos)
+        if (targetPos == ArmConstants.IntakePos)
             targetPos = ArmConstants.StorePos;
         else
             targetPos = ArmConstants.IntakePos;

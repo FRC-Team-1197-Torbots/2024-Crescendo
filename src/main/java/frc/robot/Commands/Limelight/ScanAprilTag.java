@@ -24,7 +24,7 @@ public class ScanAprilTag extends Command{
   private double angle;
   private double xDistance;
   private double yDistance;
-  Optional<Alliance> color = DriverStation.getAlliance();
+  Alliance color = (DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue);
 
   public ScanAprilTag(Limelight subsystem) {
       m_Limelight = subsystem;
@@ -35,9 +35,10 @@ public class ScanAprilTag extends Command{
 
     @Override
     public void initialize() {
+      color = DriverStation.getAlliance().get();
       botpose_intake = LimelightHelpers.getBotPose_wpiBlue("limelight-intake");
       botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
-
+      
       if(botpose_shooter.length > 0 && botpose_intake.length > 0) {
         if(botpose_shooter[0] != 0) { //check if shooter limelight sees anything
         coord_x = botpose_shooter[0];
@@ -68,7 +69,6 @@ public class ScanAprilTag extends Command{
           }
         }
       } else {
-        System.err.println("Couldn't find the limelights");
       }
 
       
@@ -89,20 +89,14 @@ public class ScanAprilTag extends Command{
     }
 
     private double distanceFromSpeaker(double x, double y) {
-      
-      if (color.isPresent()) {
-          if (color.get() == Alliance.Red) {
-            xDistance = x - Constants.AprilTag4PosX;
-            yDistance = y - Constants.AprilTag4PosY;        
-          }
-          if (color.get() == Alliance.Blue) {
-              xDistance = x - Constants.AprilTag7PosX;
-              yDistance = y - Constants.AprilTag7PosY;
-          }
-      }else{
-        
+      if (color == Alliance.Red) {
+        xDistance = x - Constants.AprilTag4PosX;
+        yDistance = y - Constants.AprilTag4PosY;        
       }
-      
+      if (color == Alliance.Blue) {
+          xDistance = x - Constants.AprilTag7PosX;
+          yDistance = y - Constants.AprilTag7PosY;
+      }
       return Math.hypot(xDistance, yDistance);
     }
 

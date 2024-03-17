@@ -84,8 +84,7 @@ public class RobotContainer {
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
   private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
   private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
-  private double speed = 0.7;
-
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -259,6 +258,7 @@ public class RobotContainer {
                   
     // m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
     m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
+    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
 
     // PID testing
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
@@ -306,7 +306,7 @@ public class RobotContainer {
       autoNameChooser.addOption("0 Note", "0 Note");
       SmartDashboard.putData("Positioning", positionChooser);
       SmartDashboard.putData("Auto Choice", autoNameChooser);
-      SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().get().toString());
+      // SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().get().toString());
     }
       
       /**
@@ -338,6 +338,7 @@ public class RobotContainer {
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.stopMotor();
+    m_robotDrive.getAlliance();
 
     // m_Shooter.setMotorMode(IdleMode.kCoast);
     //m_robotDrive.setAutoName(getAutonomousCommand().getName());
@@ -360,10 +361,11 @@ public class RobotContainer {
   public void autoInit() {
     m_Blinkin.setColor(BlinkinConstants.Pink);
     m_Arm.resetArm();
-    m_Arm.setAutoTargets(autoNameChooser.getSelected() + " " + positionChooser.getSelected());
+    m_Arm.setAutoTargets(getAutonomousCommand().getName());
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.resetAutoShots();
     m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
+    m_robotDrive.getAlliance();
   }
 
   public ScanAprilTag getScanAprilTag() {

@@ -36,15 +36,15 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Top Flywheel Velocity", TopMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("Bottom Flywheel Velocity", BottomMotor.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Top Flywheel RPM", TopMotor.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Bottom Flywheel RPM", BottomMotor.getEncoder().getVelocity());
         // SmartDashboard.putNumber("low", low);
         // SmartDashboard.putNumber("high", high);
         // SmartDashboard.putNumber("bot", bot);
         // SmartDashboard.putBoolean("Amp On Target", ampOnTarget());
         SmartDashboard.putBoolean("Shooter RPM on Target", atTargetRPM);
         // SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
-        SmartDashboard.putBoolean("Amp Mode", motorStopped());
+        // SmartDashboard.putBoolean("Amp Mode", motorStopped());
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
     }
 
