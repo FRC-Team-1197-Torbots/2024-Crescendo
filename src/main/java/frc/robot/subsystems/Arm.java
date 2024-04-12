@@ -24,13 +24,14 @@ public class Arm extends SubsystemBase {
     private double armKi;
     private double armKd;
     private double armVoltage;
+    private double feedForward = 0.1;
+    private final double ARM_ANGLE_OFFSET = 30.95;
     // private TrapezoidProfile.Constraints m_Constraints;
     // private ProfiledPIDController m_armPIDController;
     private PIDController m_PIDController;
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
     public double testAngle;
-    // private double feedForward;
     public double[] autoTargets;
 
     private DriveSubsystem m_DriveSubsystem;
@@ -71,6 +72,9 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
+        SmartDashboard.putNumber("Arm Angle Relative Ground", ticksToDegrees(ArmEncoder.get()) + ARM_ANGLE_OFFSET );
+        SmartDashboard.putNumber("Feed Forward", feedForward);
+        SmartDashboard.putNumber("Voltage", setArmOutput());
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
@@ -189,7 +193,10 @@ public class Arm extends SubsystemBase {
     }
 
     public double setArmOutput() {
-        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
+        double angleRelativeToGround = ticksToDegrees(ArmEncoder.get()) + ARM_ANGLE_OFFSET;
+        double output = feedForward*Math.cos(angleRelativeToGround);
+        return output;
+        // return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
     }
 
     public double ticksToDegrees(double ticks) {
@@ -225,6 +232,10 @@ public class Arm extends SubsystemBase {
     public void incrementKp(double amount) {
         armKp += amount;
         m_PIDController.setP(armKp);
+    }
+
+    public void incrementFeedForward(double amount) {
+        feedForward += amount;
     }
 
     public void incrementKi(double amount) {
