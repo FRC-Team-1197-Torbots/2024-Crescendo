@@ -257,20 +257,21 @@ public class RobotContainer {
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.UP));
                   
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
+    // m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
     m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
 
     // PID testing
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateValues()));
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(0.01)));
     // m_MechController.povDown().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.01)));
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_robotDrive.incrementKp(-0.1)));
     // m_MechController.povRight().onTrue(new InstantCommand(() ->m_robotDrive.incrementKp(0.01)));
     
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.1)));
-    m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.1)));
-    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-1)));
-    m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(1)));
+    // m_driverController.povUp().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(0.1)));
+    // m_driverController.povDown().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-0.1)));
+    // m_driverController.povLeft().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(-1)));
+    // m_driverController.povRight().onTrue(new InstantCommand(() -> m_Arm.incrementFeedForward(1)));
     // m_MechController.povUp().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(10)));
     // m_MechController.povDown().onTrue(new InstantCommand(() -> m_Shooter.incrementrpm(-10)));
     // m_MechController.povLeft().onTrue(new InstantCommand(() -> m_Shooter.incrementbot(-0.25)));

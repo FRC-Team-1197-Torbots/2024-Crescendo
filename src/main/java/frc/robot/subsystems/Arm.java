@@ -9,6 +9,7 @@ import frc.robot.Constants.ArmConstants;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,7 +25,7 @@ public class Arm extends SubsystemBase {
     private double armKi;
     private double armKd;
     private double armVoltage;
-    private double feedForward = 0.1;
+    private double feedForward = ArmConstants.feedForward;
     private final double ARM_ANGLE_OFFSET = 30.95;
     // private TrapezoidProfile.Constraints m_Constraints;
     // private ProfiledPIDController m_armPIDController;
@@ -38,6 +39,11 @@ public class Arm extends SubsystemBase {
     private Limelight m_Limelight;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
+        SmartDashboard.putNumber("Target Angle", ArmConstants.StorePos);
+        SmartDashboard.putNumber("Arm kP", ArmConstants.kP);
+        SmartDashboard.putNumber("Arm kI", ArmConstants.kI);
+        SmartDashboard.putNumber("Arm kD", ArmConstants.kD);
+        SmartDashboard.putNumber("Feed Forward", 0.275);
         testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
@@ -48,10 +54,10 @@ public class Arm extends SubsystemBase {
         ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
         ArmEncoder.reset();
         // m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
-        m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
-        armKp = ArmConstants.Arm_kP;
-        armKi = ArmConstants.Arm_kI;
-        armKd = ArmConstants.Arm_kD;
+        m_PIDController = new PIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
+        armKp = ArmConstants.kP;
+        armKi = ArmConstants.kI;
+        armKd = ArmConstants.kD;
         // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
         // ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
@@ -71,10 +77,8 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
-        SmartDashboard.putNumber("Arm Angle Relative Ground", ticksToDegrees(ArmEncoder.get()) + ARM_ANGLE_OFFSET );
-        SmartDashboard.putNumber("Feed Forward", feedForward);
-        SmartDashboard.putNumber("Voltage", setArmOutput());
+        SmartDashboard.putNumber("aArm Angle", ticksToDegrees(ArmEncoder.get()));
+        // SmartDashboard.putNumber("Arm Angle Relative Ground", ticksToDegrees(ArmEncoder.get()) + ARM_ANGLE_OFFSET );
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
@@ -91,8 +95,21 @@ public class Arm extends SubsystemBase {
         runArm(armVoltage);
     }
 
+    public void updateValues() {
+        setTargetAngle(SmartDashboard.getNumber("Target Angle", ArmConstants.StorePos));
+        m_PIDController.setP(SmartDashboard.getNumber("Arm kP", ArmConstants.kP));
+        m_PIDController.setI(SmartDashboard.getNumber("Arm kI", ArmConstants.kI));
+        m_PIDController.setD(SmartDashboard.getNumber("Arm kD", ArmConstants.kD));
+        feedForward = SmartDashboard.getNumber("Feed Forward", feedForward);
+    }
+
     public void setTargetAngle(double target) {
-        targetPos = target;
+        if (target > ArmConstants.IntakePos)
+            targetPos = ArmConstants.IntakePos;
+        else if (target < 10)
+            targetPos = 10;
+        else
+            targetPos = target;
     }
     
     public double setAngleFromDistance() {
@@ -193,9 +210,10 @@ public class Arm extends SubsystemBase {
     }
 
     public double setArmOutput() {
-        double angleRelativeToGround = ticksToDegrees(ArmEncoder.get()) + ARM_ANGLE_OFFSET;
-        double output = feedForward*Math.cos(angleRelativeToGround);
-        return output;
+        double armAngle = ticksToDegrees(ArmEncoder.get());
+        double angleRelativeToGround = armAngle + ARM_ANGLE_OFFSET;
+        double output = feedForward*Math.cos(Math.toRadians(angleRelativeToGround));
+        return output + m_PIDController.calculate(armAngle - targetPos);
         // return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
     }
 
