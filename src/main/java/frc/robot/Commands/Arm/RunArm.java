@@ -14,11 +14,10 @@ public class RunArm extends Command {
   public RunArm(Arm subsystem, double targetAngle) {
     m_Arm = subsystem;
     m_targetAngle = targetAngle;
-    // m_Speed = speed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
-
+  
   @Override
   public void initialize() {
 

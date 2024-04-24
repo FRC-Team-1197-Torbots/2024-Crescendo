@@ -137,7 +137,7 @@ public class RobotContainer {
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos),
           new StartEndCommand(
-            () -> m_Shooter.runShooter(-0.2), //-0.4
+            () -> m_Shooter.runShooter(-0.2), //-0.2
             () -> m_Shooter.finishIntake())));
           
     // m_driverController.rightTrigger(0.5).and(beamTrigger.negate())//Runs Intake then backspins it for 0.2 seconds
