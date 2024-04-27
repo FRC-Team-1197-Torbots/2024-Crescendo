@@ -11,6 +11,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -19,7 +20,7 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
 
-    private double targetPos = ArmConstants.StorePos;
+    private double targetPos = 0;
     private double armKp;
     private double armKi;
     private double armKd;
@@ -30,6 +31,7 @@ public class Arm extends SubsystemBase {
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
     public double testAngle;
+    private boolean resettingArm;
     // private double feedForward;
     public double[] autoTargets;
 
@@ -51,6 +53,7 @@ public class Arm extends SubsystemBase {
         armKp = ArmConstants.Arm_kP;
         armKi = ArmConstants.Arm_kI;
         armKd = ArmConstants.Arm_kD;
+
         // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
         // ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
@@ -71,6 +74,7 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
+        SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
@@ -189,11 +193,18 @@ public class Arm extends SubsystemBase {
     }
 
     public double setArmOutput() {
-        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos);
+        if (resettingArm) {
+            return -0.8;
+        }
+        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos); 
     }
 
     public double ticksToDegrees(double ticks) {
         return ticks / ArmConstants.TICKS_PER_DEGREE;
+    }
+
+    public void resettingArm(boolean value) {
+        resettingArm = value;
     }
 
     public void getPose() {
@@ -213,27 +224,7 @@ public class Arm extends SubsystemBase {
         ArmMotor2.setIdleMode(mode);
     }
 
-    // TEST CODE
-    public void incrementAngle(double amount) {
-        testAngle += amount;
-    }
-
-    public double getKp() {
-        return armKp;
-    }
-
-    public void incrementKp(double amount) {
-        armKp += amount;
-        m_PIDController.setP(armKp);
-    }
-
-    public void incrementKi(double amount) {
-        armKi += amount;
-        m_PIDController.setI(armKi);
-    }
-
-    public void incrementKd(double amount) {
-        armKd += amount;
-        m_PIDController.setD(armKd);
+    public double getArmOutput() {
+        return (ArmMotor1.getOutputCurrent() + ArmMotor2.getAppliedOutput()) / 2;
     }
 }
