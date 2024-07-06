@@ -4,6 +4,7 @@ import frc.robot.utils.LimelightHelpers;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import static frc.robot.Constants.ShooterConstants.FeedForward;
 import static frc.robot.Constants.ShooterConstants.ShootingRPM;
 
 import com.revrobotics.CANSparkFlex;
@@ -55,18 +56,19 @@ public class Shooter extends SubsystemBase {
     }
 
     public void updateKp() {
-        m_PidController.setP(SmartDashboard.getNumber("Shooter kP", ShooterConstants.kP));
+        ShooterConstants.kP = SmartDashboard.getNumber("Shooter kP", ShooterConstants.kP);
+        m_PidController.setP(ShooterConstants.kP);
+        FeedForward = SmartDashboard.getNumber("Shooter feed forward", FeedForward);
     }
 
     public void telopInit() {
         SmartDashboard.putNumber("Shooter kP", ShooterConstants.kP);
+        SmartDashboard.putNumber("Shooter feed forward", ShooterConstants.FeedForward);
     }
 
-    public void runShooter(double spd) {
-        // TopMotor.setVoltage(spd);
-        // BottomMotor.setVoltage(spd);
-        TopMotor.set(-spd);
-        BottomMotor.set(-spd);
+    public void runShooter(double voltage) {
+        // TopMotor.setVoltage(-spd);
+        BottomMotor.setVoltage(-voltage);
     }
 
     public double getPIDOutput(){
@@ -108,14 +110,6 @@ public class Shooter extends SubsystemBase {
         BottomMotor.set(0);
     }
 
-    public void finishIntake() {
-        if (gamePieceStored()) {
-            idleMotor();
-        } else {
-            stopMotor();
-        }
-    }
-
     public void idleMotor() {
         setTargetRPM(ShooterConstants.IdleSpeed);
     }
@@ -129,7 +123,8 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getAverageShooterRPM() {
-        return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
+        return getTopShooterRPM();
+        // return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
     }
 
     public boolean gamePieceStored() {
