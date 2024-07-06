@@ -242,12 +242,15 @@ public final class Constants {
     public static final int TopMotor = 12;
     public static final int BottomMotor = 11;
 
-    public static final int IdleSpeed = 2300;
-    public static final double TargetRPM = -5200;
-    public static final int ShootingRPM = 4000;
+    public static final int VortexMaxSpeed = 6784;
+    public static final int NominalBatteryVoltage = 12;
     
-    public static double FeedForward = 1.0;
-    public static double kP = 0.0000;
+
+    public static final int IdleSpeed = -2300;
+    public static final double TargetRPM = -5200;
+    public static final int ShootingRPM = -4000;
+    
+    public static double kP = 0.004;
     public static final double kI = 0;
     public static final double kD = 0;
 
@@ -265,9 +268,7 @@ public final class Constants {
     public static final double Violet = 0.91;
     public static final double Gold = 0.67;
     public static final double Yellow = 0.69;
-    public static final double Pink = 0.57;\][
-      
-    ]
+    public static final double Pink = 0.57;
     public static final double Aidan1 = 0.23;
     public static final double Aidan2 = 0.83;
     public static final double Aidan3 = -0.89;

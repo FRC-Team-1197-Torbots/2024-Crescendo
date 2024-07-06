@@ -4,7 +4,6 @@ import frc.robot.utils.LimelightHelpers;
 
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import static frc.robot.Constants.ShooterConstants.FeedForward;
 import static frc.robot.Constants.ShooterConstants.ShootingRPM;
 
 import com.revrobotics.CANSparkFlex;
@@ -29,9 +28,10 @@ public class Shooter extends SubsystemBase {
     private double low = 2100;
     private double high = 2600;
     private boolean atTargetRPM;
-    private int targetRPM;
+    private double targetRPM;
     public int AutoShots;
-    private PIDController m_PidController;
+    private PIDController m_TopPidController;
+    private PIDController m_BottomPidController;
 
     public Shooter(Intake intake) {
         TopMotor = new CANSparkFlex(ShooterConstants.TopMotor, MotorType.kBrushless);
@@ -40,42 +40,48 @@ public class Shooter extends SubsystemBase {
         timer = new Timer();
         targetRPM = 0;        
         AutoShots = 0;
-        m_PidController = new PIDController(ShooterConstants.kP ,ShooterConstants.kI, ShooterConstants.kD);
+        m_TopPidController = new PIDController(ShooterConstants.kP ,ShooterConstants.kI, ShooterConstants.kD);
+        m_BottomPidController = new PIDController(ShooterConstants.kP ,ShooterConstants.kI, ShooterConstants.kD);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Top Flywheel RPM", TopMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("Bottom Flywheel RPM", BottomMotor.getEncoder().getVelocity());
+        // SmartDashboard.putNumber("Top Flywheel RPM", TopMotor.getEncoder().getVelocity()); // you're welcome alex
+        // SmartDashboard.putNumber("Bottom Flywheel RPM", BottomMotor.getEncoder().getVelocity());
         // SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
         // SmartDashboard.putBoolean("Amp Mode", motorStopped());
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
-        runShooter(ShooterConstants.FeedForward + getPIDOutput());
-        
-        SmartDashboard.putNumber("target RPM", targetRPM);
+        SmartDashboard.putNumber("Bottom RPM", getAverageShooterRPM());
+        SmartDashboard.putNumber("PID Output", getBottomPIDOutput());
+        double feedForward = (double)targetRPM / ShooterConstants.VortexMaxSpeed * ShooterConstants.NominalBatteryVoltage; // funny alex math
+        TopMotor.setVoltage(feedForward + getTopPIDOutput());        
+        BottomMotor.setVoltage(feedForward + getBottomPIDOutput());        
+        SmartDashboard.putNumber("Caclulated Feed Forward", feedForward);
     }
 
     public void updateKp() {
         ShooterConstants.kP = SmartDashboard.getNumber("Shooter kP", ShooterConstants.kP);
-        m_PidController.setP(ShooterConstants.kP);
-        FeedForward = SmartDashboard.getNumber("Shooter feed forward", FeedForward);
+        m_TopPidController.setP(ShooterConstants.kP);
+        // targetRPM = SmartDashboard.getNumber("target rpm", targetRPM);
     }
 
     public void telopInit() {
+        System.out.println("OMG SHUFFLEBOARD IS BAD");
         SmartDashboard.putNumber("Shooter kP", ShooterConstants.kP);
-        SmartDashboard.putNumber("Shooter feed forward", ShooterConstants.FeedForward);
+        SmartDashboard.putNumber("target rpm", targetRPM);
     }
 
+    @Deprecated
     public void runShooter(double voltage) {
-        // TopMotor.setVoltage(-spd);
-        BottomMotor.setVoltage(-voltage);
+        TopMotor.setVoltage(voltage);
+        BottomMotor.setVoltage(voltage);
     }
 
-    public double getPIDOutput(){
-        if(Math.abs(getAverageShooterRPM() - targetRPM) < 100)
-            return 0;
-        
-        return m_PidController.calculate(getAverageShooterRPM() - targetRPM);
+    public double getBottomPIDOutput(){
+        return m_BottomPidController.calculate(getBottomShooterRPM() - targetRPM); // this is the wrong way but it works WPI SUX
+    }
+    public double getTopPIDOutput(){
+        return m_TopPidController.calculate(getTopShooterRPM() - targetRPM); // this is the wrong way but it works WPI SUX
     }
 
     public void resetTimer() {
@@ -89,13 +95,14 @@ public class Shooter extends SubsystemBase {
     }
 
     public void runShooter(double top, double bottom) {
-        TopMotor.setVoltage(-top);
-        BottomMotor.setVoltage(-bottom);
+        TopMotor.setVoltage(top);
+        BottomMotor.setVoltage(bottom);
     }
 
     public void setTargetRPM(int RPM) {
         targetRPM = RPM;
     }
+
 
     public void resetAutoShots() {
         AutoShots = 0;
@@ -106,8 +113,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void stopMotor() {
-        TopMotor.set(0);
-        BottomMotor.set(0);
+        setTargetRPM(0);
     }
 
     public void idleMotor() {
@@ -123,7 +129,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getAverageShooterRPM() {
-        return getTopShooterRPM();
+        return getBottomShooterRPM();
         // return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
     }
 

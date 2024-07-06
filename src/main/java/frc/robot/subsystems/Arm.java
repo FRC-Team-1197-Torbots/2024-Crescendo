@@ -25,6 +25,8 @@ public class Arm extends SubsystemBase {
     private double armKi;
     private double armKd;
     private double armVoltage;
+
+    private double feedForwardFriction;
     // private TrapezoidProfile.Constraints m_Constraints;
     // private ProfiledPIDController m_armPIDController;
     private PIDController m_PIDController;
@@ -54,6 +56,8 @@ public class Arm extends SubsystemBase {
         armKi = ArmConstants.Arm_kI;
         armKd = ArmConstants.Arm_kD;
 
+        feedForwardFriction = 0.17;
+
         // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
         // ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
@@ -75,6 +79,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
         SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
+        
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
@@ -88,12 +93,22 @@ public class Arm extends SubsystemBase {
     
         error = targetPos - ticksToDegrees(ArmEncoder.get());
         armVoltage = setArmOutput();
-        runArm(armVoltage);
+        runArm(feedForwardFriction);
     }
 
     public void setTargetAngle(double target) {
         targetPos = target;
     }
+
+    public void teleopInit(){
+        SmartDashboard.putNumber("Feed Forward Friction", feedForwardFriction);
+        
+    }
+
+    public void updateFeedForward(){
+        feedForwardFriction = SmartDashboard.getNumber("Feed Forward Friction", feedForwardFriction);
+    }
+    
     
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();

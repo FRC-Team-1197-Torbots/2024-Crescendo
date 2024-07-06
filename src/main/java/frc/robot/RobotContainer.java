@@ -126,8 +126,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    // beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
-    // beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
+    beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
+    beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     
@@ -190,8 +190,8 @@ public class RobotContainer {
     //Mech Controls
     m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.updateKp())); 
-    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFeedForward())); 
+    // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
     }
     
@@ -246,8 +246,9 @@ public class RobotContainer {
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
-    m_Shooter.idleMotor();
+    m_Shooter.stopMotor();
     m_Shooter.telopInit();
+    m_Arm.teleopInit();
     m_robotDrive.getAlliance();
   }
  

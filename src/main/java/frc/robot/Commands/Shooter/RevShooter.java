@@ -34,7 +34,7 @@ public class RevShooter extends Command{
 
       @Override
         public void end(boolean interrupted) {
-          m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed);
+          m_Shooter.setTargetRPM(0);
           m_Shooter.stopTimer();
             //m_Climber.stopMotors();
         }
