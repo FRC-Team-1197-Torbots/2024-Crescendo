@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import frc.robot.utils.LimelightHelpers;
 
 import com.revrobotics.CANSparkBase.IdleMode;
+
+import static frc.robot.Constants.ShooterConstants.ShootingRPM;
+
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -43,16 +46,20 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Top Flywheel RPM", TopMotor.getEncoder().getVelocity());
         SmartDashboard.putNumber("Bottom Flywheel RPM", BottomMotor.getEncoder().getVelocity());
-        SmartDashboard.putBoolean("Shooter RPM on Target", atTargetRPM);
-        SmartDashboard.putNumber("Shooter kP", ShooterConstants.kP);
         // SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
         // SmartDashboard.putBoolean("Amp Mode", motorStopped());
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
-        runShooter(ShooterConstants.FeedForward + m_PidController.calculate(targetRPM - getAverageShooterRPM()));
+        runShooter(ShooterConstants.FeedForward + getPIDOutput());
+        
+        SmartDashboard.putNumber("target RPM", targetRPM);
     }
 
-    public void setKp() {
+    public void updateKp() {
         m_PidController.setP(SmartDashboard.getNumber("Shooter kP", ShooterConstants.kP));
+    }
+
+    public void telopInit() {
+        SmartDashboard.putNumber("Shooter kP", ShooterConstants.kP);
     }
 
     public void runShooter(double spd) {
@@ -60,6 +67,13 @@ public class Shooter extends SubsystemBase {
         // BottomMotor.setVoltage(spd);
         TopMotor.set(-spd);
         BottomMotor.set(-spd);
+    }
+
+    public double getPIDOutput(){
+        if(Math.abs(getAverageShooterRPM() - targetRPM) < 100)
+            return 0;
+        
+        return m_PidController.calculate(getAverageShooterRPM() - targetRPM);
     }
 
     public void resetTimer() {
@@ -103,8 +117,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public void idleMotor() {
-        TopMotor.set(ShooterConstants.IdleSpeed);
-        BottomMotor.set(ShooterConstants.IdleSpeed);
+        setTargetRPM(ShooterConstants.IdleSpeed);
     }
 
     private double getBottomShooterRPM() {
@@ -116,7 +129,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getAverageShooterRPM() {
-        return (getBottomShooterRPM() + getTopShooterRPM()) / 2;
+        return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
     }
 
     public boolean gamePieceStored() {
@@ -132,7 +145,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        atTargetRPM = Math.abs(getBottomShooterRPM()) > 4200 && Math.abs(getTopShooterRPM()) > 4200;
+        atTargetRPM = Math.abs(getAverageShooterRPM() - ShootingRPM) < 100;
         return atTargetRPM || timer.hasElapsed(3); // 4500
     }
 
