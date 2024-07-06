@@ -244,6 +244,11 @@ public final class Constants {
 
     public static final double IdleSpeed = -0.4;
     public static final double TargetRPM = -5200;
+    
+    public static final double FeedForward = 0.4;
+    public static final double kP = 0.01;
+    public static final double kI = 0;
+    public static final double kD = 0;
 
   }
 

@@ -26,7 +26,6 @@ public class RevShooter extends Command{
       // Called every time the scheduler runs while the command is scheduled.
       @Override
       public void execute() {
-        //System.out.println("Going up");
         //m_Shooter.runShooter(m_ShooterPID.calculate(targetRPM - m_Shooter.getAverageShooterRPM()));
         m_Shooter.runShooter(0.85);
 
