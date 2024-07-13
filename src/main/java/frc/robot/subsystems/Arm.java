@@ -48,7 +48,7 @@ public class Arm extends SubsystemBase {
         ArmMotor1.setSmartCurrentLimit(30);
         ArmMotor2.setSmartCurrentLimit(30);
 
-        ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
+        ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, true, EncodingType.k4X);
         ArmEncoder.reset();
         // m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
@@ -77,7 +77,7 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
+        SmartDashboard.putNumber("Arm Angle", getRadians());
         SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
         
         // SmartDashboard.putNumber("Target Angle", targetPos);
@@ -91,9 +91,9 @@ public class Arm extends SubsystemBase {
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
         // SmartDashboard.putNumber("Error", error);
     
-        error = targetPos - ticksToDegrees(ArmEncoder.get());
+        error = targetPos - getRadians();
         armVoltage = setArmOutput();
-        runArm(feedForwardFriction);
+        //runArm(feedForwardFriction);
     }
 
     public void setTargetAngle(double target) {
@@ -203,19 +203,16 @@ public class Arm extends SubsystemBase {
             targetPos = ArmConstants.IntakePos;
     }
 
-    public double getAngularVelo() {
-        return ArmEncoder.getRate() / ArmConstants.TICKS_PER_DEGREE;
-    }
-
     public double setArmOutput() {
         if (resettingArm) {
             return -0.8;
         }
-        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos); 
+        return m_PIDController.calculate(getRadians() - targetPos); 
     }
 
-    public double ticksToDegrees(double ticks) {
-        return ticks / ArmConstants.TICKS_PER_DEGREE;
+    public double getRadians() {
+        double rawValue = (double)ArmEncoder.get() / ArmConstants.TicksPerRevolution * 2.0 * Math.PI / ArmConstants.EncoderToArmGear;
+        return rawValue + ArmConstants.HardStopOffset;
     }
 
     public void resettingArm(boolean value) {

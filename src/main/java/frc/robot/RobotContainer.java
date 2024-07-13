@@ -241,7 +241,7 @@ public class RobotContainer {
 
   public void teleopInit() { 
     m_Blinkin.setColor(BlinkinConstants.White);
-    m_Arm.setMotorMode(IdleMode.kBrake);
+    m_Arm.setMotorMode(IdleMode.kCoast);//brake
     // m_Arm.setTargetAngle(ArmConstants.StorePos);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);

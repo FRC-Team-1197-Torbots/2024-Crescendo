@@ -66,7 +66,6 @@ public class Shooter extends SubsystemBase {
     }
 
     public void telopInit() {
-        System.out.println("OMG SHUFFLEBOARD IS BAD");
         SmartDashboard.putNumber("Shooter kP", ShooterConstants.kP);
         SmartDashboard.putNumber("target rpm", targetRPM);
     }
