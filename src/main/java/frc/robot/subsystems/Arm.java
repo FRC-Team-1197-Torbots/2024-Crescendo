@@ -26,7 +26,7 @@ public class Arm extends SubsystemBase {
     private double armKd;
     private double armVoltage;
 
-    private double feedForwardFriction;
+    private double feedForwardGravity;
     // private TrapezoidProfile.Constraints m_Constraints;
     // private ProfiledPIDController m_armPIDController;
     private PIDController m_PIDController;
@@ -56,7 +56,7 @@ public class Arm extends SubsystemBase {
         armKi = ArmConstants.Arm_kI;
         armKd = ArmConstants.Arm_kD;
 
-        feedForwardFriction = 0.17;
+        feedForwardGravity = 0.6;
 
         // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
@@ -79,21 +79,21 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", getRadians());
         SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
-        
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
-
+        
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
         // SmartDashboard.putNumber("Error", error);
-    
+        
         error = targetPos - getRadians();
         armVoltage = setArmOutput();
-        //runArm(feedForwardFriction);
+        SmartDashboard.putNumber("PID Output",m_PIDController.calculate(error));
+        runArm(armVoltage);
     }
 
     public void setTargetAngle(double target) {
@@ -101,12 +101,14 @@ public class Arm extends SubsystemBase {
     }
 
     public void teleopInit(){
-        SmartDashboard.putNumber("Feed Forward Friction", feedForwardFriction);
-        
+        SmartDashboard.putNumber("Arm kP", armKp);
+        SmartDashboard.putNumber("Target Angle", targetPos);
     }
 
     public void updateFeedForward(){
-        feedForwardFriction = SmartDashboard.getNumber("Feed Forward Friction", feedForwardFriction);
+        armKp = SmartDashboard.getNumber("Arm kP", armKp);
+        m_PIDController.setP(armKp);
+        targetPos = SmartDashboard.getNumber("Target Angle", targetPos);
     }
     
     
@@ -207,7 +209,7 @@ public class Arm extends SubsystemBase {
         if (resettingArm) {
             return -0.8;
         }
-        return m_PIDController.calculate(getRadians() - targetPos); 
+        return -feedForwardGravity * Math.cos(getRadians()) + m_PIDController.calculate(error); 
     }
 
     public double getRadians() {
