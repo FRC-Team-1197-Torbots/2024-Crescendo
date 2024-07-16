@@ -189,8 +189,8 @@ public final class Constants {
     public static final double[] StoreTargets = {StorePos};
 
     //Arm PID Constants
-    public static final double Arm_kP = 0.01;//0.1//around 0.5 degrees of error
-    public static final double Arm_kI = 0; //0.00001;
+    public static final double Arm_kP = 6.0;
+    public static final double Arm_kI = 0.00001; //0.00001;
     public static final double Arm_kD = 0;
 
     //Arm Motion Profiling Constants

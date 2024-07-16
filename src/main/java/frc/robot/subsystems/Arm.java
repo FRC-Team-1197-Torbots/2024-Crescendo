@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -97,7 +98,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setTargetAngle(double target) {
-        targetPos = target;
+        targetPos = MathUtil.clamp(target, 0.1, 2.6);;
     }
 
     public void teleopInit(){
@@ -108,7 +109,7 @@ public class Arm extends SubsystemBase {
     public void updateFeedForward(){
         armKp = SmartDashboard.getNumber("Arm kP", armKp);
         m_PIDController.setP(armKp);
-        targetPos = SmartDashboard.getNumber("Target Angle", targetPos);
+        setTargetAngle(SmartDashboard.getNumber("Target Angle", targetPos));
     }
     
     
