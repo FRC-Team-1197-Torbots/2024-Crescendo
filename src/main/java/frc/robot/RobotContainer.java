@@ -113,7 +113,7 @@ public class RobotContainer {
         m_robotDrive));
     m_Arm.setDefaultCommand(
       new RunCommand(
-        () -> m_Arm.runDefault(), m_Arm
+        () -> m_Arm.runPID(), m_Arm
       )
     );
 

@@ -90,7 +90,7 @@ public class Arm extends SubsystemBase {
         // SmartDashboard.putNumber("Error", error);       
     }
 
-    public void runDefault() {
+    public void runPID() {
         error = targetPos - getRadians();
         armVoltage = setArmOutput();
         runArm(armVoltage);
