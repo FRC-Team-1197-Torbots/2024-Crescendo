@@ -199,7 +199,7 @@ public class RobotContainer {
     m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
     m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFeedForward())); 
-    // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
+    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
     }
     
