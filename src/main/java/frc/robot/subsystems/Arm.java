@@ -34,8 +34,6 @@ public class Arm extends SubsystemBase {
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
     public double testAngle;
-    private boolean resettingArm;
-    // private double feedForward;
     public double[] autoTargets;
 
     private DriveSubsystem m_DriveSubsystem;
@@ -89,16 +87,17 @@ public class Arm extends SubsystemBase {
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
-        // SmartDashboard.putNumber("Error", error);
-        
+        // SmartDashboard.putNumber("Error", error);       
+    }
+
+    public void runDefault() {
         error = targetPos - getRadians();
         armVoltage = setArmOutput();
-        SmartDashboard.putNumber("PID Output",m_PIDController.calculate(error));
         runArm(armVoltage);
     }
 
     public void setTargetAngle(double target) {
-        targetPos = MathUtil.clamp(target, 0.1, 2.6);;
+        targetPos = MathUtil.clamp(target, 0.1, 2.6);
     }
 
     public void teleopInit(){
@@ -207,19 +206,12 @@ public class Arm extends SubsystemBase {
     }
 
     public double setArmOutput() {
-        if (resettingArm) {
-            return -0.8;
-        }
         return -feedForwardGravity * Math.cos(getRadians()) + m_PIDController.calculate(error); 
     }
 
     public double getRadians() {
         double rawValue = (double)ArmEncoder.get() / ArmConstants.TicksPerRevolution * 2.0 * Math.PI / ArmConstants.EncoderToArmGear;
         return rawValue + ArmConstants.HardStopOffset;
-    }
-
-    public void resettingArm(boolean value) {
-        resettingArm = value;
     }
 
     public void getPose() {

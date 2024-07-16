@@ -111,6 +111,14 @@ public class RobotContainer {
         // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
+    m_Arm.setDefaultCommand(
+      new RunCommand(
+        () -> m_Arm.runDefault(), m_Arm
+      )
+    );
+
+
+
   }
 
   /**
