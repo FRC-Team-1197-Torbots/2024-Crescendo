@@ -22,7 +22,7 @@ public class Limelight extends SubsystemBase{
 
     @Override
     public void periodic(){
-      // SmartDashboard.putNumber("Distance from april tag", LimelightHelpers.getTX("limelight-shooter"));
+      SmartDashboard.putNumber("Distance from april tag", LimelightHelpers.getTX("limelight-shooter"));
         // botpose1 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
         // double[] botpose2 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
 

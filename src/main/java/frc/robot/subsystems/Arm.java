@@ -21,7 +21,7 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
 
-    private double targetPos = 0;
+    private double targetPos = ArmConstants.HardStopOffset;
     private double armKp;
     private double armKi;
     private double armKd;
@@ -33,14 +33,14 @@ public class Arm extends SubsystemBase {
     private PIDController m_PIDController;
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
-    public double testAngle;
+    public double testAngle = ArmConstants.SubwooferPos;
+    public double intakeTestPos = ArmConstants.IntakePos;
     public double[] autoTargets;
 
     private DriveSubsystem m_DriveSubsystem;
     private Limelight m_Limelight;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
-        testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
@@ -77,7 +77,7 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", getRadians());
-        SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
+        // SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
@@ -97,18 +97,15 @@ public class Arm extends SubsystemBase {
     }
 
     public void setTargetAngle(double target) {
-        targetPos = MathUtil.clamp(target, 0.1, 2.6);
+        targetPos = MathUtil.clamp(target, -0.2, 2.6);
     }
 
     public void teleopInit(){
-        SmartDashboard.putNumber("Arm kP", armKp);
-        SmartDashboard.putNumber("Target Angle", targetPos);
+        SmartDashboard.putNumber("Shooting Angle", testAngle);
     }
 
-    public void updateFeedForward(){
-        armKp = SmartDashboard.getNumber("Arm kP", armKp);
-        m_PIDController.setP(armKp);
-        setTargetAngle(SmartDashboard.getNumber("Target Angle", targetPos));
+    public void updateIntakeAngle(){
+        testAngle = SmartDashboard.getNumber("Shooting Angle", testAngle);
     }
     
     

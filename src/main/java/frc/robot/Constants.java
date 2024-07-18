@@ -162,13 +162,12 @@ public final class Constants {
 
     //Storing Position values
     // 66.2
-    public static final double StorePos = 46; //Need to change these two values later
-    public static final double IntakePos = 144;
-    public static final double SpeakerPos = 114.2; //53
+    public static final double StorePos = 1.4;
+    public static final double IntakePos = 0.05; 
+    public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
-    public static final double TestPos = 96;
-    public static final double AmpPos = 106.05;//106
-    public static final double SubwooferPos = 116; //
+    public static final double AmpPos = 106.05;
+    public static final double SubwooferPos = 0.45;  //116
     
     // Auto arm angles
     public static final double[] OneNoteTopTargets = {107.367};
