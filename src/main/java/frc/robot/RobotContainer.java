@@ -218,6 +218,7 @@ public class RobotContainer {
       positionChooser.addOption("Top to Center", "Top to Center");
       positionChooser.addOption("Middle (SPEAKER)", "Middle");
       positionChooser.addOption("Bottom (STATION)", "Bottom");
+      positionChooser.addOption("Test", "Test");
 
       autoNameChooser.addOption("5 Note", "5 Note");
       autoNameChooser.addOption("4 Note", "4 Note");

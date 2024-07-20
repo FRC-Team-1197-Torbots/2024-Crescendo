@@ -31,13 +31,13 @@ public final class Constants {
     public static final double kMaxAngularSpeed = 2.5 * Math.PI; // radians per second / 2
 
     public static final double kDirectionSlewRate = 3; // radians per second 2 / 2.5, 3
-    public static final double kMagnitudeSlewRate = 5.1; // percent per second (1 = 100%) 1.8 //4.9, 5.5
-    public static final double kRotationalSlewRate = 6.0; // percent per second (1 = 100%) 2.0//5.0, 6.0
+    public static final double kMagnitudeSlewRate = 5.1; // 5.1 //  percent per second (1 = 100%) 1.8 //4.9, 5.5
+    public static final double kRotationalSlewRate = 5.0; // percent per second (1 = 100%) 2.0//5.0, 6.0
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(25); //26.5
+    public static final double kTrackWidth = Units.inchesToMeters(21.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(25); //26.5
+    public static final double kWheelBase = Units.inchesToMeters(21.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -87,7 +87,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.07438; // 76.2 mm
+    public static final double kWheelDiameterMeters = 0.0762; // 76.2 mm
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15 teeth on the bevel pinion
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
@@ -162,13 +162,12 @@ public final class Constants {
 
     //Storing Position values
     // 66.2
-    public static final double StorePos = 1.4;
-    public static final double IntakePos = 0.05; 
+    public static final double StorePos = 1.83;
+    public static final double IntakePos = 0.065; 
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
     public static final double AmpPos = 106.05;
-    public static final double SubwooferPos = 0.45;  //116
-    
+    public static final double SubwooferPos = 0.45;  
     // Auto arm angles
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] ThreeNoteTopCenterTargets = {118, 100.1, 97.6};
@@ -188,9 +187,9 @@ public final class Constants {
     public static final double[] StoreTargets = {StorePos};
 
     //Arm PID Constants
-    public static final double Arm_kP = 6.0;
-    public static final double Arm_kI = 0.00001; //0.00001;
-    public static final double Arm_kD = 0;
+    public static final double Arm_kP = 7.0; // 6
+    public static final double Arm_kI = 0; // 0
+    public static final double Arm_kD = 0; // 0
 
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;

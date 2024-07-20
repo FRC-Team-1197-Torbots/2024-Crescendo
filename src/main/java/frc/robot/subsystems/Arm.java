@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.utils.LimelightHelpers;
 
+import com.fasterxml.jackson.core.json.DupDetector;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -46,16 +47,16 @@ public class Arm extends SubsystemBase {
 
         ArmMotor1.setSmartCurrentLimit(30);
         ArmMotor2.setSmartCurrentLimit(30);
-
         ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, true, EncodingType.k4X);
         ArmEncoder.reset();
         // m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
+        
         armKp = ArmConstants.Arm_kP;
         armKi = ArmConstants.Arm_kI;
         armKd = ArmConstants.Arm_kD;
 
-        feedForwardGravity = 0.6;
+        feedForwardGravity = 0.52;
 
         // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
@@ -109,16 +110,13 @@ public class Arm extends SubsystemBase {
     }
     
     
+
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
-        double testAngle = ArmConstants.AngleEquationA * Math.log(distance) + ArmConstants.AngleEquationB;
-        if (testAngle < ArmConstants.StorePos) {
-            testAngle = ArmConstants.StorePos;
-        }
-        if (testAngle > ArmConstants.IntakePos) {
-            testAngle = ArmConstants.IntakePos;
-        }
-        return testAngle;
+        double result = -3.03 + 8.44*distance - 8.6*distance*distance + 4.67 * distance * distance * distance - 1.37* Math.pow(distance,4) + 0.205 * Math.pow(distance,5) - 0.0122 * Math.pow(distance,6);
+        SmartDashboard.putNumber("Calculated Angle", result);
+        return MathUtil.clamp(result, ArmConstants.IntakePos, ArmConstants.SubwooferPos);
+
     }
 
     public void runArm(double voltage) {

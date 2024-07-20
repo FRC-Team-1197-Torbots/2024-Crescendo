@@ -156,7 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
             new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
             new PIDConstants(5.0, 0.0, 0.003), // Rotation PID constants
             4.5, // Max module speed, in m/s
-            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+            0.772, // Drive base radius in meters. Distance from robot center to furthest module.
             new ReplanningConfig() // Default path replanning config. See the API for the options here
         ),
         () -> {
@@ -236,9 +236,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     SmartDashboard.putData("Robot Field", m_field2d);
     // SmartDashboard.putBoolean("Period", facingSpeaker());
-    // SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
-    // SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
+    SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
+    SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
     m_field2d.setRobotPose(m_odometry.getPoseMeters());
+
 
     // SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
     // SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);

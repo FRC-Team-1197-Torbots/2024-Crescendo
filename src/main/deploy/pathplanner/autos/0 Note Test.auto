@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.7778742005415524,
-      "y": 6.8157068696448375
+      "x": 0.0,
+      "y": 4.0
     },
     "rotation": 0
   },
@@ -12,9 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Shoot Sequence"
+            "pathName": "Move Forward 1 meter"
           }
         }
       ]
