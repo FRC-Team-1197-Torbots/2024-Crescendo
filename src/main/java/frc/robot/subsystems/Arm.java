@@ -34,8 +34,7 @@ public class Arm extends SubsystemBase {
     private PIDController m_PIDController;
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
-    public double testAngle = ArmConstants.SubwooferPos;
-    public double intakeTestPos = ArmConstants.IntakePos;
+    // public double testAngle = ArmConstants.SubwooferPos;
     public double[] autoTargets;
 
     private DriveSubsystem m_DriveSubsystem;
@@ -78,6 +77,7 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm Angle", getRadians());
+        SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
@@ -101,21 +101,15 @@ public class Arm extends SubsystemBase {
         targetPos = MathUtil.clamp(target, -0.2, 2.6);
     }
 
-    public void teleopInit(){
-        SmartDashboard.putNumber("Shooting Angle", testAngle);
-    }
 
-    public void updateIntakeAngle(){
-        testAngle = SmartDashboard.getNumber("Shooting Angle", testAngle);
-    }
     
     
 
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
-        double result = -3.03 + 8.44*distance - 8.6*distance*distance + 4.67 * distance * distance * distance - 1.37* Math.pow(distance,4) + 0.205 * Math.pow(distance,5) - 0.0122 * Math.pow(distance,6);
+        double result = 0.394 + 0.37 * Math.log(distance);
         SmartDashboard.putNumber("Calculated Angle", result);
-        return MathUtil.clamp(result, ArmConstants.IntakePos, ArmConstants.SubwooferPos);
+        return MathUtil.clamp(result, ArmConstants.SubwooferPos, ArmConstants.StorePos);
 
     }
 

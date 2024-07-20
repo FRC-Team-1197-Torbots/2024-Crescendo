@@ -179,7 +179,7 @@ public class RobotContainer {
       .whileTrue(new SequentialCommandGroup(
         new ParallelCommandGroup(
           new StartEndCommand(
-            () -> m_Arm.setTargetAngle(m_Arm.testAngle), 
+            () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter))));
     //Outtake
@@ -199,7 +199,6 @@ public class RobotContainer {
     m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
     // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateIntakeAngle(), m_Arm)); 
     m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
     }
@@ -258,7 +257,6 @@ public class RobotContainer {
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.stopMotor();
     m_Shooter.telopInit();
-    m_Arm.teleopInit();
     m_robotDrive.getAlliance();
   }
  
