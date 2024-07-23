@@ -64,12 +64,13 @@ public class RobotContainer {
 
   private SendableChooser<String> autoNameChooser = new SendableChooser<>();
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final Localization m_Localization = new Localization();
+  private final DriveSubsystem m_RobotDrive = new DriveSubsystem(m_Localization);
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
   private final Climber m_Climber = new Climber();
-  public final Limelight m_Limelight = new Limelight(m_robotDrive);
-  public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
+  public final Limelight m_Limelight = new Limelight(m_RobotDrive);
+  public final Arm m_Arm = new Arm(m_RobotDrive, m_Limelight);
   public final Blinkin m_Blinkin = new Blinkin(m_Intake);
   
 
@@ -77,9 +78,9 @@ public class RobotContainer {
   //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
-  private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
-  private final Trigger speakerOnTarget = new Trigger(m_robotDrive::facingSpeaker);
-  private final Trigger closeToSpeaker = new Trigger(m_robotDrive::closeToSpeaker);
+  private final Trigger exTrigger = new Trigger(m_RobotDrive::checkLocked);
+  private final Trigger speakerOnTarget = new Trigger(m_RobotDrive::facingSpeaker);
+  private final Trigger closeToSpeaker = new Trigger(m_RobotDrive::closeToSpeaker);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
@@ -100,17 +101,17 @@ public class RobotContainer {
     registerAutoCommands();
     
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
+    m_RobotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
       new RunCommand(
-        () -> m_robotDrive.drive(
+        () -> m_RobotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
-        m_robotDrive));
+        m_RobotDrive));
     m_Arm.setDefaultCommand(
       new RunCommand(
         () -> m_Arm.runPID(), m_Arm
@@ -133,7 +134,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     
-    exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    exTrigger.whileTrue(new RunCommand(() -> m_RobotDrive.setX(), m_RobotDrive));
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
@@ -162,10 +163,10 @@ public class RobotContainer {
     m_driverController.leftTrigger(0.5).whileTrue(
       new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
-        new AimAtSpeaker(m_robotDrive),
+        new AimAtSpeaker(m_RobotDrive),
         new ScanAprilTag(m_Limelight),
         new ParallelCommandGroup(
-          new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive),
+          new RunCommand(() -> m_RobotDrive.aimRobot(),m_RobotDrive),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
@@ -197,7 +198,7 @@ public class RobotContainer {
 
     //Mech Controls
     m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
-    m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
+    m_MechController.y().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));        
     // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
     m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
@@ -252,18 +253,18 @@ public class RobotContainer {
     m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
     // m_Arm.setTargetAngle(ArmConstants.StorePos);
-    m_robotDrive.setMotorMode(IdleMode.kBrake);
+    m_RobotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.stopMotor();
     m_Shooter.telopInit();
-    m_robotDrive.getAlliance();
+    m_RobotDrive.getAlliance();
   }
  
   public void disableInit() {
     m_Blinkin.setColor(BlinkinConstants.Orange);
     m_Arm.setMotorMode(IdleMode.kCoast);
-    m_robotDrive.setMotorMode(IdleMode.kCoast);
+    m_RobotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
   }
 
@@ -273,8 +274,9 @@ public class RobotContainer {
     m_Arm.setAutoTargets(getAutonomousCommand().getName());
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.resetAutoShots();
-    m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
-    m_robotDrive.getAlliance();
+    m_RobotDrive.setAutoPosition(getAutonomousCommand().getName());
+   
+    m_RobotDrive.getAlliance();
   }
 
   public ScanAprilTag getScanAprilTag() {

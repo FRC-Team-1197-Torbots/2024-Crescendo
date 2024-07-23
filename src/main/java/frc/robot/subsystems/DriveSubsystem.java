@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 //import com.ctre.phoenix
@@ -34,8 +35,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Localization;
 import frc.robot.utils.LimelightHelpers;
-import frc.utils.SwerveUtils;
+import frc.robot.utils.SwerveUtils;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -88,7 +90,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double angleDelta;
   private double turningKp = 0.02;
   private double turningKd = 0.001;
-
+  private Localization m_Localization;
   // Odometry class for tracking robot pose
   double[] botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
   SwerveDriveOdometry m_odometry;
@@ -112,24 +114,18 @@ public class DriveSubsystem extends SubsystemBase {
   // Coordinates of robot
   private double[] m_RobotCoords = new double[2];
 
-  /** Creates a new DriveSubsystem. */
-  public DriveSubsystem() {
+  /** Creates a new DriveSubsystem. 
+ * @param m_Localization */
+  public DriveSubsystem(Localization localization) {
     //m_autoName = autoName;
     //SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
-    
-
-    m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(gyroWithOffset()),//-m_gyro.getAngle()
-      new SwerveModulePosition[] {
+    m_Localization = localization;
+    m_Localization.initializeOdometry(new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      }
-      , PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName)
-      //new Pose2d(0,0,new Rotation2d(Math.toRadians(0)))
-    );
+      }, gyroWithOffset()); 
 
 
     m_RobotCoords[0] = m_odometry.getPoseMeters().getX();
@@ -219,15 +215,15 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // SmartDashboard.putString("Auto Name", m_autoName);
     // SmartDashboard.putNumber("Angle from speaker", calcAngle());
-    m_odometry.update(new Rotation2d(Math.toRadians(gyroWithOffset())), new SwerveModulePosition[] {
+    m_Localization.updateOdometry(new Rotation2d(Math.toRadians(gyroWithOffset())), new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
     });
 
-    odometry_x = m_odometry.getPoseMeters().getX();
-    odometry_y = m_odometry.getPoseMeters().getY();
+    odometry_x = m_Localization.getOdometry().getPoseMeters().getX();
+    odometry_y = m_Localization.getOdometry().getPoseMeters().getY();
     m_RobotCoords[0] = odometry_x;
     m_RobotCoords[1] = odometry_y;
 
@@ -238,7 +234,7 @@ public class DriveSubsystem extends SubsystemBase {
     // SmartDashboard.putBoolean("Period", facingSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
-    m_field2d.setRobotPose(m_odometry.getPoseMeters());
+    m_field2d.setRobotPose(m_Localization.getOdometry().getPoseMeters());
 
 
     // SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
@@ -254,7 +250,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_Localization.getOdometry().getPoseMeters();
   }
 
   /**
@@ -263,15 +259,15 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
-        Rotation2d.fromDegrees(gyroWithOffset()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
-        pose);
+    m_Localization.resetOdometry(
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      },
+      gyroWithOffset(),
+      pose);
   }
 
   public void resetGyro(){
@@ -542,6 +538,16 @@ public class DriveSubsystem extends SubsystemBase {
     turningKd += amount;
     m_PidController.setD(turningKp);
     SmartDashboard.putNumber("Turning Kd", turningKd);
+  }
+
+  public void setAutoPosition(String autoName) {
+    setAngle(getAutoStartingAngle(autoName));
+    m_Localization.resetOdometry( new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      }, gyroWithOffset(), PathPlannerAuto.getStaringPoseFromAutoFile(autoName));
   }
 
 }
