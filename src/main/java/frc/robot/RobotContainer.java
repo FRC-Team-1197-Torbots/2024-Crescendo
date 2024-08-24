@@ -196,7 +196,7 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
 
     //Mech Controls
-    m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
+    // m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
     // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
     m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
