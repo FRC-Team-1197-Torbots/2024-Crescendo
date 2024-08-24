@@ -2,10 +2,12 @@ package frc.robot.subsystems;
 
 import frc.robot.utils.LimelightHelpers;
 
+import com.fasterxml.jackson.core.json.DupDetector;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import frc.robot.Constants.ArmConstants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -20,39 +22,40 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
 
-    private double targetPos = 0;
+    private double targetPos = ArmConstants.HardStopOffset;
     private double armKp;
     private double armKi;
     private double armKd;
     private double armVoltage;
+
+    private double feedForwardGravity;
     // private TrapezoidProfile.Constraints m_Constraints;
     // private ProfiledPIDController m_armPIDController;
     private PIDController m_PIDController;
     // private ArmFeedforward m_ArmFeedforward;
     private double error;
-    public double testAngle;
-    private boolean resettingArm;
-    // private double feedForward;
+    // public double testAngle = ArmConstants.SubwooferPos;
     public double[] autoTargets;
 
     private DriveSubsystem m_DriveSubsystem;
     private Limelight m_Limelight;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
-        testAngle = ArmConstants.TestPos;
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
         ArmMotor1.setSmartCurrentLimit(30);
         ArmMotor2.setSmartCurrentLimit(30);
-
-        ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, false, EncodingType.k4X);
+        ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, true, EncodingType.k4X);
         ArmEncoder.reset();
         // m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
+        
         armKp = ArmConstants.Arm_kP;
         armKi = ArmConstants.Arm_kI;
         armKd = ArmConstants.Arm_kD;
+
+        feedForwardGravity = 0.52;
 
         // feedForward = 0.001;
         // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
@@ -73,38 +76,41 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm Angle", ticksToDegrees(ArmEncoder.get()));
-        SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
+        SmartDashboard.putNumber("Arm Angle", getRadians());
+        SmartDashboard.putNumber("Target Angle", targetPos);
+        // SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
         // SmartDashboard.putNumber("Test Angle", testAngle);
         // SmartDashboard.putNumber("Arm speed", armSpeed);
         // SmartDashboard.putNumber("Arm Kp", armKp);
-
+        
         // SmartDashboard.putNumber("Arm Ki", armKi);
         // SmartDashboard.putNumber("Arm Kd", armKd);
         // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
-        // SmartDashboard.putNumber("Error", error);
-    
-        error = targetPos - ticksToDegrees(ArmEncoder.get());
+        // SmartDashboard.putNumber("Error", error);       
+    }
+
+    public void runPID() {
+        error = targetPos - getRadians();
         armVoltage = setArmOutput();
         runArm(armVoltage);
     }
 
     public void setTargetAngle(double target) {
-        targetPos = target;
+        targetPos = MathUtil.clamp(target, -0.2, 2.6);
     }
+
+
     
+    
+
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
-        double testAngle = ArmConstants.AngleEquationA * Math.log(distance) + ArmConstants.AngleEquationB;
-        if (testAngle < ArmConstants.StorePos) {
-            testAngle = ArmConstants.StorePos;
-        }
-        if (testAngle > ArmConstants.IntakePos) {
-            testAngle = ArmConstants.IntakePos;
-        }
-        return testAngle;
+        double result = 0.394 + 0.37 * Math.log(distance);
+        SmartDashboard.putNumber("Calculated Angle", result);
+        return MathUtil.clamp(result, ArmConstants.SubwooferPos, ArmConstants.StorePos);
+
     }
 
     public void runArm(double voltage) {
@@ -188,23 +194,13 @@ public class Arm extends SubsystemBase {
             targetPos = ArmConstants.IntakePos;
     }
 
-    public double getAngularVelo() {
-        return ArmEncoder.getRate() / ArmConstants.TICKS_PER_DEGREE;
-    }
-
     public double setArmOutput() {
-        if (resettingArm) {
-            return -0.8;
-        }
-        return m_PIDController.calculate(ticksToDegrees(ArmEncoder.get()) - targetPos); 
+        return -feedForwardGravity * Math.cos(getRadians()) + m_PIDController.calculate(error); 
     }
 
-    public double ticksToDegrees(double ticks) {
-        return ticks / ArmConstants.TICKS_PER_DEGREE;
-    }
-
-    public void resettingArm(boolean value) {
-        resettingArm = value;
+    public double getRadians() {
+        double rawValue = (double)ArmEncoder.get() / ArmConstants.TicksPerRevolution * 2.0 * Math.PI / ArmConstants.EncoderToArmGear;
+        return rawValue + ArmConstants.HardStopOffset;
     }
 
     public void getPose() {

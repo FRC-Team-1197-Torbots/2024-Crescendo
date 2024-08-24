@@ -111,6 +111,14 @@ public class RobotContainer {
         // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
+    m_Arm.setDefaultCommand(
+      new RunCommand(
+        () -> m_Arm.runPID(), m_Arm
+      )
+    );
+
+
+
   }
 
   /**
@@ -188,27 +196,28 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
 
     //Mech Controls
-    m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
+    // m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Shooter.stopMotor())); 
-    m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
+    // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
+    m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
     m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
-  }
-  
-  private void registerAutoCommands() {
-    NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
-    NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
-    NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
-    NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new InstantCommand(() -> m_Shooter.stopMotor())));
-  }
-  
-  private void addAutoPaths() {
-    positionChooser.addOption("Top (AMP)", "Top");
-    positionChooser.addOption("Top to Center", "Top to Center");
-    positionChooser.addOption("Middle (SPEAKER)", "Middle");
-    positionChooser.addOption("Bottom (STATION)", "Bottom");
+    }
+    
+    private void registerAutoCommands() {
+      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
+      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
+      NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
+      NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
+        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+        new InstantCommand(() -> m_Shooter.stopMotor())));
+    }
+    
+    private void addAutoPaths() {
+      positionChooser.addOption("Top (AMP)", "Top");
+      positionChooser.addOption("Top to Center", "Top to Center");
+      positionChooser.addOption("Middle (SPEAKER)", "Middle");
+      positionChooser.addOption("Bottom (STATION)", "Bottom");
+      positionChooser.addOption("Test", "Test");
 
     autoNameChooser.addOption("5 Note", "5 Note");
     autoNameChooser.addOption("4 Note", "4 Note");
@@ -247,6 +256,7 @@ public class RobotContainer {
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.stopMotor();
+    m_Shooter.telopInit();
     m_robotDrive.getAlliance();
   }
  

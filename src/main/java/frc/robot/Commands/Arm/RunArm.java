@@ -20,14 +20,13 @@ public class RunArm extends Command {
   
   @Override
   public void initialize() {
-
     m_Arm.setTargetAngle(m_targetAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // System.out.println("Going up");
+    m_Arm.runPID();
   }
 
   @Override
