@@ -256,6 +256,14 @@ public final class Constants {
 
   }
 
+  public static final class AmpRollerConstants {
+    public static final int RollerMotor = 18;
+    public static final double kP = 0.004;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final int NEOMaxSpeed = 5676; 
+  }
+
   public static final class BlinkinConstants {
     public static final int Blinkin = 1; 
     public static final double Red = 0.61;

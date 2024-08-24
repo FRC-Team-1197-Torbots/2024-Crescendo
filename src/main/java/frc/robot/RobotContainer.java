@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Commands.DoNothing;
+import frc.robot.Commands.Kaiden;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
@@ -71,6 +71,7 @@ public class RobotContainer {
   public final Limelight m_Limelight = new Limelight(m_robotDrive);
   public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
   public final Blinkin m_Blinkin = new Blinkin(m_Intake);
+  private final AmpRollers m_AmpRollers = new AmpRollers();
   
 
   // The driver's controller
@@ -196,11 +197,9 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
 
     //Mech Controls
-    // m_MechController.rightBumper().onTrue(new ZeroArm(m_Arm));
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
-    // m_MechController.a().onTrue(new InstantCommand(() -> m_Blinkin.setColor(Math.round((Math.random() * 100.0)) / 100.0))); 
     m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
-    m_MechController.x().onTrue(new InstantCommand(() -> m_Arm.toggleIntake()));
+    m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.rileyAndKaiden()));
     }
     
     private void registerAutoCommands() {
