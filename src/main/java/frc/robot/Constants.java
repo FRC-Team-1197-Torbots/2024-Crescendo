@@ -166,7 +166,7 @@ public final class Constants {
     public static final double IntakePos = 0.065; 
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
-    public static final double AmpPos = 106.05;
+    public static double AmpPos = 1.403;
     public static final double SubwooferPos = 0.45;  
     // Auto arm angles
     public static final double[] OneNoteTopTargets = {107.367};
@@ -246,7 +246,7 @@ public final class Constants {
     public static final int NominalBatteryVoltage = 12;
     
 
-    public static final int IdleSpeed = -2300;
+    public static final int IdleSpeed = (int) (AmpRollerConstants.PassSpeed / 4.0 * 1.625);
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -4000;
     
@@ -261,7 +261,8 @@ public final class Constants {
     public static final double kP = 0.004;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final int NEOMaxSpeed = 5676; 
+    public static final int NEOMaxSpeed = 5676;
+    public static final double PassSpeed = -2000; 
   }
 
   public static final class BlinkinConstants {

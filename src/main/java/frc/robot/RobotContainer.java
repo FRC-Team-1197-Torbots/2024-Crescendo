@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.Kaiden;
+import frc.robot.Commands.Amp.AmpIntake;
 import frc.robot.Commands.Arm.AutoArm;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
@@ -112,11 +113,11 @@ public class RobotContainer {
         // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
-    m_Arm.setDefaultCommand(
-      new RunCommand(
-        () -> m_Arm.runPID(), m_Arm
-      )
-    );
+    // m_Arm.setDefaultCommand(
+    //   new RunCommand(
+    //     () -> m_Arm.runPID(), m_Arm
+    //   )
+    // );
 
 
 
@@ -136,6 +137,7 @@ public class RobotContainer {
     
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
+    beamTrigger.onTrue(new AmpIntake(m_AmpRollers));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
@@ -197,9 +199,17 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
 
     //Mech Controls
-    m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
-    m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
-    m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.rileyAndKaiden()));
+    // m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
+    // m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
+    m_MechController.x().whileTrue(new ParallelCommandGroup(
+      new Shoot(m_Intake)));
+
+
+    m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.updateAmpTarget()));
+    m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.setTargetRPM(0)));
+
+
+
     }
     
     private void registerAutoCommands() {

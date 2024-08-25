@@ -41,6 +41,7 @@ public class Arm extends SubsystemBase {
     private Limelight m_Limelight;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
+        SmartDashboard.putNumber("Arm Amp Angle", ArmConstants.AmpPos);
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
@@ -222,5 +223,9 @@ public class Arm extends SubsystemBase {
 
     public double getArmOutput() {
         return (ArmMotor1.getOutputCurrent() + ArmMotor2.getAppliedOutput()) / 2;
+    }
+
+    public void updateAmpTarget() {
+        ArmConstants.AmpPos = SmartDashboard.getNumber("Arm Amp Angle", ArmConstants.AmpPos);
     }
 }

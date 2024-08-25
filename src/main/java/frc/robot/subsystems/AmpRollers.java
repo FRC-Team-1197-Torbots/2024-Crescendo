@@ -16,14 +16,12 @@ public class AmpRollers extends SubsystemBase{
 
     private CANSparkMax m_RollerMotor;
     private PIDController m_PidController;
-    private double targetRPM = 0;
-    private double kP;
+    private double targetRPM;
 
     public AmpRollers() {
+        targetRPM = 0;
         m_RollerMotor = new CANSparkMax(AmpRollerConstants.RollerMotor, MotorType.kBrushless);
-        m_PidController = new PIDController(kP, AmpRollerConstants.kI, AmpRollerConstants.kD);
-        SmartDashboard.putNumber("target rpm", targetRPM);
-        SmartDashboard.putNumber("kP", kP);
+        m_PidController = new PIDController(AmpRollerConstants.kP, AmpRollerConstants.kI, AmpRollerConstants.kD);
     }
 
     public void setVoltage(double voltage) {
@@ -36,29 +34,19 @@ public class AmpRollers extends SubsystemBase{
 
     private double getPIDOutput() {
         double feedForward = (double)targetRPM / AmpRollerConstants.NEOMaxSpeed * ShooterConstants.NominalBatteryVoltage;
-        double pidOutput = m_PidController.calculate(targetRPM - m_RollerMotor.getEncoder().getVelocity());
+        double pidOutput = m_PidController.calculate(m_RollerMotor.getEncoder().getVelocity() - targetRPM);
         return feedForward + pidOutput;
     }
 
-    public void rileyAndKaiden() {
-        targetRPM = SmartDashboard.getNumber("target rpm",targetRPM);
-        kP = SmartDashboard.getNumber("kP", kP);
-    }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
 
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
-       
-        setVoltage(getPIDOutput());
+        
+       double pidOutput = getPIDOutput();
+        SmartDashboard.putNumber("pid Voltage output", pidOutput);
+        setVoltage(pidOutput);
     }
     
 
