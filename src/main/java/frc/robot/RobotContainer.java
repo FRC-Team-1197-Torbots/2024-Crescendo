@@ -208,8 +208,6 @@ public class RobotContainer {
     m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.updateAmpTarget()));
     m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.setTargetRPM(0)));
 
-
-
     }
     
     private void registerAutoCommands() {
