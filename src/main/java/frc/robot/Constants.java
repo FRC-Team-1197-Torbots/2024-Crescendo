@@ -152,7 +152,7 @@ public final class Constants {
 
   public static final class ArmConstants{
     //Spark Max & Spark Flex Constants
-    public static final double HardStopOffset = Math.PI / 2 + 1.04;
+    public static final double HardStopOffset = Math.PI / 2 + 0.2;
     public static final double EncoderToArmGear = 6.4;
     public static final int TicksPerRevolution = 2048;
     public static final int Motor1 = 13; // front
