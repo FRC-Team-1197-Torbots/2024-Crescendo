@@ -1,5 +1,6 @@
 package frc.robot.Commands.Amp;
 
+import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.subsystems.AmpRollers;
@@ -7,14 +8,16 @@ import frc.robot.subsystems.AmpRollers;
 public class AmpIntake extends Command {
 
     private final AmpRollers m_AmpRollers;
+    private double voltage;
 
-    public AmpIntake(AmpRollers rollers) {
+    public AmpIntake(AmpRollers rollers, double voltage) {
         m_AmpRollers = rollers;
+        this.voltage = voltage;
     }
 
     @Override
     public void initialize() {
-        m_AmpRollers.setTargetRPM(AmpRollerConstants.PassSpeed);
+        m_AmpRollers.setVoltage(voltage);
     }
 
     @Override
@@ -23,11 +26,12 @@ public class AmpIntake extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        m_AmpRollers.setVoltage(0);
     }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
     
 }

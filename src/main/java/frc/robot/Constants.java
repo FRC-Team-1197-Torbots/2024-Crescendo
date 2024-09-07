@@ -152,7 +152,7 @@ public final class Constants {
 
   public static final class ArmConstants{
     //Spark Max & Spark Flex Constants
-    public static final double HardStopOffset = Math.PI / 2 + 1.04;
+    public static final double HardStopOffset = Math.PI / 2 + 0.29;
     public static final double EncoderToArmGear = 6.4;
     public static final int TicksPerRevolution = 2048;
     public static final int Motor1 = 13; // front
@@ -166,7 +166,7 @@ public final class Constants {
     public static final double IntakePos = 0.065; 
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
-    public static double AmpPos = 1.403;
+    public static double AmpPos = 1.35;
     public static final double SubwooferPos = 0.45;  
     // Auto arm angles
     public static final double[] OneNoteTopTargets = {107.367};
@@ -246,7 +246,7 @@ public final class Constants {
     public static final int NominalBatteryVoltage = 12;
     
 
-    public static final int IdleSpeed = (int) (AmpRollerConstants.PassSpeed / 4.0 * 1.625);
+    public static final int IdleSpeed = -1000;
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -4000;
     

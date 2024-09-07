@@ -25,6 +25,7 @@ import frc.robot.Commands.Shooter.AmpShooter;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.BlinkinConstants;
@@ -84,8 +85,6 @@ public class RobotContainer {
   private final Trigger closeToSpeaker = new Trigger(m_robotDrive::closeToSpeaker);
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
-  private final Trigger atAmpTarget = new Trigger(m_Shooter::ampOnTarget);
-  private final Trigger atArmTarget = new Trigger(m_Arm::onTarget);
   private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
   
   /**
@@ -113,14 +112,6 @@ public class RobotContainer {
         // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
-    // m_Arm.setDefaultCommand(
-    //   new RunCommand(
-    //     () -> m_Arm.runPID(), m_Arm
-    //   )
-    // );
-
-
-
   }
 
   /**
@@ -137,7 +128,7 @@ public class RobotContainer {
     
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
-    beamTrigger.onTrue(new AmpIntake(m_AmpRollers));
+    // beamTrigger.onTrue(new AmpIntake(m_AmpRollers));
     beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
@@ -151,12 +142,10 @@ public class RobotContainer {
 
     //Amp
     m_driverController.x().whileTrue(new SequentialCommandGroup(
-      new ParallelCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-        new AmpShooter(m_Shooter)),
+        new WaitUntilCommand(m_Arm::onAmpTarget),
+        new AmpIntake(m_AmpRollers,-4.0).alongWith(new Shoot(m_Intake))));
 
-      new Shoot(m_Intake),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos))));
     
     //ShootCommand
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
@@ -186,9 +175,14 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter))));
     //Outtake
-    m_driverController.b().whileTrue(new StartEndCommand( 
+    m_driverController.b().whileTrue(new ParallelCommandGroup(
+      new AmpIntake(m_AmpRollers, 4.0),
+      new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-      () -> m_Intake.stopMotor(), m_Intake));  
+      () -> m_Intake.stopMotor(), m_Intake), 
+      new StartEndCommand( 
+      () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
+      () -> m_Shooter.stopMotor())));  
     //Climber Down
     m_driverController.a()
     .whileTrue(
@@ -199,11 +193,11 @@ public class RobotContainer {
       new RunClimber(m_Climber, ClimberDirection.UP));
 
     //Mech Controls
-    // m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
+    m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
     // m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
     m_MechController.x().whileTrue(new ParallelCommandGroup(
       new Shoot(m_Intake)));
-
+    
 
     m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.updateAmpTarget()));
     m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.setTargetRPM(0)));

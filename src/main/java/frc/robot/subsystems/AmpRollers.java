@@ -43,10 +43,7 @@ public class AmpRollers extends SubsystemBase{
     public void periodic() {
         SmartDashboard.putNumber("Roller RPM", m_RollerMotor.getEncoder().getVelocity());
 
-        
-       double pidOutput = getPIDOutput();
-        SmartDashboard.putNumber("pid Voltage output", pidOutput);
-        setVoltage(pidOutput);
+    
     }
     
 

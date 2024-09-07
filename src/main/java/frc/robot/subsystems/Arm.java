@@ -77,8 +77,10 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        runPID();
         SmartDashboard.putNumber("Arm Angle", getRadians());
         SmartDashboard.putNumber("Target Angle", targetPos);
+        SmartDashboard.putBoolean("On Amp Target", onAmpTarget());
         // SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
         // SmartDashboard.putNumber("Target Angle", targetPos);
         // SmartDashboard.putBoolean("Arm On Target", onTarget());
@@ -227,5 +229,9 @@ public class Arm extends SubsystemBase {
 
     public void updateAmpTarget() {
         ArmConstants.AmpPos = SmartDashboard.getNumber("Arm Amp Angle", ArmConstants.AmpPos);
+    }
+
+    public boolean onAmpTarget() {
+        return Math.abs(getRadians() - ArmConstants.AmpPos) < 0.07;
     }
 }
