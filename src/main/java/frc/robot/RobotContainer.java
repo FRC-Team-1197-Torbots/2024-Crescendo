@@ -32,6 +32,7 @@ import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -74,6 +75,7 @@ public class RobotContainer {
   public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
   public final Blinkin m_Blinkin = new Blinkin(m_Intake);
   private final AmpRollers m_AmpRollers = new AmpRollers();
+  private final Elevator m_Elevator = new Elevator();
   
 
   // The driver's controller
@@ -192,13 +194,13 @@ public class RobotContainer {
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.UP));
 
+
+
     //Mech Controls
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
     // m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
     m_MechController.x().whileTrue(new ParallelCommandGroup(
       new Shoot(m_Intake)));
-    
-
     m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.updateAmpTarget()));
     m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.setTargetRPM(0)));
 

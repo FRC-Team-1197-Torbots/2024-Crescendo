@@ -233,7 +233,7 @@ public final class Constants {
     public static final double OuttakeSpeed = -1;
 
     //Digital Input Constants
-    public static final int breakBeam = 0;
+    public static final int breakBeam = 1;
     public static final int breakBeam2 = 5;
   }
 
@@ -263,6 +263,10 @@ public final class Constants {
     public static final double kD = 0;
     public static final int NEOMaxSpeed = 5676;
     public static final double PassSpeed = -2000; 
+  }
+
+  public static final class ElevatorConstants {
+    public static final int Motor = 19; 
   }
 
   public static final class BlinkinConstants {
