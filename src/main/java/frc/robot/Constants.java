@@ -267,6 +267,12 @@ public final class Constants {
 
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
+    public static final int encoderChannelA = 1;
+    public static final int encoderChannelB = 2;
+    public static final double StorePos = 0;
+    public static final double AmpPos = 1;
+
+
   }
 
   public static final class BlinkinConstants {

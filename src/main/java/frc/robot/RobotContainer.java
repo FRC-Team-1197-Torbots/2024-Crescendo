@@ -29,6 +29,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.BlinkinConstants;
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -88,6 +89,7 @@ public class RobotContainer {
   private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
+  private final Trigger atElevatorTarget = new Trigger(m_Elevator::atAmpHeight);
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -146,9 +148,14 @@ public class RobotContainer {
     m_driverController.x().whileTrue(new SequentialCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new WaitUntilCommand(m_Arm::onAmpTarget),
-        new AmpIntake(m_AmpRollers,-4.0).alongWith(new Shoot(m_Intake))));
+        new AmpIntake(m_AmpRollers,-4.0).alongWith(new Shoot(m_Intake)),
+        new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos))));
 
-    
+    m_driverController.start().and(atElevatorTarget).onTrue(new SequentialCommandGroup(
+      new AmpIntake(m_AmpRollers, 4.0),
+      new WaitUntilCommand(m_AmpRollers::getBreakBeam),
+      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
+      
     //ShootCommand
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 

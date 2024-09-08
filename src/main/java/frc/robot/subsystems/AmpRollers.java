@@ -46,6 +46,9 @@ public class AmpRollers extends SubsystemBase{
         return feedForward + pidOutput;
     }
 
+    public boolean getBreakBeam() {
+        return m_BeamBreak.get();
+    }
 
     @Override
     public void periodic() {
