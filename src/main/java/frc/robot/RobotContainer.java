@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -135,17 +136,18 @@ public class RobotContainer {
           new RunArm(m_Arm, ArmConstants.IntakePos)));
 
     //Amp
-    m_driverController.x().and(m_AmpRollers::gamePieceStored).negate().whileTrue(new SequentialCommandGroup(
+    m_driverController.x().and(ampBeamTrigger.negate()).whileTrue(new SequentialCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new WaitUntilCommand(m_Arm::onAmpTarget),
         new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
         new Shoot(m_Intake))));
 
-    m_driverController.start().whileTrue(new SequentialCommandGroup(
+    m_driverController.povUp().toggleOnTrue(new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
-      new AmpScore(m_AmpRollers)).finallyDo(
-      () -> m_Elevator.setTargetPos(ElevatorConstants.StorePos)));
+      new AmpScore(m_AmpRollers),
+      new Kaiden().withTimeout(0.3),
+      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
       
     //ShootCommand
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));

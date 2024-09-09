@@ -258,15 +258,13 @@ public final class Constants {
 
   public static final class AmpRollerConstants {
     public static final int RollerMotor = 18;
-    public static final double IntakeVoltage = -4.0;
+    public static final double IntakeVoltage = -6.0;
   }
 
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
-    public static final int encoderChannelA = 3;
-    public static final int encoderChannelB = 4;
     public static final double StorePos = 0;
-    public static final double AmpPos = 1; // test this
+    public static final double AmpPos = 11.83; 
 
 
   }
