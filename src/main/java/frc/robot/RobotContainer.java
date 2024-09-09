@@ -31,6 +31,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -140,19 +141,14 @@ public class RobotContainer {
         new WaitUntilCommand(m_Arm::onAmpTarget),
         new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
         new Shoot(m_Intake))));
-
-    m_driverController.start().whileTrue(new SequentialCommandGroup(
+        
+    Command scoreAmpCommand = new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
       new AmpScore(m_AmpRollers)).finallyDo(
-      () -> m_Elevator.setTargetPos(ElevatorConstants.StorePos)));
-      
-    //ShootCommand
-    m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
-
-    //Rev Up
-    m_driverController.leftTrigger(0.5).whileTrue(
-      new SequentialCommandGroup(
+        () -> m_Elevator.setTargetPos(ElevatorConstants.StorePos));
+        
+    Command revUpCommand = new SequentialCommandGroup(
         new ScanAprilTag(m_Limelight),
         new AimAtSpeaker(m_robotDrive),
         new ScanAprilTag(m_Limelight),
@@ -164,8 +160,12 @@ public class RobotContainer {
           ),
           new RevShooter(m_Shooter)
         )
-      )
-    );
+      );
+      
+    m_driverController.leftTrigger().whileTrue(new ConditionalCommand(revUpCommand, scoreAmpCommand, intakeBeamTrigger)); 
+
+    //ShootCommand
+    m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
 
     m_driverController.rightBumper()
       .whileTrue(new SequentialCommandGroup(
