@@ -42,6 +42,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import static frc.robot.Constants.AmpRollerConstants.IntakeVoltage;
+import static frc.robot.Constants.AmpRollerConstants.RollerMotor;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -123,7 +126,6 @@ public class RobotContainer {
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
-
     intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
@@ -135,12 +137,20 @@ public class RobotContainer {
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos)));
 
-    //Amp
-    m_driverController.x().and(m_AmpRollers::gamePieceStored).negate().whileTrue(new SequentialCommandGroup(
+    //Load Amp
+    m_driverController.x().and(ampBeamTrigger.negate()).whileTrue(new SequentialCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new WaitUntilCommand(m_Arm::onAmpTarget),
         new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
         new Shoot(m_Intake))));
+
+    //Unload Amp 
+    m_driverController.start().and(intakeBeamTrigger.negate()).whileTrue(new ParallelCommandGroup(
+      new AmpIntake(m_AmpRollers, -AmpRollerConstants.IntakeVoltage),
+      new RunIntake(m_Intake,-0.4),
+      new StartEndCommand( 
+      () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
+      () -> m_Shooter.stopMotor())));
         
     Command scoreAmpCommand = new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
@@ -174,7 +184,7 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter))));
-
+        
     //Outtake
     m_driverController.b().whileTrue(new ParallelCommandGroup(
       new AmpIntake(m_AmpRollers, 4.0),
@@ -183,7 +193,7 @@ public class RobotContainer {
       () -> m_Intake.stopMotor(), m_Intake), 
       new StartEndCommand( 
       () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-      () -> m_Shooter.stopMotor())));  
+      () -> m_Shooter.stopMotor())));
 
     //Climber Down
     m_driverController.a()

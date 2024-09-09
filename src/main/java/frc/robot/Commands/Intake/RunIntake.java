@@ -35,19 +35,7 @@ public class RunIntake extends Command{
       @Override
         public void end(boolean interrupted) {
           m_Intake.stopMotor();
-          // if(!m_Intake.finishedIntaking){
-          //   m_Intake.runIntake(-0.5);
-          //   wait = new WaitCommand(1);
-          //   try{wait.wait();}
-          //   catch(Exception e){
-          //     System.out.println(e.toString());
-          //   }
-          //   //wait.wait();
-          //   m_Intake.stopMotor();
-          //     System.out.println("Intake has ended");
-          // }
           m_Intake.setFinishedIntake(true);
-          //System.out.println("Intake command finished");
         }
       
   // Returns true when the command should end.
