@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
@@ -19,7 +21,7 @@ public class Elevator extends SubsystemBase{
     private PIDController m_PidController;
     // private Encoder m_Encoder;
     private AbsoluteEncoder m_Encoder;
-    
+    private BooleanSupplier m_BeamBreak;
     private double marginOfError = 10;
 
     public Elevator() {
@@ -38,6 +40,14 @@ public class Elevator extends SubsystemBase{
 
     public void setTargetPos(double value) {
         targetPos = value;
+    }
+
+    public void giveBeamBreak(BooleanSupplier beamBreak) {
+        m_BeamBreak = beamBreak;
+    }
+
+    public boolean gamePieceStored() {
+        return m_BeamBreak.getAsBoolean();
     }
 
     public void updateFromSmartDashboard() {

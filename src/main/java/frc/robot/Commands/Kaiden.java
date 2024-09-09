@@ -4,7 +4,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class Kaiden extends Command {
 
-
+    /**
+    * Does nothing, just like Kaiden instead of making drawing files!
+    */
     public Kaiden() {
      
     }

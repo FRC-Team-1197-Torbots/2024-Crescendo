@@ -5,26 +5,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.subsystems.AmpRollers;
 
-public class AmpIntake extends Command {
+public class AmpScore extends Command {
 
     private final AmpRollers m_AmpRollers;
-    private double voltage;
 
     /**
-     * Runs amp rollers at specified voltage
-     * 
-     * @param voltage to run rollers
-     * 
-     * Stops rollers when interupted 
-     */
-    public AmpIntake(AmpRollers rollers, double voltage) {
+    * Run amp rollers until game piece leaves
+    */
+    public AmpScore(AmpRollers rollers) {
         m_AmpRollers = rollers;
-        this.voltage = voltage;
     }
 
     @Override
     public void initialize() {
-        m_AmpRollers.setVoltage(voltage);
+        m_AmpRollers.setVoltage(AmpRollerConstants.IntakeVoltage);
     }
 
     @Override
@@ -38,7 +32,7 @@ public class AmpIntake extends Command {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return !m_AmpRollers.gamePieceStored();
     }
     
 }

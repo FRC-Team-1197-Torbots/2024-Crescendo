@@ -258,11 +258,7 @@ public final class Constants {
 
   public static final class AmpRollerConstants {
     public static final int RollerMotor = 18;
-    public static final double kP = 0.004;
-    public static final double kI = 0;
-    public static final double kD = 0;
-    public static final int NEOMaxSpeed = 5676;
-    public static final double PassSpeed = -2000; 
+    public static final double IntakeVoltage = -4.0;
   }
 
   public static final class ElevatorConstants {
@@ -270,7 +266,7 @@ public final class Constants {
     public static final int encoderChannelA = 3;
     public static final int encoderChannelB = 4;
     public static final double StorePos = 0;
-    public static final double AmpPos = 1;
+    public static final double AmpPos = 1; // test this
 
 
   }

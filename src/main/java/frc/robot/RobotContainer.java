@@ -5,55 +5,44 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.proto.Wpimath;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.Kaiden;
 import frc.robot.Commands.Amp.AmpIntake;
-import frc.robot.Commands.Arm.AutoArm;
+import frc.robot.Commands.Amp.AmpScore;
 import frc.robot.Commands.Arm.RunArm;
-import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Drive.AimAtSpeaker;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Commands.Limelight.ScanAprilTag;
-import frc.robot.Commands.Shooter.AmpShooter;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ClimberConstants.ClimberDirection;
+import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import java.sql.Driver;
-import java.time.Instant;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 /*
@@ -86,10 +75,10 @@ public class RobotContainer {
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
   private final Trigger speakerOnTarget = new Trigger(m_robotDrive::facingSpeaker);
   private final Trigger closeToSpeaker = new Trigger(m_robotDrive::closeToSpeaker);
-  private final Trigger beamTrigger = new Trigger(m_Intake::gamePieceStored);
+  private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
+  private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
-  private final Trigger atElevatorTarget = new Trigger(m_Elevator::atAmpHeight);
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -129,32 +118,34 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    
+  
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
-    beamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
-    // beamTrigger.onTrue(new AmpIntake(m_AmpRollers));
-    beamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
-    beamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
-    beamTrigger.onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
+    intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
+    intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
+
+    intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
+    intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
+    ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
     
     // Intake Routines
-    m_driverController.rightTrigger(0.5).and(beamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
+    m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
       .whileTrue(
         new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos)));
 
     //Amp
-    m_driverController.x().whileTrue(new SequentialCommandGroup(
+    m_driverController.x().and(m_AmpRollers::gamePieceStored).negate().whileTrue(new SequentialCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new WaitUntilCommand(m_Arm::onAmpTarget),
-        new AmpIntake(m_AmpRollers,-4.0).alongWith(new Shoot(m_Intake)),
-        new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos))));
+        new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+        new Shoot(m_Intake))));
 
-    m_driverController.start().and(atElevatorTarget).onTrue(new SequentialCommandGroup(
-      new AmpIntake(m_AmpRollers, 4.0),
-      new WaitUntilCommand(m_AmpRollers::getBreakBeam),
-      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
+    m_driverController.start().whileTrue(new SequentialCommandGroup(
+      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
+      new WaitUntilCommand(m_Elevator::atAmpHeight),
+      new AmpScore(m_AmpRollers)).finallyDo(
+      () -> m_Elevator.setTargetPos(ElevatorConstants.StorePos)));
       
     //ShootCommand
     m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
