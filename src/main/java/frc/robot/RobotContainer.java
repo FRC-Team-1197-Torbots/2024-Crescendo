@@ -172,6 +172,7 @@ public class RobotContainer {
         )
       );
       
+    // Shoot or amp
     m_driverController.leftTrigger().whileTrue(new ConditionalCommand(revUpCommand, scoreAmpCommand, intakeBeamTrigger)); 
 
     //ShootCommand
