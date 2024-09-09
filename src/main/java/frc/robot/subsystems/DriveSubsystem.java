@@ -477,14 +477,15 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private Translation2d getAprilTagPos() {
-    if (color.isPresent())
+    if (color.isPresent()) {
       if (color.get() == Alliance.Red) {
         return Constants.redSpeakerCoords;
       }
       if (color.get() == Alliance.Blue) {
         return Constants.blueSpeakerCoords;
       }
-    else
+      return new Translation2d();
+    } else
       return new Translation2d();
   }
   public void setAutoName(String autoname){

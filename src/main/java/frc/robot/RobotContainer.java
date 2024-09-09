@@ -183,6 +183,7 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter))));
+
     //Outtake
     m_driverController.b().whileTrue(new ParallelCommandGroup(
       new AmpIntake(m_AmpRollers, 4.0),
@@ -192,25 +193,21 @@ public class RobotContainer {
       new StartEndCommand( 
       () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
       () -> m_Shooter.stopMotor())));  
+
     //Climber Down
     m_driverController.a()
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.DOWN));
+
     //Climber Up
     m_driverController.y()
     .whileTrue(
       new RunClimber(m_Climber, ClimberDirection.UP));
 
-
-
+      
     //Mech Controls
-    m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));        
-    // m_MechController.a().onTrue(new ScanAprilTag(m_Limelight)); 
-    m_MechController.x().whileTrue(new ParallelCommandGroup(
-      new Shoot(m_Intake)));
-    m_MechController.a().onTrue(new InstantCommand(() -> m_Arm.updateAmpTarget()));
-    m_MechController.b().onTrue(new InstantCommand(() -> m_AmpRollers.setTargetRPM(0)));
-
+    m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()));  
     }
     
     private void registerAutoCommands() {
