@@ -38,7 +38,7 @@ public class AmpIntake extends Command {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return m_AmpRollers.gamePieceStored();
     }
     
 }

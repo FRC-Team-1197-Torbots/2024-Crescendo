@@ -31,6 +31,7 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -134,23 +135,19 @@ public class RobotContainer {
         new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos)));
-
-    //Amp
-    m_driverController.x().and(ampBeamTrigger.negate()).whileTrue(new SequentialCommandGroup(
-        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-        new WaitUntilCommand(m_Arm::onAmpTarget),
-        new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-        new Shoot(m_Intake))));
-
-    m_driverController.povUp().toggleOnTrue(new SequentialCommandGroup(
+      
+    Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
-      new AmpScore(m_AmpRollers),
-      new Kaiden().withTimeout(0.3),
+      new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+      new Kaiden().withTimeout(0.6
+      ),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
-      
+
+    Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget);
     //ShootCommand
-    m_driverController.leftBumper().and(atShooterTarget).onTrue(new Shoot(m_Intake));
+    m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
 
     //Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(
@@ -164,7 +161,7 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
           ),
-          new RevShooter(m_Shooter)
+          new RevShooter(m_Shooter, ShooterConstants.ShootingRPM)
         )
       )
     );
@@ -175,11 +172,11 @@ public class RobotContainer {
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-          new RevShooter(m_Shooter))));
+          new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM))));
 
     //Outtake
     m_driverController.b().whileTrue(new ParallelCommandGroup(
-      new AmpIntake(m_AmpRollers, 4.0),
+      new AmpScore(m_AmpRollers, 4.0),
       new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(), m_Intake), 
@@ -200,7 +197,14 @@ public class RobotContainer {
       
     //Mech Controls
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()));  
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()));
+
+    //Amp
+    m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
+        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+        new WaitUntilCommand(m_Arm::onAmpTarget),
+        new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+        new Shoot(m_Intake)))));
     }
     
     private void registerAutoCommands() {

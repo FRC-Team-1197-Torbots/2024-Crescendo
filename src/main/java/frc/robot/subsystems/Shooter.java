@@ -48,10 +48,8 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         // SmartDashboard.putNumber("Top Flywheel RPM", TopMotor.getEncoder().getVelocity()); // you're welcome alex
         // SmartDashboard.putNumber("Bottom Flywheel RPM", BottomMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber("Bottom flywheel voltage", BotFlyWheelTestVoltage);
-        // SmartDashboard.putBoolean("Amp Mode", motorStopped());
         // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
-        SmartDashboard.putNumber("Bottom RPM", getAverageShooterRPM());
+        SmartDashboard.putNumber("Shooter RPM", getAverageShooterRPM());
         SmartDashboard.putNumber("PID Output", getBottomPIDOutput());
         double feedForward = (double)targetRPM / ShooterConstants.VortexMaxSpeed * ShooterConstants.NominalBatteryVoltage; // funny alex math
         TopMotor.setVoltage(feedForward + getTopPIDOutput());        
@@ -145,7 +143,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        atTargetRPM = Math.abs(getAverageShooterRPM() - ShootingRPM) < 100;
+        atTargetRPM = Math.abs(getAverageShooterRPM() - targetRPM) < 100;
         return atTargetRPM || timer.hasElapsed(3); // 4500
     }
 

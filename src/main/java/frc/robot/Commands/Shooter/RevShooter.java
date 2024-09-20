@@ -10,9 +10,11 @@ public class RevShooter extends Command{
 
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
     private final Shooter m_Shooter;
+    private int targetRPM;
 
-    public RevShooter(Shooter subsystem) {
+    public RevShooter(Shooter subsystem, int rpm) {
         m_Shooter = subsystem;
+        targetRPM = rpm;
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(subsystem);
       }
@@ -21,7 +23,7 @@ public class RevShooter extends Command{
       public void initialize() {
         
         m_Shooter.resetTimer();
-        m_Shooter.setTargetRPM(ShooterConstants.ShootingRPM);
+        m_Shooter.setTargetRPM(targetRPM);
       }
     
       // Called every time the scheduler runs while the command is scheduled.

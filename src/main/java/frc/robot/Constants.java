@@ -122,7 +122,7 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 35; // amps // 50
+    public static final int kDrivingMotorCurrentLimit = 35; // amps // 35 normal // 15 baby mode
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
@@ -249,6 +249,7 @@ public final class Constants {
     public static final int IdleSpeed = -1000;
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -4000;
+    public static final int SubwooferRPM = -3500;
     
     public static double kP = 0.004;
     public static final double kI = 0;
@@ -259,14 +260,13 @@ public final class Constants {
   public static final class AmpRollerConstants {
     public static final int RollerMotor = 18;
     public static final double IntakeVoltage = -6.0;
+    public static final double ScoreVoltage = -5.0;
   }
 
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
     public static final double StorePos = 0;
-    public static final double AmpPos = 11.83; 
-
-
+    public static final double AmpPos = 14.3; //11.83
   }
 
   public static final class BlinkinConstants {

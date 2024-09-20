@@ -8,17 +8,19 @@ import frc.robot.subsystems.AmpRollers;
 public class AmpScore extends Command {
 
     private final AmpRollers m_AmpRollers;
+    private double voltage;
 
     /**
     * Run amp rollers until game piece leaves
     */
-    public AmpScore(AmpRollers rollers) {
+    public AmpScore(AmpRollers rollers, double voltage) {
         m_AmpRollers = rollers;
+        this.voltage = voltage; 
     }
 
     @Override
     public void initialize() {
-        m_AmpRollers.setVoltage(AmpRollerConstants.IntakeVoltage);
+        m_AmpRollers.setVoltage(voltage);
     }
 
     @Override

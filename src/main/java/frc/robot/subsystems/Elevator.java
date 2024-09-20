@@ -18,7 +18,7 @@ import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
     private double targetPos = ElevatorConstants.StorePos; 
-    private double error, elevatorVoltage, kp = 0.9, kd;
+    private double error, elevatorVoltage, kp = 0.9, kd, ki;
     private double feedForward = -0.3;
     private CANSparkMax m_Motor;
     private PIDController m_PidController;
@@ -33,6 +33,7 @@ public class Elevator extends SubsystemBase{
         m_Encoder = m_Motor.getEncoder();
         m_PidController = new PIDController(kp, 0, kd);
         SmartDashboard.putNumber("Elevator kp", kp);
+        SmartDashboard.putNumber("Elevator ki", ki);
         SmartDashboard.putNumber("Elevator kd", kd);
     }
 
@@ -54,8 +55,10 @@ public class Elevator extends SubsystemBase{
 
     public void updateFromSmartDashboard() {
         kp = SmartDashboard.getNumber("Elevator kp", kp);
+        ki = SmartDashboard.getNumber("Elevator ki", ki);
         kd = SmartDashboard.getNumber("Elevator kd", kd);
         m_PidController.setP(kp); 
+        m_PidController.setI(ki); 
         m_PidController.setD(kd);
     }
 
