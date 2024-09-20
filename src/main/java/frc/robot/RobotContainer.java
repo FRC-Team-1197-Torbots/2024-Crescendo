@@ -107,6 +107,8 @@ public class RobotContainer {
         // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
+
+      intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
   }
 
   /**

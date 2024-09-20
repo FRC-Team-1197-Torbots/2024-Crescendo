@@ -260,13 +260,13 @@ public final class Constants {
   public static final class AmpRollerConstants {
     public static final int RollerMotor = 18;
     public static final double IntakeVoltage = -6.0;
-    public static final double ScoreVoltage = -5.0;
+    public static double ScoreVoltage = -4.0;
   }
 
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
     public static final double StorePos = 0;
-    public static final double AmpPos = 14.3; //11.83
+    public static double AmpPos = 14.3; //11.83
   }
 
   public static final class BlinkinConstants {

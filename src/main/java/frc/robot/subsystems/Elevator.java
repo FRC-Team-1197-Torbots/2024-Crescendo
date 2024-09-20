@@ -14,14 +14,18 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AmpRollerConstants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
-    private double targetPos = ElevatorConstants.StorePos; 
+    private double targetPos = ElevatorConstants.StorePos;
+    private double speed = AmpRollerConstants.ScoreVoltage;
     private double error, elevatorVoltage, kp = 0.9, kd, ki;
     private double feedForward = -0.3;
     private CANSparkMax m_Motor;
     private PIDController m_PidController;
+
     // private Encoder m_Encoder;
     private RelativeEncoder m_Encoder;
     private BooleanSupplier m_BeamBreak;
@@ -32,9 +36,11 @@ public class Elevator extends SubsystemBase{
         m_Motor = new CANSparkMax(ElevatorConstants.Motor, MotorType.kBrushless);
         m_Encoder = m_Motor.getEncoder();
         m_PidController = new PIDController(kp, 0, kd);
-        SmartDashboard.putNumber("Elevator kp", kp);
-        SmartDashboard.putNumber("Elevator ki", ki);
-        SmartDashboard.putNumber("Elevator kd", kd);
+        // SmartDashboard.putNumber("Elevator kp", kp);
+        // SmartDashboard.putNumber("Elevator ki", ki);
+        // SmartDashboard.putNumber("Elevator kd", kd);
+        // SmartDashboard.putNumber("Elevator target", targetPos);
+        // SmartDashboard.putNumber("Roller Voltage", speed);
     }
 
     public void setVoltage(double voltage) {
@@ -57,6 +63,8 @@ public class Elevator extends SubsystemBase{
         kp = SmartDashboard.getNumber("Elevator kp", kp);
         ki = SmartDashboard.getNumber("Elevator ki", ki);
         kd = SmartDashboard.getNumber("Elevator kd", kd);
+        ElevatorConstants.AmpPos = SmartDashboard.getNumber("Elevator target", ElevatorConstants.AmpPos);
+        AmpRollerConstants.ScoreVoltage = SmartDashboard.getNumber("Roller Voltage", AmpRollerConstants.ScoreVoltage);
         m_PidController.setP(kp); 
         m_PidController.setI(ki); 
         m_PidController.setD(kd);
