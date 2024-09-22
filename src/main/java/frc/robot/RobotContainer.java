@@ -108,9 +108,11 @@ public class RobotContainer {
         true, true),
         m_robotDrive));
 
-        // test both
-        // intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_driverController.leftBumper().negate()));
-        // intakeBeamTrigger.onFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_Intake::intakingNoteState));
+      // note regrab
+      intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+      // test both
+      // intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_driverController.leftBumper().negate()));
+      // intakeBeamTrigger.onFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_Intake::intakingNoteState));
   }
 
   /**
