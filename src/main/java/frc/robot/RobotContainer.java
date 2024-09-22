@@ -230,7 +230,7 @@ public class RobotContainer {
     //Mech Controls
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
     m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
-    m_MechController.a().whileTrue(new ZeroArm(m_Arm));
+    
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
