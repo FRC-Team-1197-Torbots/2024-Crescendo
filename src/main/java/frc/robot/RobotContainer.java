@@ -13,6 +13,7 @@ import frc.robot.Commands.Kaiden;
 import frc.robot.Commands.Amp.AmpIntake;
 import frc.robot.Commands.Amp.AmpScore;
 import frc.robot.Commands.Arm.RunArm;
+import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Drive.AimAtSpeaker;
 import frc.robot.Commands.Intake.AutoIntake;
@@ -195,7 +196,7 @@ public class RobotContainer {
     Command reverseEverything = Commands.parallel(
       new AmpScore(m_AmpRollers, 4.0),
       new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
-      new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed)));
+      new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed))).until(intakeBeamTrigger);
           
     Command reverseIntakeSlow = new StartEndCommand( 
         () -> m_Intake.runIntake(IntakeConstants.passBackSpeed),
@@ -229,7 +230,7 @@ public class RobotContainer {
     //Mech Controls
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
     m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
-
+    m_MechController.a().whileTrue(new ZeroArm(m_Arm));
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
