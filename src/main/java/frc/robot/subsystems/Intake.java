@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
-
+    private boolean intakingNote = false;
     private double testspeed = 4.2;
     private CANSparkMax MotorA;
     private DigitalInput m_BreakBeam;
@@ -77,5 +77,13 @@ public class Intake extends SubsystemBase {
 
     public boolean intakeMoving(){
         return Math.abs(MotorA.getEncoder().getVelocity()) >= 200;
+    }
+
+    public void setIntakingNote(boolean value){
+        intakingNote = value;
+    }
+    
+    public boolean intakingNoteState() {
+        return intakingNote;
     }
 }

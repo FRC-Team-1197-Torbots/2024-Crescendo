@@ -81,7 +81,6 @@ public class RobotContainer {
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
-  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -108,7 +107,9 @@ public class RobotContainer {
         true, true),
         m_robotDrive));
 
-      intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+        if(m_Intake.intakingNoteState()) {
+          intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+        }
   }
 
   /**
@@ -136,21 +137,21 @@ public class RobotContainer {
       .whileTrue(
         new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-          new RunArm(m_Arm, ArmConstants.IntakePos)));
+          new RunArm(m_Arm, ArmConstants.IntakePos),
+          new InstantCommand(() -> m_Intake.setIntakingNote(true))));
       
     Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
       new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new Kaiden().withTimeout(0.6
-      ),
+      new Kaiden().withTimeout(0.6),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
     Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget);
     //ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
-
+    m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_Intake.setIntakingNote(false)));
     //Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(
       new SequentialCommandGroup(
@@ -199,7 +200,9 @@ public class RobotContainer {
       
     //Mech Controls
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()));
+    m_MechController.b().onTrue(new SequentialCommandGroup(
+      new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()),
+      new InstantCommand(() -> m_Arm.updateFromSmartDashboard())));
 
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(

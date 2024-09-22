@@ -167,7 +167,7 @@ public final class Constants {
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
-    public static final double SubwooferPos = 0.45;  
+    public static double SubwooferPos = 0.45;  
     // Auto arm angles
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] ThreeNoteTopCenterTargets = {118, 100.1, 97.6};

@@ -6,7 +6,10 @@ import com.fasterxml.jackson.core.json.DupDetector;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ElevatorConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -78,7 +81,7 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         runPID();
-        SmartDashboard.putNumber("Arm Angle", getRadians());
+        // SmartDashboard.putNumber("Arm Angle", getRadians());
         SmartDashboard.putNumber("Target Angle", targetPos);
         SmartDashboard.putBoolean("On Amp Target", onAmpTarget());
         // SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
@@ -104,9 +107,9 @@ public class Arm extends SubsystemBase {
         targetPos = MathUtil.clamp(target, -0.2, 2.6);
     }
 
-
-    
-    
+    public void updateFromSmartDashboard() {
+        ArmConstants.SubwooferPos = SmartDashboard.getNumber("Target Angle", ArmConstants.SubwooferPos);
+    }
 
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
