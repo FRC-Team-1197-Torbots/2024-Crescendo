@@ -31,9 +31,11 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -103,13 +105,12 @@ public class RobotContainer {
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
-        // m_robotDrive.setTurnRate(m_robotDrive.calcAngle()),
         true, true),
         m_robotDrive));
 
-        if(m_Intake.intakingNoteState()) {
-          intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
-        }
+        // test both
+        // intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_driverController.leftBumper().negate()));
+        // intakeBeamTrigger.onFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_Intake::intakingNoteState));
   }
 
   /**
@@ -148,7 +149,7 @@ public class RobotContainer {
       new Kaiden().withTimeout(0.6),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
-    Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget);
+    Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunIntake(m_Intake, 0).withTimeout(0.1));
     //ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_Intake.setIntakingNote(false)));
@@ -187,6 +188,31 @@ public class RobotContainer {
       () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
       () -> m_Shooter.stopMotor())));  
 
+      
+      
+    Command reverseEverything = Commands.parallel(
+      new AmpScore(m_AmpRollers, 4.0),
+      new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
+      new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed)));
+          
+    Command reverseIntakeSlow = new StartEndCommand( 
+        () -> m_Intake.runIntake(IntakeConstants.passBackSpeed),
+        () -> m_Intake.stopMotor(), m_Intake).until(intakeBeamTrigger.negate()); 
+
+    Command ampPassBack = Commands.sequence(reverseEverything, reverseIntakeSlow);  
+
+    Command outtake = new ParallelCommandGroup(
+      new StartEndCommand( 
+      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+      () -> m_Intake.stopMotor(), m_Intake), 
+      new StartEndCommand( 
+        () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
+        () -> m_Shooter.stopMotor()))
+      .until(m_driverController.b().negate()); 
+
+    // Better outake
+    m_driverController.b().toggleOnTrue(new ConditionalCommand(ampPassBack, outtake, intakeBeamTrigger));
+
     //Climber Down
     m_driverController.a()
     .whileTrue(
@@ -200,9 +226,7 @@ public class RobotContainer {
       
     //Mech Controls
     m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
-    m_MechController.b().onTrue(new SequentialCommandGroup(
-      new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()),
-      new InstantCommand(() -> m_Arm.updateFromSmartDashboard())));
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
 
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(

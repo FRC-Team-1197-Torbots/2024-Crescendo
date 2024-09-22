@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase {
     private Limelight m_Limelight;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
-        SmartDashboard.putNumber("Arm Amp Angle", ArmConstants.AmpPos);
+        SmartDashboard.putNumber("Target Angle", targetPos);
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
@@ -61,8 +61,6 @@ public class Arm extends SubsystemBase {
 
         feedForwardGravity = 0.52;
 
-        // feedForward = 0.001;
-        // m_armPIDController = new ProfiledPIDController(ArmConstants.Arm_kP,
         // ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
         // m_ArmFeedforward = new ArmFeedforward(0.1, 0.66, 1.30, 0.02); // ks value might need to change
         /****************************
@@ -81,20 +79,6 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
         runPID();
-        // SmartDashboard.putNumber("Arm Angle", getRadians());
-        SmartDashboard.putNumber("Target Angle", targetPos);
-        SmartDashboard.putBoolean("On Amp Target", onAmpTarget());
-        // SmartDashboard.putNumber("Arm Voltage Output", getArmOutput());
-        // SmartDashboard.putNumber("Target Angle", targetPos);
-        // SmartDashboard.putBoolean("Arm On Target", onTarget());
-        // SmartDashboard.putNumber("Test Angle", testAngle);
-        // SmartDashboard.putNumber("Arm speed", armSpeed);
-        // SmartDashboard.putNumber("Arm Kp", armKp);
-        
-        // SmartDashboard.putNumber("Arm Ki", armKi);
-        // SmartDashboard.putNumber("Arm Kd", armKd);
-        // SmartDashboard.putNumber("Get Arm Angular Velo", getAngularVelo());
-        // SmartDashboard.putNumber("Error", error);       
     }
 
     public void runPID() {

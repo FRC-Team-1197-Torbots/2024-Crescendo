@@ -231,6 +231,7 @@ public final class Constants {
     public static final int IntakeMotor = 10;
     public static final double IntakeSpeed = 0.6;
     public static final double OuttakeSpeed = -1;
+    public static final double passBackSpeed = -0.4;
 
     //Digital Input Constants
     public static final int breakBeam = 1;
