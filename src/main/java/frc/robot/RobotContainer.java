@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -45,6 +46,8 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.time.Instant;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -109,13 +112,9 @@ public class RobotContainer {
         true, true),
         m_robotDrive));
 
-      // note regrab
-      intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
-      // test both
-      // intakeBeamTrigger.toggleOnFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_driverController.leftBumper().negate()));
-      // intakeBeamTrigger.onFalse(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed).onlyIf(m_Intake::intakingNoteState));
-  }
-
+      // note regrab (goated james)
+    }
+    
   /**
    * Use this method to 
    * define your button->command mappings. Buttons can be
@@ -131,19 +130,22 @@ public class RobotContainer {
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
-
     intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
+
+
+    intakeBeamTrigger.onFalse(new ConditionalCommand(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), new Kaiden(), m_Intake::intakingNoteState));
     
     // Intake Routines
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
-      .whileTrue(
-        new ParallelCommandGroup(
+    .whileTrue(
+      new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
           new RunArm(m_Arm, ArmConstants.IntakePos),
           new InstantCommand(() -> m_Intake.setIntakingNote(true))));
       
+
     Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
@@ -152,7 +154,8 @@ public class RobotContainer {
       new Kaiden().withTimeout(0.6),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
-    Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunIntake(m_Intake, 0).withTimeout(0.1));
+    Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
+    
     //ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_Intake.setIntakingNote(false)));
@@ -172,7 +175,7 @@ public class RobotContainer {
         )
       )
     );
-
+    //Subwoofer rev up
     m_driverController.rightBumper()
       .whileTrue(new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -181,41 +184,46 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM))));
 
-    //Outtake
-    m_driverController.b().whileTrue(new ParallelCommandGroup(
-      new AmpScore(m_AmpRollers, 4.0),
-      new StartEndCommand( 
-      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-      () -> m_Intake.stopMotor(), m_Intake), 
-      new StartEndCommand( 
-      () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-      () -> m_Shooter.stopMotor())));  
+    //OldOuttake
+    // m_driverController.b().whileTrue(new ParallelCommandGroup(
+    //   new AmpScore(m_AmpRollers, 4.0),
+    //   new StartEndCommand( 
+    //   () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+    //   () -> m_Intake.stopMotor(), m_Intake), 
+    //   new StartEndCommand( 
+    //   () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
+    //   () -> m_Shooter.stopMotor())));  
 
       
       
     Command reverseEverything = Commands.parallel(
+      new InstantCommand(() -> m_Intake.setIntakingNote(false)),
       new AmpScore(m_AmpRollers, 4.0),
       new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
       new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed))).until(intakeBeamTrigger);
           
-    Command reverseIntakeSlow = new StartEndCommand( 
+    Command reverseIntakeSlow = Commands.parallel(
+    new InstantCommand(() -> m_Shooter.stopMotor()),
+    new InstantCommand(() -> m_Intake.setIntakingNote(true)),
+    new StartEndCommand( 
         () -> m_Intake.runIntake(IntakeConstants.passBackSpeed),
-        () -> m_Intake.stopMotor(), m_Intake).until(intakeBeamTrigger.negate()); 
+        () -> m_Intake.stopMotor(), m_Intake).until(intakeBeamTrigger.negate())); 
 
     Command ampPassBack = Commands.sequence(reverseEverything, reverseIntakeSlow);  
 
-    Command outtake = new ParallelCommandGroup(
+    Command eject = new ParallelCommandGroup(
       new StartEndCommand( 
-      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-      () -> m_Intake.stopMotor(), m_Intake), 
+        () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+        () -> m_Intake.stopMotor(), m_Intake), 
       new StartEndCommand( 
         () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-        () -> m_Shooter.stopMotor()))
-      .until(m_driverController.b().negate()); 
+        () -> m_Shooter.stopMotor())); 
+        
+    Command outtake = Commands.sequence(new InstantCommand(() -> m_Intake.setIntakingNote(false)), eject);
+    //outake
 
-    // Better outake
-    m_driverController.b().toggleOnTrue(new ConditionalCommand(ampPassBack, outtake, intakeBeamTrigger));
-
+    m_driverController.b().whileTrue(ampPassBack);
+// new ConditionalCommand(ampPassBack, outtake, ampBeamTrigger)
     //Climber Down
     m_driverController.a()
     .whileTrue(
@@ -233,11 +241,16 @@ public class RobotContainer {
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
+        new InstantCommand(() -> m_Intake.setIntakingNote(false)),
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new WaitUntilCommand(m_Arm::onAmpTarget),
         new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
         new Shoot(m_Intake)))));
+        
+    //Zero Arm
+    m_MechController.a().onTrue(new ZeroArm(m_Arm));
     }
+    
     
     private void registerAutoCommands() {
       NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));

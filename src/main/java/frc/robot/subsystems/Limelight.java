@@ -16,35 +16,24 @@ public class Limelight extends SubsystemBase{
     private DriveSubsystem m_DriveSubsystem;
     private double limelight_x;
     private double limelight_y;
+    
     public Limelight(DriveSubsystem drive){
         m_DriveSubsystem = drive;
     }
 
     @Override
-    public void periodic(){
-      SmartDashboard.putNumber("Distance from april tag", LimelightHelpers.getTX("limelight-shooter"));
-        // botpose1 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
-        // double[] botpose2 = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
-
-        // if(botpose1[0] != 0){
-            
-        // }
-        // else if(botpose2[0] != 0){
-
-        // }
-
-        // SmartDashboard.putNumber("Botpose X", botpose1[0]);
-        // SmartDashboard.putNumber("Botpose Y", botpose1[1]);
-        
-
+    public void periodic() {
+      SmartDashboard.putNumber("Left Limelight Tx", LimelightHelpers.getTX("limelight-left"));
     }
 
     public void resetOdometry(Pose2d pose){
         m_DriveSubsystem.resetOdometry(pose);
     }
+
     public void setX(double value) {
         limelight_x = value;
     }
+
     public void setY(double value) {
         limelight_y = value;
     }
@@ -75,10 +64,7 @@ public class Limelight extends SubsystemBase{
       return 0;
   }
   
-
   public double distanceFromSpeaker() {
     return Math.hypot(xDistanceFromSpeaker(), yDistanceFromSpeaker());
   }
-    
-
 }

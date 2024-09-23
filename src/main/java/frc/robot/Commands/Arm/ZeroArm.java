@@ -13,11 +13,13 @@ public class ZeroArm extends Command {
 
     @Override
     public void initialize() {
+        m_Arm.setZeroingArm(false);
         m_Arm.runArm(-0.8);
     }
 
     @Override
     public void end(boolean isFinished) {
+        m_Arm.setZeroingArm(true);
         m_Arm.stopMotor();
         m_Arm.resetArm();
     }

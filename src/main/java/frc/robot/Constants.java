@@ -163,7 +163,7 @@ public final class Constants {
     //Storing Position values
     // 66.2
     public static final double StorePos = 1.83;
-    public static final double IntakePos = 0.065; 
+    public static final double IntakePos = 0.085; 
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
@@ -187,7 +187,7 @@ public final class Constants {
     public static final double[] StoreTargets = {StorePos};
 
     //Arm PID Constants
-    public static final double Arm_kP = 7.0; // 6
+    public static final double Arm_kP = 7.0; // 7
     public static final double Arm_kI = 0; // 0
     public static final double Arm_kD = 0; // 0
 

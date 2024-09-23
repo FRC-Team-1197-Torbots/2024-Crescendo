@@ -42,6 +42,7 @@ public class Arm extends SubsystemBase {
 
     private DriveSubsystem m_DriveSubsystem;
     private Limelight m_Limelight;
+    private boolean pidActive = true;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
         SmartDashboard.putNumber("Target Angle", targetPos);
@@ -78,6 +79,7 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if(pidActive)
         runPID();
     }
 
@@ -89,6 +91,10 @@ public class Arm extends SubsystemBase {
 
     public void setTargetAngle(double target) {
         targetPos = MathUtil.clamp(target, -0.2, 2.6);
+    }
+
+    public void setZeroingArm(boolean pidActive) {
+        this.pidActive = pidActive;
     }
 
     public void updateFromSmartDashboard() {
