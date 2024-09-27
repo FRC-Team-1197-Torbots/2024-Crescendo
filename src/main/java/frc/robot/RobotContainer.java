@@ -92,7 +92,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Add subsystems to different subsystems
-
     // Configure the button bindings
     configureButtonBindings();
 

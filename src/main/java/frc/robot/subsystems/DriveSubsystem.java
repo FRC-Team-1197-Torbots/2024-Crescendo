@@ -522,7 +522,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
   
   public boolean facingSpeaker() {
-    return Math.abs(calcAngle()) < 8;
+    return Math.abs(calcAngle()) < 8; // bruh why we using magic numbers here
   }
 
   public boolean closeToSpeaker() {
