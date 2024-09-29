@@ -134,16 +134,13 @@ public class RobotContainer {
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
 
-
-    intakeBeamTrigger.onFalse(new ConditionalCommand(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), new Kaiden(), m_Intake::intakingNoteState));
     
     // Intake Routines
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
     .whileTrue(
       new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-          new RunArm(m_Arm, ArmConstants.IntakePos),
-          new InstantCommand(() -> m_Intake.setIntakingNote(true))));
+        new RunArm(m_Arm, ArmConstants.IntakePos)));
       
 
     Command ampScore = (new SequentialCommandGroup(
@@ -158,7 +155,6 @@ public class RobotContainer {
     
     //ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
-    m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_Intake.setIntakingNote(false)));
     //Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(
       new SequentialCommandGroup(
@@ -196,34 +192,14 @@ public class RobotContainer {
 
       
       
-    Command reverseEverything = Commands.parallel(
-      new InstantCommand(() -> m_Intake.setIntakingNote(false)),
+    Command outtake = Commands.parallel(
       new AmpScore(m_AmpRollers, 4.0),
       new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
       new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed))).until(intakeBeamTrigger);
           
-    Command reverseIntakeSlow = Commands.parallel(
-    new InstantCommand(() -> m_Shooter.stopMotor()),
-    new InstantCommand(() -> m_Intake.setIntakingNote(true)),
-    new StartEndCommand( 
-        () -> m_Intake.runIntake(IntakeConstants.passBackSpeed),
-        () -> m_Intake.stopMotor(), m_Intake).until(intakeBeamTrigger.negate())); 
-
-    Command ampPassBack = Commands.sequence(reverseEverything, reverseIntakeSlow);  
-
-    Command eject = new ParallelCommandGroup(
-      new StartEndCommand( 
-        () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-        () -> m_Intake.stopMotor(), m_Intake), 
-      new StartEndCommand( 
-        () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-        () -> m_Shooter.stopMotor())); 
-        
-    Command outtake = Commands.sequence(new InstantCommand(() -> m_Intake.setIntakingNote(false)), eject);
     //outake
+    m_driverController.b().whileTrue(outtake);
 
-    m_driverController.b().whileTrue(ampPassBack);
-// new ConditionalCommand(ampPassBack, outtake, ampBeamTrigger)
     //Climber Down
     m_driverController.a()
     .whileTrue(
@@ -241,7 +217,6 @@ public class RobotContainer {
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
-        new InstantCommand(() -> m_Intake.setIntakingNote(false)),
         new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
         new WaitUntilCommand(m_Arm::onAmpTarget),
         new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
