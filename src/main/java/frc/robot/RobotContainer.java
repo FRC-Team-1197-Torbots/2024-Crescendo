@@ -92,6 +92,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Add subsystems to different subsystems
+
     // Configure the button bindings
     configureButtonBindings();
 
@@ -111,7 +112,7 @@ public class RobotContainer {
         true, true),
         m_robotDrive));
 
-      // note regrab (goated james)
+
     }
     
   /**
