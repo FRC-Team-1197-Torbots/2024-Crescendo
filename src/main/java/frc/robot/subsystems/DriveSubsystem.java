@@ -16,7 +16,9 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,6 +28,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -91,7 +94,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   double[] botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
-  SwerveDriveOdometry m_odometry;
 
   private SwerveDriveKinematics kinematics;
   // private isLocked m_isLocked = isLocked.UNLOCK;
@@ -112,28 +114,29 @@ public class DriveSubsystem extends SubsystemBase {
   // Coordinates of robot
   private double[] m_RobotCoords = new double[2];
 
+  private final SwerveDrivePoseEstimator m_poseEstimator;
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     //m_autoName = autoName;
     //SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
-    
+    m_poseEstimator =
+      new SwerveDrivePoseEstimator(
+          DriveConstants.kDriveKinematics,
+          m_gyro.getRotation2d(),
+          new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
+          },
+          PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName),
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)), // tune these
+          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
-    m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(gyroWithOffset()),//-m_gyro.getAngle()
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      }
-      , PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName)
-      //new Pose2d(0,0,new Rotation2d(Math.toRadians(0)))
-    );
+  
 
 
-    m_RobotCoords[0] = m_odometry.getPoseMeters().getX();
-    m_RobotCoords[1] = m_odometry.getPoseMeters().getY();
 
     m_PidController = new PIDController(turningKp, 0, turningKd);
     resetEncoders();
@@ -214,38 +217,46 @@ public class DriveSubsystem extends SubsystemBase {
     
   }
   
+   public void updateOdometry() {
+    m_poseEstimator.update(
+        m_gyro.getRotation2d(),
+        new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+        });
+
+
+    boolean useMegaTag2 = true; //set to false to use MegaTag1
+    boolean doRejectUpdate = false;
+   
+      LimelightHelpers.SetRobotOrientation("limelight", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+      {
+        doRejectUpdate = true;
+      }
+      if(mt2.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if(!doRejectUpdate)
+      {
+        m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+        m_poseEstimator.addVisionMeasurement(
+            mt2.pose,
+            mt2.timestampSeconds);
+      }
+  }
 
   @Override
   public void periodic() {
-    // SmartDashboard.putString("Auto Name", m_autoName);
-    // SmartDashboard.putNumber("Angle from speaker", calcAngle());
-    m_odometry.update(new Rotation2d(Math.toRadians(gyroWithOffset())), new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-    });
+    updateOdometry();
 
-    odometry_x = m_odometry.getPoseMeters().getX();
-    odometry_y = m_odometry.getPoseMeters().getY();
-    m_RobotCoords[0] = odometry_x;
-    m_RobotCoords[1] = odometry_y;
-
-    SmartDashboard.putNumber("Odometry X", odometry_x);
-    SmartDashboard.putNumber("Odometry Y", odometry_y);
-
-    SmartDashboard.putData("Robot Field", m_field2d);
-    // SmartDashboard.putBoolean("Period", facingSpeaker());
-    SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
-    SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getTranslation().getX() - getAprilTagPos().getX()));
-    m_field2d.setRobotPose(m_odometry.getPoseMeters());
-
-
-    // SmartDashboard.putNumber("Front Left Pos", m_frontLeft.getPosition().distanceMeters);
-    // SmartDashboard.putNumber("Front Right Pos", m_frontRight.getPosition().distanceMeters);
-    // SmartDashboard.putNumber("Back Left Pos", m_rearLeft.getPosition().distanceMeters);
-    // SmartDashboard.putNumber("Back Right Pos", m_rearRight.getPosition().distanceMeters);
-    // SmartDashboard.putNumber("Robot angular velocity", getSpeeds().omegaRadiansPerSecond);
+    m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
+    SmartDashboard.putData(m_field2d);
+    SmartDashboard.putNumber("Distance From Speaker",distanceFromSpeaker());
   }
 
   /**
@@ -254,7 +265,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -263,7 +274,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    m_odometry.resetPosition(
+    m_poseEstimator.resetPosition(
         Rotation2d.fromDegrees(gyroWithOffset()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
@@ -463,19 +474,6 @@ public class DriveSubsystem extends SubsystemBase {
     } 
   }
 
-  public void initializeOdometry(){
-    m_odometry.resetPosition(Rotation2d.fromDegrees(45),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
-        new Pose2d(botpose_shooter[0],
-        botpose_shooter[1],
-        new Rotation2d(Math.toRadians(90))));//180 + botpose_shooter[5]
-  }
-
   private Translation2d getAprilTagPos() {
     if (color.isPresent()) {
       if (color.get() == Alliance.Red) {
@@ -543,6 +541,18 @@ public class DriveSubsystem extends SubsystemBase {
     turningKd += amount;
     m_PidController.setD(turningKp);
     SmartDashboard.putNumber("Turning Kd", turningKd);
+  }
+
+  public void setAprilTagID() {
+    int[] validIDs = {7,8};
+    if (color.isPresent()) 
+      if (color.get() == Alliance.Red) {
+        validIDs[0] = 3;
+        validIDs[1] = 4;
+      }
+
+    LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
+    LimelightHelpers.SetFiducialIDFiltersOverride("limelight-right", validIDs);
   }
 
 }

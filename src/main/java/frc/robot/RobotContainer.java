@@ -31,6 +31,7 @@ import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
+import frc.robot.utils.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -282,6 +283,7 @@ public class RobotContainer {
     m_Shooter.stopMotor();
     m_Shooter.telopInit();
     m_robotDrive.getAlliance();
+    m_robotDrive.setAprilTagID();
   }
  
   public void disableInit() {
@@ -299,6 +301,7 @@ public class RobotContainer {
     m_Shooter.resetAutoShots();
     m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
     m_robotDrive.getAlliance();
+    m_robotDrive.setAprilTagID();
   }
 
   public ScanAprilTag getScanAprilTag() {
