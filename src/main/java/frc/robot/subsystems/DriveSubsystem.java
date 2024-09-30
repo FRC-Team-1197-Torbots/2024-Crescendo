@@ -230,9 +230,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     boolean doRejectUpdate = false;
    
-      LimelightHelpers.SetRobotOrientation("limelight", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight-left", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+      SmartDashboard.putBoolean("Limelight Pose is null", mt2 == null);
       if(mt2 != null) {
+        SmartDashboard.putNumber("limelight pose", mt2.pose.getX());
         if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         {
           doRejectUpdate = true;
@@ -256,7 +258,7 @@ public class DriveSubsystem extends SubsystemBase {
     updateOdometry();
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
-    SmartDashboard.putData(m_field2d);
+    SmartDashboard.putData("Robot Field", m_field2d);
     SmartDashboard.putNumber("Distance From Speaker",distanceFromSpeaker());
   }
 
@@ -545,11 +547,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setAprilTagID() {
-    int[] validIDs = {7,8};
+    int[] validIDs = {3,4};
     if (color.isPresent()) 
-      if (color.get() == Alliance.Red) {
-        validIDs[0] = 3;
-        validIDs[1] = 4;
+      if (color.get() == Alliance.Blue) {
+        validIDs[0] = 7;
+        validIDs[1] = 8;
       }
 
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
