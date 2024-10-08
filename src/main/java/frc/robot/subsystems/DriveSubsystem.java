@@ -123,7 +123,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
-          m_gyro.getRotation2d(),
+          Rotation2d.fromDegrees(gyroWithOffset()),
           new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -219,7 +219,7 @@ public class DriveSubsystem extends SubsystemBase {
   
    public void updateOdometry() {
     m_poseEstimator.update(
-        m_gyro.getRotation2d(),
+        new Rotation2d(Math.toRadians(gyroWithOffset())),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
