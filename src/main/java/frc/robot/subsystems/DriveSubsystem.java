@@ -232,20 +232,25 @@ public class DriveSubsystem extends SubsystemBase {
    
       LimelightHelpers.SetRobotOrientation("limelight-left", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-      SmartDashboard.putBoolean("Limelight Pose is null", mt2 == null);
-      if(mt2 != null) {
-        SmartDashboard.putNumber("limelight pose", mt2.pose.getX());
+      LimelightHelpers.SetRobotOrientation("limelight-right", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+      if(mt1 != null) {
+        SmartDashboard.putNumber("limelight pose", mt1.pose.getX());
         if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         {
           doRejectUpdate = true;
         }
-        if(mt2.tagCount == 0)
+        if(mt1.tagCount == 0)
         {
           doRejectUpdate = true;
         }
         if(!doRejectUpdate)
         {
           m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+          m_poseEstimator.addVisionMeasurement(
+              mt1.pose,
+              mt1.timestampSeconds);
+        
           m_poseEstimator.addVisionMeasurement(
               mt2.pose,
               mt2.timestampSeconds);
@@ -259,7 +264,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putData("Robot Field", m_field2d);
-    SmartDashboard.putNumber("Distance From Speaker",distanceFromSpeaker());
+    SmartDashboard.putNumber("Distance From Speaker", distanceFromSpeaker());
   }
 
   /**
