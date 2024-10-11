@@ -255,7 +255,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putData("Robot Field", m_field2d);
-    SmartDashboard.putNumber("Distance From Speaker", distanceFromSpeaker());
+    SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
+    SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getX() - Constants.AprilTag4PosX));
   }
 
   /**

@@ -141,7 +141,7 @@ public class RobotContainer {
     .whileTrue(
       new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-        new RunArm(m_Arm, ArmConstants.IntakePos)));
+        new RunArm(m_Arm, ArmConstants.StorePos))); //IntakePos
       
 
     Command ampScore = (new SequentialCommandGroup(
@@ -176,25 +176,24 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM))));
 
-    //OldOuttake
-    // m_driverController.b().whileTrue(new ParallelCommandGroup(
-    //   new AmpScore(m_AmpRollers, 4.0),
-    //   new StartEndCommand( 
-    //   () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-    //   () -> m_Intake.stopMotor(), m_Intake), 
-    //   new StartEndCommand( 
-    //   () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-    //   () -> m_Shooter.stopMotor())));  
+    m_driverController.b().whileTrue(new ParallelCommandGroup(
+      new AmpScore(m_AmpRollers, 4.0),
+      new StartEndCommand( 
+      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+      () -> m_Intake.stopMotor(), m_Intake), 
+      new StartEndCommand( 
+      () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
+      () -> m_Shooter.stopMotor())));  
 
       
       
-    Command outtake = Commands.parallel(
-      new AmpScore(m_AmpRollers, 4.0),
-      new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
-      new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed))).until(intakeBeamTrigger);
+    // Command outtake = Commands.parallel(
+    //   new AmpScore(m_AmpRollers, 4.0),
+    //   new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
+    //   new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed))).until(intakeBeamTrigger);
           
     //outake
-    m_driverController.b().whileTrue(outtake);
+    // m_driverController.b().whileTrue(outtake);
 
     //Climber Down
     m_driverController.a()
