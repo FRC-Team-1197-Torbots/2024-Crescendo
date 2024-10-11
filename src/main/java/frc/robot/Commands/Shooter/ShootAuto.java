@@ -1,6 +1,7 @@
 package frc.robot.Commands.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Shooter;
 
@@ -31,7 +32,7 @@ public class ShootAuto extends Command {
     public void execute() {
         super.execute();
 
-        m_Shooter.runShooter(0.9f);
+        m_Shooter.setTargetRPM(ShooterConstants.ShootingRPM);
 
         if(m_Shooter.onTarget() && m_arm.autoOnTarget()) {
             m_Shooter.runIntakeShooter();

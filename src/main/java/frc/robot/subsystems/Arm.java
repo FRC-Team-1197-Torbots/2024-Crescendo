@@ -90,7 +90,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void setTargetAngle(double target) {
-        targetPos = MathUtil.clamp(target, -0.2, 2.6);
+        targetPos = MathUtil.clamp(target, -0.2, 1.83);
     }
 
     public void setZeroingArm(boolean pidActive) {
@@ -129,7 +129,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean autoOnTarget() {
-        return error > -4 && error < 1; // if error is between -5 and 1
+        return error > -4/180.0*Math.PI && error < 1/180.0*Math.PI; // if error is between -5 and 1
     }
 
     public void setAutoTargets(String autoName) {

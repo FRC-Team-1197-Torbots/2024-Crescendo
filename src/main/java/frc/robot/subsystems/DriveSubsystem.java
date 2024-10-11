@@ -92,9 +92,6 @@ public class DriveSubsystem extends SubsystemBase {
   private double turningKp = 0.02;
   private double turningKd = 0.001;
 
-  // Odometry class for tracking robot pose
-  double[] botpose_shooter = LimelightHelpers.getBotPose_wpiBlue("limelight-shooter");
-
   private SwerveDriveKinematics kinematics;
   // private isLocked m_isLocked = isLocked.UNLOCK;
   private boolean is_Locked = false;
@@ -105,7 +102,7 @@ public class DriveSubsystem extends SubsystemBase {
   private double odometry_y;
   private boolean isRedAlliance;
   Optional<Alliance> color = DriverStation.getAlliance();
-  private String m_autoName = "0 Note Bottom";
+  private String m_autoName = "0 Note Middle";
 
   // Robot's Unit Vector
 
@@ -132,7 +129,7 @@ public class DriveSubsystem extends SubsystemBase {
           },
           PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName),
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)), // tune these
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))); 
 
   
 
@@ -226,31 +223,25 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
         });
+  }
 
-
-    boolean doRejectUpdate = false;
+  public void updatePoseFromVision(String limelightName) {
+     boolean doRejectUpdate = false;
    
-      LimelightHelpers.SetRobotOrientation("limelight-left", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-      LimelightHelpers.SetRobotOrientation("limelight-right", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
-      if(mt1 != null) {
-        SmartDashboard.putNumber("limelight pose", mt1.pose.getX());
+      LimelightHelpers.SetRobotOrientation(limelightName, m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+      if(mt2 != null) {
         if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         {
           doRejectUpdate = true;
         }
-        if(mt1.tagCount == 0)
+        if(mt2.tagCount == 0)
         {
           doRejectUpdate = true;
         }
         if(!doRejectUpdate)
         {
           m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-          m_poseEstimator.addVisionMeasurement(
-              mt1.pose,
-              mt1.timestampSeconds);
-        
           m_poseEstimator.addVisionMeasurement(
               mt2.pose,
               mt2.timestampSeconds);
@@ -562,5 +553,4 @@ public class DriveSubsystem extends SubsystemBase {
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-right", validIDs);
   }
-
 }

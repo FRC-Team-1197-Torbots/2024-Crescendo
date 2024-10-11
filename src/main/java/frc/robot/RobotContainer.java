@@ -158,10 +158,6 @@ public class RobotContainer {
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
     //Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(
-      new SequentialCommandGroup(
-        new ScanAprilTag(m_Limelight),
-        new AimAtSpeaker(m_robotDrive),
-        new ScanAprilTag(m_Limelight),
         new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive),
           new StartEndCommand(
@@ -169,7 +165,6 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
           ),
           new RevShooter(m_Shooter, ShooterConstants.ShootingRPM)
-        )
       )
     );
     //Subwoofer rev up
@@ -269,7 +264,7 @@ public class RobotContainer {
         return new PathPlannerAuto(autoName);
     }
     catch(Exception e){
-      return new PathPlannerAuto("0 Note Bottom");
+      return new PathPlannerAuto("0 Note Middle");
     }  
   }
 
@@ -284,6 +279,11 @@ public class RobotContainer {
     m_Shooter.telopInit();
     m_robotDrive.getAlliance();
     m_robotDrive.setAprilTagID();
+  }
+
+  public void teleopPeriodic() {
+    m_robotDrive.updatePoseFromVision("limelight-left");
+    m_robotDrive.updatePoseFromVision("limelight-right");
   }
  
   public void disableInit() {
@@ -301,7 +301,6 @@ public class RobotContainer {
     m_Shooter.resetAutoShots();
     m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
     m_robotDrive.getAlliance();
-    m_robotDrive.setAprilTagID();
   }
 
   public ScanAprilTag getScanAprilTag() {

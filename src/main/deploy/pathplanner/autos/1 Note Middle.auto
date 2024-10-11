@@ -5,7 +5,7 @@
       "x": 1.3,
       "y": 5.54
     },
-    "rotation": 0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -15,6 +15,12 @@
           "type": "path",
           "data": {
             "pathName": "Move Forward 1 meter"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
           }
         }
       ]
