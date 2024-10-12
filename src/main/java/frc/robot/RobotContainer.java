@@ -237,10 +237,9 @@ public class RobotContainer {
     Consumer<String> action = a -> updateAutoChooser();
     positionChooser.onChange(action);
     positionChooser.addOption("Top (AMP)", "Top");
-    positionChooser.addOption("Top to Center", "Top to Center");
+    // positionChooser.addOption("Top to Center", "Top to Center");
     positionChooser.addOption("Middle (SPEAKER)", "Middle");
     positionChooser.addOption("Bottom (STATION)", "Bottom");
-    positionChooser.addOption("Test", "Test");
 
     // autoNameChooser.addOption("5 Note", "5 Note");
     // autoNameChooser.addOption("4 Note", "4 Note");
@@ -249,21 +248,26 @@ public class RobotContainer {
     // autoNameChooser.addOption("1 Note", "1 Note");
     // autoNameChooser.addOption("0 Note", "0 Note");
     SmartDashboard.putData("Positioning", positionChooser);
-    // SmartDashboard.putData("Auto Choice", autoNameChooser);
+    SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
   
   private void updateAutoChooser() {
     
     autoNameChooser.close();
     autoNameChooser = new SendableChooser<>();
-    if (positionChooser.getSelected() == "Top") {
+    switch (positionChooser.getSelected()) {
+      case "Top":
       autoNameChooser.addOption("2 Note", "2 Note");
-    }
-    if (positionChooser.getSelected() == "Middle") {
-      autoNameChooser.addOption("4 Note", "4 Note");
-    }
-    if (positionChooser.getSelected() == "Bottom") {
-      autoNameChooser.addOption("2 Note", "2 Note");
+      break;
+      case "Middle":
+        autoNameChooser.addOption("2 Note", "2 Note");
+        autoNameChooser.addOption("4 Note", "4 Note");
+        break;
+      case "Bottom": 
+        autoNameChooser.addOption("2 Note", "2 Note");
+        break;
+      default:
+        return;
     }
     SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
