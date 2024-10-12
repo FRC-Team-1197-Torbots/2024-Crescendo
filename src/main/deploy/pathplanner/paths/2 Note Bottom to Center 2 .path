@@ -20,8 +20,8 @@
         "y": 4.461828723942754
       },
       "prevControl": {
-        "x": 0.4942610741141581,
-        "y": 3.173636703906788
+        "x": 0.49433091933143936,
+        "y": 3.173611307789784
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,7 +43,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "New Folder",
+  "folder": "2 Note Bottom to Center",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0
