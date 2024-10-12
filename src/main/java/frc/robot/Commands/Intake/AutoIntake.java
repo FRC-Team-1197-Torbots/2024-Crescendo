@@ -8,39 +8,34 @@ import frc.robot.subsystems.Intake;
 
 public class AutoIntake extends Command {
 
-    private Arm m_arm;
-    private Intake m_intake;
+    private Arm m_Arm;
+    private Intake m_Intake;
 
     public AutoIntake(Arm arm, Intake intake) {
-        m_arm = arm;
-        m_intake = intake;
+        m_Arm = arm;
+        m_Intake = intake;
     }
 
     @Override
-    public void end(boolean interrupted) {
-        // TODO Auto-generated method stub
-        super.end(interrupted);
-
-        m_intake.runIntake(0);
+    public void initialize() {        
+        m_Arm.setTargetAngle(ArmConstants.IntakePos);;
+        m_Intake.runIntake(IntakeConstants.IntakeSpeed);
     }
-
+    
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        super.execute();
     }
-
+    
+    
     @Override
-    public void initialize() {
-        super.initialize();
-
-        m_arm.setTargetAngle(ArmConstants.IntakePos);;
-        m_intake.runIntake(0.4);
+    public void end(boolean interrupted) {
+        m_Intake.stopMotor();
+        m_Arm.setTargetAngle(ArmConstants.StorePos);
     }
 
     @Override
     public boolean isFinished() {
-        return m_intake.gamePieceStored();
+        return m_Intake.gamePieceStored();
     }
     
 }
