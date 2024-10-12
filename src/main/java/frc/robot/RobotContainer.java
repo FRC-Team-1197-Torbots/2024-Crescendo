@@ -141,7 +141,7 @@ public class RobotContainer {
     .whileTrue(
       new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-        new RunArm(m_Arm, ArmConstants.StorePos))); //IntakePos
+        new RunArm(m_Arm, ArmConstants.IntakePos))); //IntakePos
       
 
     Command ampScore = (new SequentialCommandGroup(

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.27,
-      "y": 5.54
+      "x": 0.73,
+      "y": 4.49
     },
-    "rotation": 0.0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "2NoteMiddle_1"
+                  "pathName": "2 Note Bottom to Center 1"
                 }
               },
               {
@@ -37,9 +37,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.0
+            "pathName": "2 Note Bottom to Center 2 "
           }
         },
         {

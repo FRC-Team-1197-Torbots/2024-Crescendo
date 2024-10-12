@@ -7,9 +7,11 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import frc.robot.Commands.Intake.Shoot;
 import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -46,6 +48,7 @@ public class Arm extends SubsystemBase {
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
         SmartDashboard.putNumber("Target Angle", targetPos);
+        SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
@@ -99,6 +102,7 @@ public class Arm extends SubsystemBase {
 
     public void updateFromSmartDashboard() {
         ArmConstants.SubwooferPos = SmartDashboard.getNumber("Target Angle", ArmConstants.SubwooferPos);
+        ShooterConstants.ShuttleRPM = SmartDashboard.getNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
     }
 
     public double setAngleFromDistance() {
@@ -143,6 +147,9 @@ public class Arm extends SubsystemBase {
                 break;
             case("1 Note Bottom"):
                 autoTargets = ArmConstants.OneNoteBottomTargets;
+                break;
+            case("2 Note Bottom"):
+                autoTargets = ArmConstants.TwoNoteBottomTargets;
                 break;
             case("3 Note Middle"):
                 autoTargets = ArmConstants.ThreeNoteMiddleTargets;

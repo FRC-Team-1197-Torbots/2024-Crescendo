@@ -177,9 +177,10 @@ public final class Constants {
     public static final double[] TwoNoteTopTargets = {118, 97.6};
     public static final double[] TwoNoteMiddleTargets = {0.5513, 0.8131}; //118, 103
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
-    public static final double[] FourNoteMiddleTargetsRed = {118, 98.5, 101.5, 99.5};
-    public static final double[] FourNoteMiddleTargetsBlue = {118, 98.5, 101.5, 99};
+    public static final double[] FourNoteMiddleTargetsRed = {0.5513, 0.89164, 0.83928, 0.874193}; //118, 98.5, 101.5, 99.5
+    public static final double[] FourNoteMiddleTargetsBlue = {0.5513, 0.89164, 0.83928, 0.874193};
     public static final double[] FiveNoteMiddleTargets = {118, 98.5, 101.5, 99, 96.937};
+    public static final double[] TwoNoteBottomTargets = {0.5513, 0.5013};
 
     public static final double[] OneNoteBottomTargets = {118}; //Old: 107.888
     public static final double[] FourNoteBottomTargets = {118, 100.5, 101.5, 98};
@@ -251,6 +252,7 @@ public final class Constants {
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -4000;
     public static final int SubwooferRPM = -3500;
+    public static double ShuttleRPM = -3500;
     
     public static double kP = 0.004;
     public static final double kI = 0;
