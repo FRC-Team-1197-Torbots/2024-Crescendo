@@ -161,20 +161,21 @@ public final class Constants {
     public static final int encoderChannelB = 8;
 
     //Storing Position values
-    // 66.2
     public static final double StorePos = 1.83;
     public static final double IntakePos = 0.085; 
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
     public static double SubwooferPos = 0.45;  
-    // Auto arm angles
+    /* Auto arm angles
+    * r = -d * Math.PI + Math.PI / 2 + 1.04
+     */  
     public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] ThreeNoteTopCenterTargets = {118, 100.1, 97.6};
     public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
     public static final double[] FiveNoteTopTargets = {118, 100.5, 101.5, 98, 71};
 
-    public static final double[] TwoNoteTopTargets = {118, 97.6};
+    public static final double[] TwoNoteTopTargets = {0.5513, 0.907354};
     public static final double[] TwoNoteMiddleTargets = {0.5513, 0.8131}; //118, 103
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
     public static final double[] FourNoteMiddleTargetsRed = {0.5513, 0.89164, 0.83928, 0.874193}; //118, 98.5, 101.5, 99.5

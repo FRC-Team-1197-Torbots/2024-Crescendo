@@ -49,6 +49,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.time.Instant;
+import java.util.function.Consumer;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -231,25 +232,45 @@ public class RobotContainer {
         new InstantCommand(() -> m_Shooter.stopMotor())));
     }
     
-    private void addAutoPaths() {
-      positionChooser.addOption("Top (AMP)", "Top");
-      positionChooser.addOption("Top to Center", "Top to Center");
-      positionChooser.addOption("Middle (SPEAKER)", "Middle");
-      positionChooser.addOption("Bottom (STATION)", "Bottom");
-      positionChooser.addOption("Test", "Test");
+  private void addAutoPaths() {
 
-    autoNameChooser.addOption("5 Note", "5 Note");
-    autoNameChooser.addOption("4 Note", "4 Note");
-    autoNameChooser.addOption("3 Note", "3 Note");
-    autoNameChooser.addOption("2 Note", "2 Note");
-    autoNameChooser.addOption("1 Note", "1 Note");
-    autoNameChooser.addOption("0 Note", "0 Note");
+    Consumer<String> action = a -> updateAutoChooser();
+    positionChooser.onChange(action);
+    positionChooser.addOption("Top (AMP)", "Top");
+    positionChooser.addOption("Top to Center", "Top to Center");
+    positionChooser.addOption("Middle (SPEAKER)", "Middle");
+    positionChooser.addOption("Bottom (STATION)", "Bottom");
+    positionChooser.addOption("Test", "Test");
+
+    // autoNameChooser.addOption("5 Note", "5 Note");
+    // autoNameChooser.addOption("4 Note", "4 Note");
+    // autoNameChooser.addOption("3 Note", "3 Note");
+    // autoNameChooser.addOption("2 Note", "2 Note");
+    // autoNameChooser.addOption("1 Note", "1 Note");
+    // autoNameChooser.addOption("0 Note", "0 Note");
     SmartDashboard.putData("Positioning", positionChooser);
+    // SmartDashboard.putData("Auto Choice", autoNameChooser);
+  }
+  
+  private void updateAutoChooser() {
+    
+    autoNameChooser.close();
+    autoNameChooser = new SendableChooser<>();
+    if (positionChooser.getSelected() == "Top") {
+      autoNameChooser.addOption("2 Note", "2 Note");
+    }
+    if (positionChooser.getSelected() == "Middle") {
+      autoNameChooser.addOption("4 Note", "4 Note");
+    }
+    if (positionChooser.getSelected() == "Bottom") {
+      autoNameChooser.addOption("2 Note", "2 Note");
+    }
     SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
-    
-    /**
-     * 
+  
+  
+  /**
+   * 
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
      * @return the command to run in autonomous
