@@ -151,6 +151,9 @@ public class Arm extends SubsystemBase {
             case("2 Note Bottom"):
                 autoTargets = ArmConstants.TwoNoteBottomTargets;
                 break;
+            case("2 Note Bottom Shrunk"):
+                autoTargets = ArmConstants.TwoNoteBottomTargets;
+                break;
             case("3 Note Middle"):
                 autoTargets = ArmConstants.ThreeNoteMiddleTargets;
                 break;

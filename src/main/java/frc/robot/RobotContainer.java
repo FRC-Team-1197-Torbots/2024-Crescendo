@@ -49,8 +49,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.function.Consumer;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -246,20 +248,25 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
   
-  private void updateAutoChooser() {
-    
+private void updateAutoChooser() {
+    List<String> autoNames = AutoBuilder.getAllAutoNames();
     autoNameChooser.close();
     autoNameChooser = new SendableChooser<>();
     switch (positionChooser.getSelected()) {
       case "Top":
-      autoNameChooser.addOption("2 Note", "2 Note");
+      for (String name : autoNames)
+        if (name.contains("Top"))
+          autoNameChooser.addOption(name, name);
       break;
       case "Middle":
-        autoNameChooser.addOption("2 Note", "2 Note");
-        autoNameChooser.addOption("4 Note", "4 Note");
+        for (String name : autoNames)
+        if (name.contains("Middle"))
+          autoNameChooser.addOption(name, name);
         break;
       case "Bottom": 
-        autoNameChooser.addOption("2 Note", "2 Note");
+        for (String name : autoNames)
+        if (name.contains("Bottom"))
+          autoNameChooser.addOption(name, name);
         break;
       default:
         return;
@@ -276,10 +283,7 @@ public class RobotContainer {
      */
   public Command getAutonomousCommand() {
     try{
-      String autoName = autoNameChooser.getSelected() + " " + positionChooser.getSelected();
-      if (autoName.contains("4 Note Middle")) 
-        return new PathPlannerAuto(autoName + " " + DriverStation.getAlliance().get());
-      else
+      String autoName = autoNameChooser.getSelected();
         return new PathPlannerAuto(autoName);
     }
     catch(Exception e){
