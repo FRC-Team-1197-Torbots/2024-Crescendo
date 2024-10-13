@@ -162,7 +162,7 @@ public final class Constants {
 
     //Storing Position values
     public static final double StorePos = 1.83;
-    public static final double IntakePos = 0.085; 
+    public static final double IntakePos = 0.095; 
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
@@ -264,7 +264,7 @@ public final class Constants {
   public static final class AmpRollerConstants {
     public static final int RollerMotor = 18;
     public static final double IntakeVoltage = -6.0;
-    public static double ScoreVoltage = -4.0;
+    public static double ScoreVoltage = -5.5;
   }
 
   public static final class ElevatorConstants {

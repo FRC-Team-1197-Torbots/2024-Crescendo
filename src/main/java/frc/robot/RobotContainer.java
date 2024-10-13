@@ -213,10 +213,11 @@ public class RobotContainer {
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
-        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-        new WaitUntilCommand(m_Arm::onAmpTarget),
-        new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-        new Shoot(m_Intake)))));
+      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+      new WaitUntilCommand(m_Arm::onAmpTarget),
+      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+      new Shoot(m_Intake)))));
         
     //Zero Arm
     m_MechController.a().onTrue(new ZeroArm(m_Arm));
