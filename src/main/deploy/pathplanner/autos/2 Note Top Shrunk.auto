@@ -1,0 +1,56 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7518994781213513,
+      "y": 6.67517683109546
+    },
+    "rotation": 60.62787494075021
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "2NoteTopToCenter1Shrunk"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Sequence"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2NoteTopToCenter2Shrunk"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Finished Autos",
+  "choreoAuto": false
+}
