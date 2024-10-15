@@ -63,11 +63,6 @@ public class Shooter extends SubsystemBase {
         // targetRPM = SmartDashboard.getNumber("target rpm", targetRPM);
     }
 
-    public void telopInit() {
-        SmartDashboard.putNumber("Shooter kP", ShooterConstants.kP);
-        SmartDashboard.putNumber("target rpm", targetRPM);
-    }
-
     @Deprecated
     public void runShooter(double voltage) {
         TopMotor.setVoltage(voltage);

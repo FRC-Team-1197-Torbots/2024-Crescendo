@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,7 +17,6 @@ import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
-import frc.robot.Commands.Limelight.ScanAprilTag;
 import frc.robot.Commands.Shooter.RevShooter;
 import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.Constants.OIConstants;
@@ -30,27 +28,19 @@ import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.*;
-import frc.robot.utils.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.function.Consumer;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -65,8 +55,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 public class RobotContainer {
   //Auto Selectors
   private SendableChooser<String> positionChooser = new SendableChooser<>();
-
   private SendableChooser<String> autoNameChooser = new SendableChooser<>();
+
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
@@ -79,17 +69,16 @@ public class RobotContainer {
   private final Elevator m_Elevator = new Elevator();
   
 
-  // The driver's controller
-  //XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  // Driver controllers
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
+
+  // Triggers
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
-  // private final Trigger speakerOnTarget = new Trigger(m_robotDrive::facingAngle);
-  private final Trigger closeToSpeaker = new Trigger(m_robotDrive::closeToSpeaker);
   private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
-  private final Trigger intakeFinished = new Trigger(m_Intake::finishedIntakeState);
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -114,7 +103,6 @@ public class RobotContainer {
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         true, true),
         m_robotDrive));
-
     }
     
   /**
@@ -136,7 +124,6 @@ public class RobotContainer {
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
 
-    
     // Intake Routines
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
     .whileTrue(
@@ -144,7 +131,6 @@ public class RobotContainer {
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmConstants.IntakePos))); //IntakePos
       
-
     Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
@@ -188,6 +174,7 @@ public class RobotContainer {
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
           new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM))));
 
+    // outtake
     m_driverController.b().whileTrue(new ParallelCommandGroup(
       new AmpScore(m_AmpRollers, 4.0),
       new StartEndCommand( 
@@ -197,17 +184,7 @@ public class RobotContainer {
       () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
       () -> m_Shooter.stopMotor())));  
 
-      
-    // Command outtake = Commands.parallel(
-    //   new AmpScore(m_AmpRollers, 4.0),
-    //   new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
-    //   new InstantCommand(() -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed))).until(intakeBeamTrigger);
-          
-    //outake
-    // m_driverController.b().whileTrue(outtake);
-
-    
-    
+  
     //Mech Controls
 
     //Climber Down
@@ -216,18 +193,11 @@ public class RobotContainer {
     //Climber Up
     m_MechController.y().whileTrue(new RunClimber(m_Climber, ClimberDirection.UP));
     
+    // zero gyro *press to reset field relative drive*
     m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
-    
-    m_MechController.b().whileTrue(new RunCommand(
-        () -> m_robotDrive.drive(
-        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-        m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(-90)), 
-        true, true),
-        m_robotDrive));
-    // m_MechController.b().whileTrue(new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive));
-    // m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
+    // test code
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
@@ -242,21 +212,18 @@ public class RobotContainer {
     }
     
     
-    private void registerAutoCommands() {
-      NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
-      NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
-      NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
-      NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
-        new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-        new InstantCommand(() -> m_Shooter.stopMotor())));
+  private void registerAutoCommands() {
+    NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
+    NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
+    NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
+    NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+      new InstantCommand(() -> m_Shooter.stopMotor())));
     }
     
   private void addAutoPaths() {
-
-    Consumer<String> action = a -> updateAutoChooser();
-    positionChooser.onChange(action);
+    positionChooser.onChange(oh -> updateAutoChooser());  // update auto chooser when position is changed
     positionChooser.addOption("Top (AMP)", "Top");
-    // positionChooser.addOption("Top to Center", "Top to Center");
     positionChooser.addOption("Middle (SPEAKER)", "Middle");
     positionChooser.addOption("Bottom (STATION)", "Bottom");
     positionChooser.setDefaultOption("None Selected", "None");
@@ -268,12 +235,15 @@ private void updateAutoChooser() {
   List<String> autoNames = AutoBuilder.getAllAutoNames();
   autoNameChooser.close();
   autoNameChooser = new SendableChooser<>();
-
-  for (String name : autoNames)
-          if (!name.contains("#") && name.contains(positionChooser.getSelected()))
-            autoNameChooser.addOption(name, name);
-  if (positionChooser.getSelected() == "None")
+  
+  if (positionChooser.getSelected() == "None") {
     autoNameChooser.addOption("Do Nothing", "Nothing");
+  } else {
+    for (String name : autoNames)
+      if (!name.contains("#") && name.contains(positionChooser.getSelected()))
+        autoNameChooser.addOption(name, name);
+  }
+            
   SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
   
@@ -286,8 +256,7 @@ private void updateAutoChooser() {
      */
   public Command getAutonomousCommand() {
     try{
-      String autoName = autoNameChooser.getSelected();
-        return new PathPlannerAuto(autoName);
+      return new PathPlannerAuto(autoNameChooser.getSelected());
     }
     catch(Exception e){
       return new PathPlannerAuto("Nothing");
@@ -297,12 +266,10 @@ private void updateAutoChooser() {
   public void teleopInit() { 
     m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
-    // m_Arm.setTargetAngle(ArmConstants.StorePos);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.stopMotor();
-    m_Shooter.telopInit();
     m_robotDrive.getAlliance();
     m_robotDrive.setAprilTagID();
   }
@@ -328,7 +295,4 @@ private void updateAutoChooser() {
     m_robotDrive.getAlliance();
   }
 
-  public ScanAprilTag getScanAprilTag() {
-    return new ScanAprilTag(m_Limelight);
-  }
 }
