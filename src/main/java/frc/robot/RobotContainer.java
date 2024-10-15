@@ -196,7 +196,7 @@ public class RobotContainer {
     m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
     // test code
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
+    m_MechController.b().onTrue(new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()));
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
