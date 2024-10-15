@@ -9,7 +9,6 @@ public class ShootAuto extends Command {
 
     private Arm m_arm;
     private Shooter m_Shooter;
-    private boolean armReachedTarget = false;
     private double[] autoTargets;
     private int shots;
 
@@ -49,9 +48,7 @@ public class ShootAuto extends Command {
 
     @Override
     public boolean isFinished() {
-        // TODO Auto-generated method stub
         return !m_Shooter.gamePieceStored();
-        // return true;
     }
     
 }

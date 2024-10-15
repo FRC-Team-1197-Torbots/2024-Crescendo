@@ -1,9 +1,7 @@
 package frc.robot.Commands.Arm;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.Arm;
 
 public class RunArm extends Command {
@@ -11,7 +9,6 @@ public class RunArm extends Command {
   private final Arm m_Arm;
   private double m_targetAngle;
 
-  
   public RunArm(Arm subsystem, double targetAngle) {
     m_Arm = subsystem;
     m_targetAngle = targetAngle;
@@ -26,9 +23,7 @@ public class RunArm extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    // m_Arm.runPID();
-  }
+  public void execute() {}
 
   @Override
   public void end(boolean interrupted) {
@@ -40,10 +35,4 @@ public class RunArm extends Command {
   public boolean isFinished() {
     return false;
   }
-
-  // limelight procedure
-  // 1. Have driver select with button what to target: amp, speaker or source
-  // 2. Based on alliance and target, pick apriltag id number
-  // 3. Look for the apriltag, and retrieve the distance and maybe angle
-
 }

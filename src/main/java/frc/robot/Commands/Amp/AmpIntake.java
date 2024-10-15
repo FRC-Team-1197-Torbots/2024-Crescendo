@@ -1,12 +1,10 @@
 package frc.robot.Commands.Amp;
 
-import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.subsystems.AmpRollers;
 
 public class AmpIntake extends Command {
-
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     private final AmpRollers m_AmpRollers;
     private double voltage;
 
@@ -40,5 +38,4 @@ public class AmpIntake extends Command {
     public boolean isFinished() {
         return m_AmpRollers.gamePieceStored();
     }
-    
 }

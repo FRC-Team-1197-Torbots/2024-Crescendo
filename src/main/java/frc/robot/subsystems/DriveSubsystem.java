@@ -479,13 +479,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_autoName = autoname;
     SmartDashboard.putString("Auto Name", m_autoName);
   }
+
   public double distanceFromSpeaker() {
     return getPose().getTranslation().getDistance(getAprilTagPos());
   }
 
   public double getDeltaAngleFrom(double angle) {
-    
-  
     double deltaAngle = (getPose().getRotation().getDegrees() - angle);
 
     if (color.isPresent())
@@ -499,9 +498,6 @@ public class DriveSubsystem extends SubsystemBase {
       return deltaAngle + 360;
     else
       return deltaAngle;
-
-
-    // return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
   public void aimRobotAtSpeaker() {
@@ -511,14 +507,11 @@ public class DriveSubsystem extends SubsystemBase {
     pointAt(speakerAngle);
   }
 
-
-
   public void aimRobotShuttle() {
     pointAt(0);
   }
 
   public void aimAtAmp() {
-
     pointAt(90);
   }
   
@@ -536,18 +529,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   public double getPIDOutput(double error) {
     return m_PidController.calculate(error);
-  }
-
-  public void incrementKp(double amount) {
-    turningKp += amount;
-    m_PidController.setP(turningKp);
-    SmartDashboard.putNumber("Turning Kp", turningKp);
-  }
-
-  public void incrementKd(double amount) {
-    turningKd += amount;
-    m_PidController.setD(turningKp);
-    SmartDashboard.putNumber("Turning Kd", turningKd);
   }
 
   public void setAprilTagID() {
