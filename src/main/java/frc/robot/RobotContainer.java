@@ -115,7 +115,6 @@ public class RobotContainer {
         true, true),
         m_robotDrive));
 
-
     }
     
   /**
@@ -158,17 +157,28 @@ public class RobotContainer {
     
     //ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
-    //Rev Up
-    m_driverController.leftTrigger(0.5).whileTrue(
-        new ParallelCommandGroup(
+
+    Command revUp = new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
           ),
           new RevShooter(m_Shooter, ShooterConstants.ShootingRPM)
-      )
+      );
+
+    Command pointAtAmp = new RunCommand(
+        () -> m_robotDrive.drive(
+        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+        m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(-90)), 
+        true, true),
+        m_robotDrive);
+
+    //Rev Up
+    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger)
     );
+
     //Subwoofer rev up
     m_driverController.rightBumper()
       .whileTrue(new SequentialCommandGroup(
@@ -208,7 +218,15 @@ public class RobotContainer {
     
     m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
-    m_MechController.b().whileTrue(new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive));
+    
+    m_MechController.b().whileTrue(new RunCommand(
+        () -> m_robotDrive.drive(
+        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+        m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(-90)), 
+        true, true),
+        m_robotDrive));
+    // m_MechController.b().whileTrue(new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive));
     // m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
     
     //Amp

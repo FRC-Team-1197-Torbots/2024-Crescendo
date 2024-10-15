@@ -528,12 +528,19 @@ public class DriveSubsystem extends SubsystemBase {
     pointAt(speakerAngle);
   }
 
+
+
   public void aimRobotShuttle() {
     pointAt(0);
   }
+
+  public void aimAtAmp() {
+
+    pointAt(90);
+  }
   
   public void pointAt(double angle) {
-    drive(0,0, setTurnRate(getDeltaAngleFrom(angle)),false,false);
+    drive(0,0, getPIDOutput(getDeltaAngleFrom(angle)),false,false);
   }
 
   public boolean facingAngle(double angleToFace) {
@@ -544,7 +551,7 @@ public class DriveSubsystem extends SubsystemBase {
     return distanceFromSpeaker() < 3.1;
   }
 
-  public double setTurnRate(double error) {
+  public double getPIDOutput(double error) {
     return m_PidController.calculate(error);
   }
 
