@@ -10,13 +10,13 @@ import frc.robot.utils.LimelightHelpers;
 public class Limelight extends SubsystemBase{
     double pose_x;
     double pose_y;
-    private double[] botpose1;
     //Optional<Alliance> color = DriverStation.getAlliance();
 
     private DriveSubsystem m_DriveSubsystem;
     private double limelight_x;
     private double limelight_y;
     
+    @Deprecated
     public Limelight(DriveSubsystem drive){
         m_DriveSubsystem = drive;
     }

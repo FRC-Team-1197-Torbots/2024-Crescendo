@@ -167,6 +167,7 @@ public final class Constants {
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
     public static final double SubwooferPos = 0.5;  
+
     /* Auto arm angles
     * r = -d * Math.PI + Math.PI / 2 + 1.04
      */  
@@ -189,9 +190,10 @@ public final class Constants {
     public static final double[] StoreTargets = {StorePos};
 
     //Arm PID Constants
-    public static final double Arm_kP = 7.0; // 7
-    public static final double Arm_kI = 0; // 0
-    public static final double Arm_kD = 0; // 0
+    public static final double Arm_kP = 7.0;
+    public static final double Arm_kI = 0;
+    public static final double Arm_kD = 0; 
+    public static final double FeedForwardGravity = 0.52;
 
     //Arm Motion Profiling Constants
     public static final double MaxAngularVelo = 160;
@@ -271,7 +273,11 @@ public final class Constants {
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
     public static final double StorePos = 0;
-    public static double AmpPos = 14.3; //11.83
+    public static double AmpPos = 14.3;
+
+    public static final double kP = 0.9;
+    public static final double kI = 0;
+    public static final double kD = 0;
   }
 
   public static final class BlinkinConstants {

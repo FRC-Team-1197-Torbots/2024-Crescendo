@@ -25,7 +25,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -88,7 +87,6 @@ public class DriveSubsystem extends SubsystemBase {
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
   private PIDController m_PidController;
-  private double angleDelta;
   private double turningKp = 0.02;
   private double turningKd = 0.001;
 
@@ -192,22 +190,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public double gyroWithOffset() {
-
-    if (!DriverStation.getAlliance().isEmpty()) {
-      double offset;
-      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
-        offset = GeometryUtil.flipFieldPose(PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName)).getRotation().getDegrees();
-        // if(offset == 180){
-        //   offset = 0;
-        // }
-      } else {
-        offset = PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees();
-      }
-      return (-m_gyro.getAngle() + 0);
-    } else {
-      return 0;
-    }
-    
+      return -m_gyro.getAngle();
   }
   
    public void updateOdometry() {

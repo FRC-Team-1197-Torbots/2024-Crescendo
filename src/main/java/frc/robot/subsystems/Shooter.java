@@ -1,19 +1,12 @@
 package frc.robot.subsystems;
 
-import frc.robot.utils.LimelightHelpers;
-
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import static frc.robot.Constants.ShooterConstants.ShootingRPM;
-
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,10 +16,6 @@ public class Shooter extends SubsystemBase {
     private Timer timer;
     private CANSparkFlex TopMotor;
     private CANSparkFlex BottomMotor;
-    private double TopFlyWheelTestVoltage = 0;
-    public double BotFlyWheelTestVoltage = 4.3;
-    private double low = 2100;
-    private double high = 2600;
     private boolean atTargetRPM;
     private double targetRPM;
     public int AutoShots;
@@ -46,21 +35,11 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // SmartDashboard.putNumber("Top Flywheel RPM", TopMotor.getEncoder().getVelocity()); // you're welcome alex
-        // SmartDashboard.putNumber("Bottom Flywheel RPM", BottomMotor.getEncoder().getVelocity());
-        // SmartDashboard.putNumber(" ,Shooter Kp", shooterKp);
         SmartDashboard.putNumber("Shooter RPM", getAverageShooterRPM());
         SmartDashboard.putNumber("PID Output", getBottomPIDOutput());
         double feedForward = (double)targetRPM / ShooterConstants.VortexMaxSpeed * ShooterConstants.NominalBatteryVoltage; // funny alex math
         TopMotor.setVoltage(feedForward + getTopPIDOutput());        
         BottomMotor.setVoltage(feedForward + getBottomPIDOutput());        
-        SmartDashboard.putNumber("Caclulated Feed Forward", feedForward);
-    }
-
-    public void updateKp() {
-        ShooterConstants.kP = SmartDashboard.getNumber("Shooter kP", ShooterConstants.kP);
-        m_TopPidController.setP(ShooterConstants.kP);
-        // targetRPM = SmartDashboard.getNumber("target rpm", targetRPM);
     }
 
     @Deprecated
@@ -95,7 +74,6 @@ public class Shooter extends SubsystemBase {
         targetRPM = RPM;
     }
 
-
     public void resetAutoShots() {
         AutoShots = 0;
     }
@@ -121,8 +99,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getAverageShooterRPM() {
-        return getBottomShooterRPM();
-        // return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
+        return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
     }
 
     public boolean gamePieceStored() {
@@ -146,27 +123,8 @@ public class Shooter extends SubsystemBase {
         return Math.abs(getBottomShooterRPM()) > 3900 && Math.abs(getTopShooterRPM()) > 3900; // 4200
     }
 
-    public boolean ampOnTarget() {
-        return Math.abs(getBottomShooterRPM()) > low && Math.abs(getBottomShooterRPM()) < high
-                && Math.abs(TopMotor.getEncoder().getVelocity()) < 500;
-    }
-
     public void setMotorMode(IdleMode mode) {
         TopMotor.setIdleMode(mode);
         BottomMotor.setIdleMode(mode);
-    }
-
-    // TEST CODE
-    public void incrementbot(double amount) {
-        BotFlyWheelTestVoltage += amount;
-    }
-
-    public void incrementrpm(double amount) {
-        low += amount;
-        high += amount;
-    }
-
-    public boolean motorStopped(){
-        return Math.abs(TopMotor.getEncoder().getVelocity()) < 50 && Math.abs(BottomMotor.getEncoder().getVelocity()) < 50 && gamePieceStored();
     }
 }

@@ -62,9 +62,8 @@ public class RobotContainer {
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
   private final Climber m_Climber = new Climber();
-  public final Limelight m_Limelight = new Limelight(m_robotDrive);
-  public final Arm m_Arm = new Arm(m_robotDrive, m_Limelight);
-  public final Blinkin m_Blinkin = new Blinkin(m_Intake);
+  public final Arm m_Arm = new Arm(m_robotDrive);
+  public final Blinkin m_Blinkin = new Blinkin();
   private final AmpRollers m_AmpRollers = new AmpRollers();
   private final Elevator m_Elevator = new Elevator();
   

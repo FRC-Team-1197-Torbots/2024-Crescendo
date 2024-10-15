@@ -2,26 +2,19 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AmpRollerConstants;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase{
     private double targetPos = ElevatorConstants.StorePos;
-    private double speed = AmpRollerConstants.ScoreVoltage;
-    private double error, elevatorVoltage, kp = 0.9, kd, ki;
+    private double error, elevatorVoltage;
     private double feedForward = -0.3;
     private CANSparkMax m_Motor;
     private PIDController m_PidController;
@@ -35,12 +28,9 @@ public class Elevator extends SubsystemBase{
         
         m_Motor = new CANSparkMax(ElevatorConstants.Motor, MotorType.kBrushless);
         m_Encoder = m_Motor.getEncoder();
-        m_PidController = new PIDController(kp, 0, kd);
-        // SmartDashboard.putNumber("Elevator kp", kp);
-        // SmartDashboard.putNumber("Elevator ki", ki);
-        // SmartDashboard.putNumber("Elevator kd", kd);
-        // SmartDashboard.putNumber("Elevator target", targetPos);
-        // SmartDashboard.putNumber("Roller Voltage", speed);
+        m_PidController = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
+        SmartDashboard.putNumber("Elevator target", targetPos);
+        SmartDashboard.putNumber("Roller Voltage", AmpRollerConstants.ScoreVoltage);
     }
 
     public void setVoltage(double voltage) {
@@ -60,36 +50,27 @@ public class Elevator extends SubsystemBase{
     }
 
     public void updateFromSmartDashboard() {
-        kp = SmartDashboard.getNumber("Elevator kp", kp);
-        ki = SmartDashboard.getNumber("Elevator ki", ki);
-        kd = SmartDashboard.getNumber("Elevator kd", kd);
         ElevatorConstants.AmpPos = SmartDashboard.getNumber("Elevator target", ElevatorConstants.AmpPos);
         AmpRollerConstants.ScoreVoltage = SmartDashboard.getNumber("Roller Voltage", AmpRollerConstants.ScoreVoltage);
-        m_PidController.setP(kp); 
-        m_PidController.setI(ki); 
-        m_PidController.setD(kd);
     }
 
     public double getPosition() {
         return -m_Encoder.getPosition();
     }
+
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Elevator Encoder", getPosition());
         runPID();
     }
-
-
     
     public void runPID() {
-        error = targetPos - getPosition(); // might need to switch negative
+        error = targetPos - getPosition();
         elevatorVoltage = m_PidController.calculate(error);
-        SmartDashboard.putNumber("elevator voltage", elevatorVoltage);
         setVoltage(feedForward + elevatorVoltage);
     }
 
     public boolean atAmpHeight() {
         return Math.abs(error) < marginOfError;
     }
-   
 }

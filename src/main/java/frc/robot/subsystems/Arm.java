@@ -20,27 +20,16 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
 
-    private double targetPos = ArmConstants.HardStopOffset;
-    private double armKp;
-    private double armKi;
-    private double armKd;
-    private double armVoltage;
-
-
-    private double feedForwardGravity;
-    // private TrapezoidProfile.Constraints m_Constraints;
-    // private ProfiledPIDController m_armPIDController;
-    private PIDController m_PIDController;
-    // private ArmFeedforward m_ArmFeedforward;
-    private double error;
-    // public double testAngle = ArmConstants.SubwooferPos;
-    public double[] autoTargets;
+    private double targetPos = ArmConstants.StorePos;
 
     private DriveSubsystem m_DriveSubsystem;
-    private Limelight m_Limelight;
+    private PIDController m_PIDController;
+    private double error;
+    public double[] autoTargets;
+
     private boolean pidActive = true;
 
-    public Arm(DriveSubsystem drive, Limelight limelight) {
+    public Arm(DriveSubsystem drive) {
         SmartDashboard.putNumber("Shuttle Angle", Constants.ShuttleAngle);
         SmartDashboard.putNumber("Target Angle", targetPos);
         SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
@@ -51,15 +40,8 @@ public class Arm extends SubsystemBase {
         ArmMotor2.setSmartCurrentLimit(30);
         ArmEncoder = new Encoder(ArmConstants.encoderChannelA, ArmConstants.encoderChannelB, true, EncodingType.k4X);
         ArmEncoder.reset();
-        // m_Constraints = new TrapezoidProfile.Constraints(ArmConstants.MaxAngularVelo, ArmConstants.MaxAngularAccel);
         m_PIDController = new PIDController(ArmConstants.Arm_kP, ArmConstants.Arm_kI, ArmConstants.Arm_kD);
         
-        armKp = ArmConstants.Arm_kP;
-        armKi = ArmConstants.Arm_kI;
-        armKd = ArmConstants.Arm_kD;
-
-        feedForwardGravity = 0.52;
-
         // ArmConstants.Arm_kI, ArmConstants.Arm_kD, m_Constraints);
         // m_ArmFeedforward = new ArmFeedforward(0.1, 0.66, 1.30, 0.02); // ks value might need to change
         /****************************
@@ -72,7 +54,6 @@ public class Arm extends SubsystemBase {
          **************************/
 
         m_DriveSubsystem = drive;
-        m_Limelight = limelight;
     }
 
     @Override
@@ -83,7 +64,7 @@ public class Arm extends SubsystemBase {
 
     public void runPID() {
         error = targetPos - getRadians();
-        armVoltage = setArmOutput();
+        double armVoltage = setArmOutput();
         runArm(armVoltage);
     }
 
@@ -196,7 +177,7 @@ public class Arm extends SubsystemBase {
     }
 
     public double setArmOutput() {
-        return -feedForwardGravity * Math.cos(getRadians()) + m_PIDController.calculate(error); 
+        return -ArmConstants.FeedForwardGravity * Math.cos(getRadians()) + m_PIDController.calculate(error); 
     }
 
     public double getRadians() {
@@ -210,10 +191,6 @@ public class Arm extends SubsystemBase {
 
     public double distanceFromSpeaker() {
         return m_DriveSubsystem.distanceFromSpeaker();
-    }
-
-    public double autoDistanceFromSpeaker() {
-        return m_Limelight.distanceFromSpeaker();
     }
 
     public void setMotorMode(IdleMode mode) {
