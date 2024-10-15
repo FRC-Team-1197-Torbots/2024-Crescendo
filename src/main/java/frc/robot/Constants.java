@@ -166,7 +166,7 @@ public final class Constants {
     public static final double SpeakerPos = 114.2;
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
-    public static double SubwooferPos = 0.45;  
+    public static final double SubwooferPos = 0.5;  
     /* Auto arm angles
     * r = -d * Math.PI + Math.PI / 2 + 1.04
      */  
@@ -251,7 +251,7 @@ public final class Constants {
 
     public static final int IdleSpeed = -1000;
     public static final double TargetRPM = -5200;
-    public static final int ShootingRPM = -4000;
+    public static final int ShootingRPM = -3500;
     public static final int SubwooferRPM = -3500;
     public static double ShuttleRPM = -3500;
     
@@ -262,6 +262,7 @@ public final class Constants {
   }
 
   public static final class AmpRollerConstants {
+    public static final int BeamBreakChannel = 3;
     public static final int RollerMotor = 18;
     public static final double IntakeVoltage = -6.0;
     public static double ScoreVoltage = -5.5;
@@ -290,14 +291,16 @@ public final class Constants {
     public static final double Aidan2 = 0.83;
     public static final double Aidan3 = -0.89;
     public static final double Aidan4 = -0.19;
-
-
   }
+
+
 
   public static final double AprilTag4PosX = 16.579;  
   public static final double AprilTag4PosY = 5.548;
   public static final double AprilTag7PosX = -0.0381;//-1.5in
   public static final double AprilTag7PosY = 5.547868;//218.42in
+
+  public static double ShuttleAngle = 0;
 
   public static final Translation2d blueSpeakerCoords = new Translation2d(AprilTag7PosX, AprilTag7PosY); 
   public static final Translation2d redSpeakerCoords = new Translation2d(AprilTag4PosX, AprilTag4PosY); 

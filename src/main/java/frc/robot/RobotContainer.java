@@ -15,7 +15,6 @@ import frc.robot.Commands.Amp.AmpScore;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Climber.RunClimber;
-import frc.robot.Commands.Drive.AimAtSpeaker;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
@@ -85,7 +84,7 @@ public class RobotContainer {
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
   private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
-  private final Trigger speakerOnTarget = new Trigger(m_robotDrive::facingSpeaker);
+  // private final Trigger speakerOnTarget = new Trigger(m_robotDrive::facingAngle);
   private final Trigger closeToSpeaker = new Trigger(m_robotDrive::closeToSpeaker);
   private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
@@ -162,7 +161,7 @@ public class RobotContainer {
     //Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(
         new ParallelCommandGroup(
-          new RunCommand(() -> m_robotDrive.aimRobot(),m_robotDrive),
+          new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
             () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
@@ -189,7 +188,6 @@ public class RobotContainer {
       () -> m_Shooter.stopMotor())));  
 
       
-      
     // Command outtake = Commands.parallel(
     //   new AmpScore(m_AmpRollers, 4.0),
     //   new InstantCommand(() -> m_Intake.runIntake(IntakeConstants.passBackSpeed)),
@@ -198,20 +196,20 @@ public class RobotContainer {
     //outake
     // m_driverController.b().whileTrue(outtake);
 
+    
+    
+    //Mech Controls
+
     //Climber Down
-    m_driverController.a()
-    .whileTrue(
-      new RunClimber(m_Climber, ClimberDirection.DOWN));
+    m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
 
     //Climber Up
-    m_driverController.y()
-    .whileTrue(
-      new RunClimber(m_Climber, ClimberDirection.UP));
+    m_MechController.y().whileTrue(new RunClimber(m_Climber, ClimberDirection.UP));
+    
+    m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
-      
-    //Mech Controls
-    m_MechController.y().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));      
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
+    m_MechController.b().whileTrue(new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive));
+    // m_MechController.b().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
@@ -222,7 +220,7 @@ public class RobotContainer {
       new Shoot(m_Intake)))));
         
     //Zero Arm
-    m_MechController.a().onTrue(new ZeroArm(m_Arm));
+    m_MechController.back().onTrue(new ZeroArm(m_Arm));
     }
     
     
@@ -243,35 +241,22 @@ public class RobotContainer {
     // positionChooser.addOption("Top to Center", "Top to Center");
     positionChooser.addOption("Middle (SPEAKER)", "Middle");
     positionChooser.addOption("Bottom (STATION)", "Bottom");
-
+    positionChooser.setDefaultOption("None Selected", "None");
     SmartDashboard.putData("Positioning", positionChooser);
     SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
   
 private void updateAutoChooser() {
-    List<String> autoNames = AutoBuilder.getAllAutoNames();
-    autoNameChooser.close();
-    autoNameChooser = new SendableChooser<>();
-    switch (positionChooser.getSelected()) {
-      case "Top":
-      for (String name : autoNames)
-        if (name.contains("Top"))
-          autoNameChooser.addOption(name, name);
-      break;
-      case "Middle":
-        for (String name : autoNames)
-        if (name.contains("Middle"))
-          autoNameChooser.addOption(name, name);
-        break;
-      case "Bottom": 
-        for (String name : autoNames)
-        if (name.contains("Bottom"))
-          autoNameChooser.addOption(name, name);
-        break;
-      default:
-        return;
-    }
-    SmartDashboard.putData("Auto Choice", autoNameChooser);
+  List<String> autoNames = AutoBuilder.getAllAutoNames();
+  autoNameChooser.close();
+  autoNameChooser = new SendableChooser<>();
+
+  for (String name : autoNames)
+          if (!name.contains("#") && name.contains(positionChooser.getSelected()))
+            autoNameChooser.addOption(name, name);
+  if (positionChooser.getSelected() == "None")
+    autoNameChooser.addOption("Do Nothing", "Nothing");
+  SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
   
   
@@ -287,7 +272,7 @@ private void updateAutoChooser() {
         return new PathPlannerAuto(autoName);
     }
     catch(Exception e){
-      return new PathPlannerAuto("0 Note Middle");
+      return new PathPlannerAuto("Nothing");
     }  
   }
 
@@ -305,8 +290,7 @@ private void updateAutoChooser() {
   }
 
   public void teleopPeriodic() {
-    m_robotDrive.updatePoseFromVision("limelight-left");
-    m_robotDrive.updatePoseFromVision("limelight-right");
+    m_robotDrive.updatePoseFromVision();
   }
  
   public void disableInit() {

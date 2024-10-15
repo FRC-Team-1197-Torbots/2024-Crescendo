@@ -98,9 +98,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /* Field 2D on Robot Sim */
   private Field2d m_field2d = new Field2d();
-  private double odometry_x;
-  private double odometry_y;
-  private boolean isRedAlliance;
   Optional<Alliance> color = DriverStation.getAlliance();
   private String m_autoName = "0 Note Middle";
 
@@ -109,7 +106,6 @@ public class DriveSubsystem extends SubsystemBase {
   // Vector from robot's position to speaker
 
   // Coordinates of robot
-  private double[] m_RobotCoords = new double[2];
 
   private final SwerveDrivePoseEstimator m_poseEstimator;
 
@@ -225,28 +221,36 @@ public class DriveSubsystem extends SubsystemBase {
         });
   }
 
-  public void updatePoseFromVision(String limelightName) {
-     boolean doRejectUpdate = false;
+  public void updatePoseFromVision() {
+    LimelightHelpers.SetRobotOrientation("limelight-left", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight-right", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    
+    LimelightHelpers.PoseEstimate leftPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+    LimelightHelpers.PoseEstimate rightPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+
+    if(doRejectUpdate(rightPose) && doRejectUpdate(leftPose)) {
+      return;
+    }
+    if (doRejectUpdate(rightPose))
+      rightPose = leftPose;
+    else if (doRejectUpdate(leftPose))
+      leftPose = rightPose;
    
-      LimelightHelpers.SetRobotOrientation(limelightName, m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-      if(mt2 != null) {
-        if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
-        {
-          doRejectUpdate = true;
-        }
-        if(mt2.tagCount == 0)
-        {
-          doRejectUpdate = true;
-        }
-        if(!doRejectUpdate)
-        {
-          m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
-          m_poseEstimator.addVisionMeasurement(
-              mt2.pose,
-              mt2.timestampSeconds);
-        }
-      }
+    Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), leftPose.pose.getRotation());      
+      
+    m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.4,.4,9999999));
+    m_poseEstimator.addVisionMeasurement(
+        averagePose,
+        leftPose.timestampSeconds);
+        
+    }
+
+  private boolean doRejectUpdate(LimelightHelpers.PoseEstimate mt2) {
+    if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+          return true;
+    if(mt2.tagCount == 0)
+      return true;
+    return false;
   }
 
   @Override
@@ -257,6 +261,8 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putData("Robot Field", m_field2d);
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getX() - Constants.AprilTag4PosX));
+    SmartDashboard.putNumber("LL left (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-left").getX() - Constants.AprilTag4PosX));
+    SmartDashboard.putNumber("LL right (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-right").getX() - Constants.AprilTag4PosX));
   }
 
   /**
@@ -494,10 +500,11 @@ public class DriveSubsystem extends SubsystemBase {
     return getPose().getTranslation().getDistance(getAprilTagPos());
   }
 
-  public double calcAngle() {
-    Translation2d robotPos = getPose().getTranslation();
-    Translation2d deltaPos = getAprilTagPos().minus(robotPos);
-    double deltaAngle = (getPose().getRotation().getDegrees() - Math.toDegrees(Math.atan(deltaPos.getY() / deltaPos.getX())));
+  public double getDeltaAngleFrom(double angle) {
+    
+  
+    double deltaAngle = (getPose().getRotation().getDegrees() - angle);
+
     if (color.isPresent())
       if (color.get() == Alliance.Red)
         deltaAngle -= 180;
@@ -514,13 +521,23 @@ public class DriveSubsystem extends SubsystemBase {
     // return -1 * Math.toDegrees(Math.atan(yDistanceFromSpeaker() / xDistanceFromSpeaker())); //maybe pi wuld help
   }
 
-  public void aimRobot() {
-    angleDelta = calcAngle();
-    drive(0,0, setTurnRate(angleDelta),false,false);
+  public void aimRobotAtSpeaker() {
+    Translation2d robotPos = getPose().getTranslation();
+    Translation2d deltaPos = getAprilTagPos().minus(robotPos);
+    double speakerAngle = Math.toDegrees(Math.atan(deltaPos.getY() / deltaPos.getX()));
+    pointAt(speakerAngle);
+  }
+
+  public void aimRobotShuttle() {
+    pointAt(0);
   }
   
-  public boolean facingSpeaker() {
-    return Math.abs(calcAngle()) < 8; // bruh why we using magic numbers here
+  public void pointAt(double angle) {
+    drive(0,0, setTurnRate(getDeltaAngleFrom(angle)),false,false);
+  }
+
+  public boolean facingAngle(double angleToFace) {
+    return Math.abs(getDeltaAngleFrom(angleToFace)) < 8; // bruh why we using magic numbers here
   }
 
   public boolean closeToSpeaker() {

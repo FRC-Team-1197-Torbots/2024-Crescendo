@@ -1,26 +1,19 @@
 package frc.robot.subsystems;
 
-import frc.robot.utils.LimelightHelpers;
-
-import com.fasterxml.jackson.core.json.DupDetector;
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import frc.robot.Commands.Intake.Shoot;
-import frc.robot.Constants.AmpRollerConstants;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.ShooterConstants;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.utils.LimelightHelpers;
 
 public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor1;
@@ -32,6 +25,7 @@ public class Arm extends SubsystemBase {
     private double armKi;
     private double armKd;
     private double armVoltage;
+
 
     private double feedForwardGravity;
     // private TrapezoidProfile.Constraints m_Constraints;
@@ -47,6 +41,7 @@ public class Arm extends SubsystemBase {
     private boolean pidActive = true;
 
     public Arm(DriveSubsystem drive, Limelight limelight) {
+        SmartDashboard.putNumber("Shuttle Angle", Constants.ShuttleAngle);
         SmartDashboard.putNumber("Target Angle", targetPos);
         SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
@@ -101,13 +96,13 @@ public class Arm extends SubsystemBase {
     }
 
     public void updateFromSmartDashboard() {
-        ArmConstants.SubwooferPos = SmartDashboard.getNumber("Target Angle", ArmConstants.SubwooferPos);
         ShooterConstants.ShuttleRPM = SmartDashboard.getNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
+        Constants.ShuttleAngle = SmartDashboard.getNumber("Shuttle Angle", Constants.ShuttleAngle);
     }
 
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
-        double result = 0.394 + 0.37 * Math.log(distance);
+        double result = 0.169 + 0.336*distance + -0.0257*distance*distance + -0.00313*distance*distance*distance;
         SmartDashboard.putNumber("Calculated Angle", result);
         return MathUtil.clamp(result, ArmConstants.SubwooferPos, ArmConstants.StorePos);
 

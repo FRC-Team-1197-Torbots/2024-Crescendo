@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.AmpRollerConstants;
 
 public class AmpRollers extends SubsystemBase{
@@ -17,7 +18,7 @@ public class AmpRollers extends SubsystemBase{
     private DigitalInput m_BeamBreak;
     
     public AmpRollers() {
-        m_BeamBreak = new DigitalInput(0);
+        m_BeamBreak = new DigitalInput(AmpRollerConstants.BeamBreakChannel);
         m_RollerMotor = new CANSparkMax(AmpRollerConstants.RollerMotor, MotorType.kBrushless);
     }
 
