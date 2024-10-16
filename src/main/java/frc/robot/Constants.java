@@ -73,7 +73,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
-    public static final double ShuttleAngle = 132.35;
+    public static final double ShuttleAngle = 132.35 + 180;
   }
 
   public static final class ModuleConstants {
@@ -212,7 +212,7 @@ public final class Constants {
     // logarithmic
     public static final double AngleEquationA = -18.7;
     public static final double AngleEquationB = 122;
-    public static final double ShuttleAngle = Math.PI / 4; // tune to actually be 45 degrees
+    public static final double ShuttleAngle = 0.91548;
   }
 
   public static final class ClimberConstants{
@@ -257,7 +257,7 @@ public final class Constants {
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -3600;
     public static final int SubwooferRPM = -3500;
-    public static final int ShuttleRPM = -2000;
+    public static final int ShuttleRPM = -3000;
     
     public static double kP = 0.004;
     public static final double kI = 0;

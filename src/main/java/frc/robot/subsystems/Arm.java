@@ -58,6 +58,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         if(pidActive)
             runPID();
+        SmartDashboard.putNumber("Arm Angle", getRadians());
     }
 
     public void runPID() {
@@ -105,7 +106,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean autoOnTarget() {
-        return error > -4/180.0*Math.PI && error < 1/180.0*Math.PI; // if error is between -5 and 1
+        return error > 0.2 && error < 0.2; // if error is between -5 and 1
     }
 
     public void setAutoTargets(String autoName) {

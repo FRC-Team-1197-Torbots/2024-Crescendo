@@ -141,7 +141,7 @@ public class RobotContainer {
     Command shootSubwoofer = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
     
     //ShootCommand
-    m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSubwoofer, ampScore, intakeBeamTrigger));
+    m_driverController.leftBumper().whileTrue(new ConditionalCommand(shootSubwoofer, ampScore, intakeBeamTrigger));
 
     Command speakerRev = new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
@@ -167,7 +167,7 @@ public class RobotContainer {
     () -> m_robotDrive.drive(
     -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
     -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-    m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(90)), 
+    m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(-90)), 
     true, true),
     m_robotDrive);
     
@@ -206,9 +206,10 @@ public class RobotContainer {
     // zero gyro *press to reset field relative drive*
     m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
+    m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));
+    
     // test code
     
-    m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
