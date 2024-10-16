@@ -73,6 +73,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
+    public static final double ShuttleAngle = 132.35;
   }
 
   public static final class ModuleConstants {
@@ -211,6 +212,7 @@ public final class Constants {
     // logarithmic
     public static final double AngleEquationA = -18.7;
     public static final double AngleEquationB = 122;
+    public static final double ShuttleAngle = Math.PI / 4; // tune to actually be 45 degrees
   }
 
   public static final class ClimberConstants{
@@ -255,7 +257,7 @@ public final class Constants {
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -3600;
     public static final int SubwooferRPM = -3500;
-    public static double ShuttleRPM = -3500;
+    public static final int ShuttleRPM = -2000;
     
     public static double kP = 0.004;
     public static final double kI = 0;
@@ -305,8 +307,6 @@ public final class Constants {
   public static final double AprilTag4PosY = 5.548;
   public static final double AprilTag7PosX = -0.0381;//-1.5in
   public static final double AprilTag7PosY = 5.547868;//218.42in
-
-  public static double ShuttleAngle = 0;
 
   public static final Translation2d blueSpeakerCoords = new Translation2d(AprilTag7PosX, AprilTag7PosY); 
   public static final Translation2d redSpeakerCoords = new Translation2d(AprilTag4PosX, AprilTag4PosY); 

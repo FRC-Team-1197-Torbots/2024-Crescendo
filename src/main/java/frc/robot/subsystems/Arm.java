@@ -30,9 +30,7 @@ public class Arm extends SubsystemBase {
     private boolean pidActive = true;
 
     public Arm(DriveSubsystem drive) {
-        SmartDashboard.putNumber("Shuttle Angle", Constants.ShuttleAngle);
         SmartDashboard.putNumber("Target Angle", targetPos);
-        SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
@@ -77,8 +75,6 @@ public class Arm extends SubsystemBase {
     }
 
     public void updateFromSmartDashboard() {
-        ShooterConstants.ShuttleRPM = SmartDashboard.getNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
-        Constants.ShuttleAngle = SmartDashboard.getNumber("Shuttle Angle", Constants.ShuttleAngle);
     }
 
     public double setAngleFromDistance() {

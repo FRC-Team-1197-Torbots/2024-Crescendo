@@ -508,7 +508,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void aimRobotShuttle() {
-    pointAt(0);
+    pointAt(DriveConstants.ShuttleAngle);
   }
 
   public void aimAtAmp() {

@@ -116,11 +116,7 @@ public class Shooter extends SubsystemBase {
 
     public boolean onTarget() {
         atTargetRPM = Math.abs(getAverageShooterRPM() - targetRPM) < 200;
-        return atTargetRPM || timer.hasElapsed(3); // 4500
-    }
-
-    public boolean onTargetAuto() {
-        return Math.abs(getBottomShooterRPM()) > 3900 && Math.abs(getTopShooterRPM()) > 3900; // 4200
+        return atTargetRPM || timer.hasElapsed(3); 
     }
 
     public void setMotorMode(IdleMode mode) {

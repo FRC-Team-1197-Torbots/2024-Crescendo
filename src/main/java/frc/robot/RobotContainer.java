@@ -77,7 +77,7 @@ public class RobotContainer {
   private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
-
+  private boolean shuttleMode = false;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -138,12 +138,12 @@ public class RobotContainer {
       new Kaiden().withTimeout(0.6),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
-    Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
+    Command shootSubwoofer = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
     
     //ShootCommand
-    m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
+    m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSubwoofer, ampScore, intakeBeamTrigger));
 
-    Command revUp = new ParallelCommandGroup(
+    Command speakerRev = new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
           new StartEndCommand(
             () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
@@ -152,14 +152,25 @@ public class RobotContainer {
           new RevShooter(m_Shooter, ShooterConstants.ShootingRPM)
       );
 
-    Command pointAtAmp = new RunCommand(
-        () -> m_robotDrive.drive(
-        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-        m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(-90)), 
-        true, true),
-        m_robotDrive);
+    Command shuttleRev = new ParallelCommandGroup(
+          new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
+          new StartEndCommand(
+            () -> m_Arm.setTargetAngle(ArmConstants.ShuttleAngle),
+            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
+          ),
+          new RevShooter(m_Shooter, ShooterConstants.ShuttleRPM)
+      );
 
+    Command revUp = new ConditionalCommand(shuttleRev, speakerRev, this::inShuttleMode);
+
+    Command pointAtAmp = new RunCommand(
+    () -> m_robotDrive.drive(
+    -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+    -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+    m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(90)), 
+    true, true),
+    m_robotDrive);
+    
     //Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger)
     );
@@ -196,7 +207,8 @@ public class RobotContainer {
     m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
     // test code
-    m_MechController.b().onTrue(new InstantCommand(() -> m_Elevator.updateFromSmartDashboard()));
+    
+    m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));
     
     //Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
@@ -208,9 +220,16 @@ public class RobotContainer {
         
     //Zero Arm
     m_MechController.back().onTrue(new ZeroArm(m_Arm));
-    }
-    
-    
+  }
+
+  private void toggleShuttleMode() {
+    shuttleMode = !shuttleMode;
+  }
+
+  public boolean inShuttleMode() {
+    return shuttleMode;
+  }
+      
   private void registerAutoCommands() {
     NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
     NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
