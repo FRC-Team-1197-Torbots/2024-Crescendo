@@ -253,7 +253,7 @@ public final class Constants {
 
     public static final int IdleSpeed = -1000;
     public static final double TargetRPM = -5200;
-    public static final int ShootingRPM = -3500;
+    public static final int ShootingRPM = -3600;
     public static final int SubwooferRPM = -3500;
     public static double ShuttleRPM = -3500;
     
@@ -267,13 +267,13 @@ public final class Constants {
     public static final int BeamBreakChannel = 3;
     public static final int RollerMotor = 18;
     public static final double IntakeVoltage = -6.0;
-    public static double ScoreVoltage = -5.5;
+    public static double ScoreVoltage = -4.7;
   }
 
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
     public static final double StorePos = 0;
-    public static double AmpPos = 14.3;
+    public static double AmpPos = 14.4;
 
     public static final double kP = 0.9;
     public static final double kI = 0;

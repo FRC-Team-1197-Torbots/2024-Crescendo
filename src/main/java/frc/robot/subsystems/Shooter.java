@@ -115,7 +115,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean onTarget() {
-        atTargetRPM = Math.abs(getAverageShooterRPM() - targetRPM) < 100;
+        atTargetRPM = Math.abs(getAverageShooterRPM() - targetRPM) < 200;
         return atTargetRPM || timer.hasElapsed(3); // 4500
     }
 
