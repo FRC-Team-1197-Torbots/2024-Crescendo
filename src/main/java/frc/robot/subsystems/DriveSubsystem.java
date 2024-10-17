@@ -229,6 +229,8 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
   private boolean doRejectUpdate(LimelightHelpers.PoseEstimate mt2) {
+    if(mt2 == null)
+      return true;
     if(Math.abs(m_gyro.getRate()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
           return true;
     if(mt2.tagCount == 0)
