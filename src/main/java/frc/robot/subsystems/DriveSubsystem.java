@@ -516,7 +516,7 @@ public class DriveSubsystem extends SubsystemBase {
   public double adjustAngleForAllianceColor(double angle) {
     if (color.isPresent()) {
        if (color.get() == Alliance.Red) {
-         return 180 + angle;
+         return -angle;
        } else {
           return angle;
        }

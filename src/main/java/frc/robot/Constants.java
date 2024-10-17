@@ -283,7 +283,7 @@ public final class Constants {
   }
 
   public static final class BlinkinConstants {
-    public static final int Blinkin = 1; 
+    public static final int Blinkin = 0; 
     public static final double Red = 0.61;
     public static final double White = 0.93;
     public static final double Black = 0.99;
