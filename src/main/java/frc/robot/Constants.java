@@ -73,7 +73,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
-    public static final double ShuttleAngle = 132.35 + 180;
+    public static final double ShuttleAngle = -47.65; // degrees
   }
 
   public static final class ModuleConstants {

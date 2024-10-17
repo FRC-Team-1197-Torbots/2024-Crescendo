@@ -508,23 +508,30 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void aimRobotShuttle() {
-    pointAt(DriveConstants.ShuttleAngle);
+     pointAt(adjustAngleForAllianceColor(DriveConstants.ShuttleAngle));
   }
 
-  public void aimAtAmp() {
-    pointAt(90);
+  public double adjustAngleForAllianceColor(double angle) {
+    if (color.isPresent()) {
+       if (color.get() == Alliance.Red) {
+         return 180 + angle;
+       } else {
+          return angle;
+       }
+     }
+     return 0;
   }
   
+  public double getAmpRotationSpeed() {
+    return getPIDOutput(getDeltaAngleFrom(adjustAngleForAllianceColor(-90)));
+  }
+
   public void pointAt(double angle) {
     drive(0,0, getPIDOutput(getDeltaAngleFrom(angle)),false,false);
   }
 
   public boolean facingAngle(double angleToFace) {
-    return Math.abs(getDeltaAngleFrom(angleToFace)) < 8; // bruh why we using magic numbers here
-  }
-
-  public boolean closeToSpeaker() {
-    return distanceFromSpeaker() < 3.1;
+    return Math.abs(getDeltaAngleFrom(angleToFace)) < 8; // why we using magic numbers here
   }
 
   public double getPIDOutput(double error) {

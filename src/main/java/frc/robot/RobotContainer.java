@@ -138,10 +138,11 @@ public class RobotContainer {
       new Kaiden().withTimeout(0.6),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
-    Command shootSubwoofer = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
+    // Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
+    Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
     
     //ShootCommand
-    m_driverController.leftBumper().whileTrue(new ConditionalCommand(shootSubwoofer, ampScore, intakeBeamTrigger));
+    m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
 
     Command speakerRev = new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
@@ -167,7 +168,7 @@ public class RobotContainer {
     () -> m_robotDrive.drive(
     -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
     -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-    m_robotDrive.getPIDOutput(m_robotDrive.getDeltaAngleFrom(-90)), 
+    m_robotDrive.getAmpRotationSpeed(), 
     true, true),
     m_robotDrive);
     
