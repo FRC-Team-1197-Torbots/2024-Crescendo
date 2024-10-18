@@ -102,9 +102,9 @@ public class Arm extends SubsystemBase {
     public boolean onTarget() {
         return error > -3 && error < 1.5; // if error is between -5 and 1
     }
-
+    
     public boolean autoOnTarget() {
-        return Math.abs(error) < 0.1; // if error is between 
+        return error > -4 && error < 1; // if error is between -5 and 1
     }
 
     public void setAutoTargets(String autoName) {
