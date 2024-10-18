@@ -31,6 +31,7 @@ public class Elevator extends SubsystemBase{
         m_PidController = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
         SmartDashboard.putNumber("Elevator target", targetPos);
         SmartDashboard.putNumber("Roller Voltage", AmpRollerConstants.ScoreVoltage);
+        zeroEncoder();
     }
 
     public void setVoltage(double voltage) {
@@ -72,5 +73,9 @@ public class Elevator extends SubsystemBase{
 
     public boolean atAmpHeight() {
         return Math.abs(error) < marginOfError;
+    }
+
+    public void zeroEncoder() {
+        m_Encoder.setPosition(0);
     }
 }

@@ -25,9 +25,9 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Break beam1", !m_BreakBeam.get());
-        SmartDashboard.putBoolean("Break beam2", m_BreakBeam2.get());
-        SmartDashboard.putBoolean("Game Piece Stored", gamePieceStored());
+        SmartDashboard.putBoolean("Break beam 1", !m_BreakBeam.get());
+        SmartDashboard.putBoolean("Break beam 2", m_BreakBeam2.get());
+        SmartDashboard.putBoolean("Game Piece Stored Intake", gamePieceStored());
     }
 
     public void setIntakeVoltage(double voltage) {

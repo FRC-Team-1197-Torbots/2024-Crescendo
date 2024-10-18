@@ -4,30 +4,18 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Commands.Kaiden;
-import frc.robot.Commands.Amp.AmpIntake;
-import frc.robot.Commands.Amp.AmpScore;
-import frc.robot.Commands.Arm.RunArm;
-import frc.robot.Commands.Arm.ZeroArm;
-import frc.robot.Commands.Climber.RunClimber;
-import frc.robot.Commands.Intake.AutoIntake;
-import frc.robot.Commands.Intake.RunIntake;
-import frc.robot.Commands.Intake.Shoot;
-import frc.robot.Commands.Shooter.RevShooter;
-import frc.robot.Commands.Shooter.ShootAuto;
-import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ClimberConstants.ClimberDirection;
-import frc.robot.Constants.AmpRollerConstants;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.BlinkinConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -39,12 +27,33 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
-import java.util.List;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.revrobotics.CANSparkBase.IdleMode;
+import frc.robot.Constants.AmpRollerConstants;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.BlinkinConstants;
+import frc.robot.Constants.ClimberConstants.ClimberDirection;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.Commands.Kaiden;
+import frc.robot.Commands.Amp.AmpIntake;
+import frc.robot.Commands.Amp.AmpScore;
+import frc.robot.Commands.Arm.RunArm;
+import frc.robot.Commands.Arm.ZeroArm;
+import frc.robot.Commands.Climber.RunClimber;
+import frc.robot.Commands.Intake.AutoIntake;
+import frc.robot.Commands.Intake.RunIntake;
+import frc.robot.Commands.Intake.Shoot;
+import frc.robot.Commands.Shooter.RevShooter;
+import frc.robot.Commands.Shooter.ShootAuto;
+import frc.robot.subsystems.AmpRollers;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Blinkin;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -90,7 +99,9 @@ public class RobotContainer {
     // Add auto selector and commands used
     addAutoPaths();
     registerAutoCommands();
-    
+
+    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
+
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -226,6 +237,7 @@ public class RobotContainer {
 
   private void toggleShuttleMode() {
     shuttleMode = !shuttleMode;
+    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
   }
 
   public boolean inShuttleMode() {
@@ -263,7 +275,6 @@ private void updateAutoChooser() {
       if (!name.contains("#") && name.contains(positionChooser.getSelected()))
         autoNameChooser.addOption(name, name);
   }
-            
   SmartDashboard.putData("Auto Choice", autoNameChooser);
   }
   
@@ -284,6 +295,7 @@ private void updateAutoChooser() {
   }
 
   public void teleopInit() { 
+    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_robotDrive.setMotorMode(IdleMode.kBrake);
