@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.utils.LimelightHelpers;
 
 public class Arm extends SubsystemBase {
@@ -29,6 +30,8 @@ public class Arm extends SubsystemBase {
 
     public Arm(DriveSubsystem drive) {
         SmartDashboard.putNumber("Target Angle", targetPos);
+        SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.TargetRPM);
+
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
 
@@ -74,6 +77,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void updateFromSmartDashboard() {
+        ShooterConstants.ShuttleRPM = (int)SmartDashboard.getNumber("Shuttle RPM", ShooterConstants.TargetRPM);;
     }
 
     public double setAngleFromDistance() {

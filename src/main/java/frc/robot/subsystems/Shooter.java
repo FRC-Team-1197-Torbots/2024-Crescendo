@@ -35,6 +35,7 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("Shooter On Target", onTarget());
         SmartDashboard.putNumber("Shooter RPM", getAverageShooterRPM());
         SmartDashboard.putNumber("PID Output", getBottomPIDOutput());
         double feedForward = (double)targetRPM / ShooterConstants.VortexMaxSpeed * ShooterConstants.NominalBatteryVoltage; // funny alex math
@@ -99,7 +100,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getAverageShooterRPM() {
-        return Math.abs((getBottomShooterRPM() + getTopShooterRPM())) / 2;
+        return (getBottomShooterRPM() + getTopShooterRPM()) / 2;
     }
 
     public boolean gamePieceStored() {

@@ -257,8 +257,8 @@ public final class Constants {
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -3600;
     public static final int SubwooferRPM = -3500;
-    public static final int ShuttleRPM = -3000;
-    
+    public static int ShuttleRPM = -3000;
+    //
     public static double kP = 0.004;
     public static final double kI = 0;
     public static final double kD = 0;

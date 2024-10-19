@@ -96,6 +96,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
+    
     // Add auto selector and commands used
     addAutoPaths();
     registerAutoCommands();
@@ -133,7 +134,7 @@ public class RobotContainer {
     intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
-
+    // Driver Controls
     // Intake Routines
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
     .whileTrue(
@@ -152,7 +153,7 @@ public class RobotContainer {
     // Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
     Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
     
-    //ShootCommand
+    // ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
 
     Command speakerRev = new ParallelCommandGroup(
@@ -183,11 +184,11 @@ public class RobotContainer {
     true, true),
     m_robotDrive);
     
-    //Rev Up
+    // Rev Up
     m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger)
     );
 
-    //Subwoofer rev up
+    // Subwoofer rev up
     m_driverController.rightBumper()
       .whileTrue(new SequentialCommandGroup(
         new ParallelCommandGroup(
@@ -209,21 +210,18 @@ public class RobotContainer {
   
     //Mech Controls
 
-    //Climber Down
+    // Climber Down
     m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
 
-    //Climber Up
+    // Climber Up
     m_MechController.y().whileTrue(new RunClimber(m_Climber, ClimberDirection.UP));
     
     // zero gyro *press to reset field relative drive*
     m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
-    m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));
+    m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
     
-    // test code
-    
-    
-    //Amp
+    // Amp
     m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
       new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
@@ -231,8 +229,11 @@ public class RobotContainer {
       new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
       new Shoot(m_Intake)))));
         
-    //Zero Arm
+    // Zero Arm
     m_MechController.back().onTrue(new ZeroArm(m_Arm));
+
+    // update from smartdashboard
+    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
   }
 
   private void toggleShuttleMode() {
