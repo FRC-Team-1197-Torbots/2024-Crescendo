@@ -212,7 +212,7 @@ public final class Constants {
     // logarithmic
     public static final double AngleEquationA = -18.7;
     public static final double AngleEquationB = 122;
-    public static final double ShuttleAngle = 0.91548;
+    public static final double ShuttleAngle = 0.75; //0.91548
   }
 
   public static final class ClimberConstants{
@@ -257,7 +257,7 @@ public final class Constants {
     public static final double TargetRPM = -5200;
     public static final int ShootingRPM = -3600;
     public static final int SubwooferRPM = -3500;
-    public static int ShuttleRPM = -3000;
+    public static int ShuttleRPM = -3200;
     //
     public static double kP = 0.004;
     public static final double kI = 0;
