@@ -122,7 +122,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
           },
           PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName),
-          VecBuilder.fill(999999, 999999, Units.degreesToRadians(5)), // 0.05
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)), // 0.05
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))); 
 
   
@@ -222,7 +222,7 @@ public class DriveSubsystem extends SubsystemBase {
    
     Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), leftPose.pose.getRotation());      
       
-    m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.001,0.001,9999999)); // 0.4
+    m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.4,0.4,9999999)); // 0.4
     m_poseEstimator.addVisionMeasurement(
         averagePose,
         leftPose.timestampSeconds);
