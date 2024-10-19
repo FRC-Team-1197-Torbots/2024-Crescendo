@@ -217,7 +217,7 @@ public class RobotContainer {
     m_MechController.y().whileTrue(new RunClimber(m_Climber, ClimberDirection.UP));
     
     // zero gyro *press to reset field relative drive*
-    m_MechController.start().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
+    m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
     
@@ -230,7 +230,7 @@ public class RobotContainer {
       new Shoot(m_Intake)))));
         
     // Zero Arm
-    m_MechController.back().onTrue(new ZeroArm(m_Arm));
+    m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
 
     // update from smartdashboard
     m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
