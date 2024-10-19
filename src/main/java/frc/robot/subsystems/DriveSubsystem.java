@@ -122,7 +122,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
           },
           PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName),
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)), // tune these
+          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)), // 0.05
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))); 
 
   

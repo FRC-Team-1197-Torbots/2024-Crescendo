@@ -25,12 +25,12 @@ public class Arm extends SubsystemBase {
     private PIDController m_PIDController;
     private double error;
     public double[] autoTargets;
-
+    public int ShuttleRPM = ShooterConstants.ShuttleRPM;
     private boolean pidActive = true;
 
     public Arm(DriveSubsystem drive) {
         SmartDashboard.putNumber("Target Angle", targetPos);
-        SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.TargetRPM);
+        SmartDashboard.putNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
 
         ArmMotor1 = new CANSparkFlex(ArmConstants.Motor1, MotorType.kBrushless);
         ArmMotor2 = new CANSparkFlex(ArmConstants.Motor2, MotorType.kBrushless);
@@ -77,12 +77,13 @@ public class Arm extends SubsystemBase {
     }
 
     public void updateFromSmartDashboard() {
-        ShooterConstants.ShuttleRPM = (int)SmartDashboard.getNumber("Shuttle RPM", ShooterConstants.TargetRPM);;
+        ShooterConstants.ShuttleRPM = (int)SmartDashboard.getNumber("Shuttle RPM", ShooterConstants.ShuttleRPM);
     }
 
     public double setAngleFromDistance() {
         double distance = distanceFromSpeaker();
-        double result = 0.169 + 0.336*distance + -0.0257*distance*distance + -0.00313*distance*distance*distance;
+        double result = 0.155 + 0.336*distance + -0.0257*distance*distance + -0.00313*distance*distance*distance;
+        // double result = 0.169 + 0.336*distance + -0.0257*distance*distance + -0.00313*distance*distance*distance;
         SmartDashboard.putNumber("Calculated Angle", result);
         return MathUtil.clamp(result, ArmConstants.SubwooferPos, ArmConstants.StorePos);
 
