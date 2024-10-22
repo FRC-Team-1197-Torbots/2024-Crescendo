@@ -154,8 +154,11 @@ public class RobotContainer {
     Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
     
     // ShootCommand
-    m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
+    // m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
+    m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
 
+    m_driverController.y().toggleOnTrue(ampScore);
+    
     Command speakerRev = new ParallelCommandGroup(
           new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
           new StartEndCommand(
