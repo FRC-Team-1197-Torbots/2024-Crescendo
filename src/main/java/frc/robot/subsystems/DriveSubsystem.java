@@ -22,6 +22,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -98,6 +99,7 @@ public class DriveSubsystem extends SubsystemBase {
   private Field2d m_field2d = new Field2d();
   Optional<Alliance> color = DriverStation.getAlliance();
   private String m_autoName = "0 Note Middle";
+  private int badPositionCount = 0;
 
   // Robot's Unit Vector
 
@@ -222,6 +224,16 @@ public class DriveSubsystem extends SubsystemBase {
    
     Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), leftPose.pose.getRotation());      
       
+    // if odometry is way off
+    if (averagePose.getTranslation().getDistance(m_poseEstimator.getEstimatedPosition().getTranslation()) < 0.25) {
+      badPositionCount++;
+    } else {
+      badPositionCount = 0;
+    }
+    if (badPositionCount >= 3) {
+      resetOdometry(averagePose);
+    }
+
     m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.000001,0.000001,9999999)); // 0.4
     m_poseEstimator.addVisionMeasurement(
         averagePose,
