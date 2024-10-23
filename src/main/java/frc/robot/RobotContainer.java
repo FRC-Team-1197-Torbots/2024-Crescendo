@@ -137,16 +137,11 @@ public class RobotContainer {
     intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
-    // Driver Controls
-    // Intake Routines
-
-    m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
-    .whileTrue(
-      new ParallelCommandGroup(
+    
+    Command intake = new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-        new RunArm(m_Arm, ArmConstants.IntakePos))); //IntakePos
+        new RunArm(m_Arm, ArmConstants.IntakePos));
         
-
     Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
@@ -155,76 +150,86 @@ public class RobotContainer {
       new Kaiden().withTimeout(0.6),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
-    // Command shootSpeaker = new Shoot(m_Intake).onlyIf(atShooterTarget).andThen(new RunCommand(() -> m_Intake.stopMotor(), m_Intake).withTimeout(5));
     Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
     
-    // ShootCommand
-    // m_driverController.leftBumper().toggleOnTrue(new ConditionalCommand(shootSpeaker, ampScore, intakeBeamTrigger));
-    m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
-
-    m_driverController.y().toggleOnTrue(ampScore);
-    
     Command speakerRev = new ParallelCommandGroup(
-          new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
-          new StartEndCommand(
-            () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
-            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
-          ),
-          new RevShooter(m_Shooter, ShooterConstants.ShootingRPM)
-      );
+      new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
+      new StartEndCommand(
+        () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
+        () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+      new RevShooter(m_Shooter, ShooterConstants.ShootingRPM));
 
     Command shuttleRev = new ParallelCommandGroup(
-          new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
-          new StartEndCommand(
-            () -> m_Arm.setTargetAngle(ArmConstants.ShuttleAngle),
-            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)
-          ),
-          new RevShooter(m_Shooter, ShooterConstants.ShuttleRPM)
-      );
+      new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
+      new StartEndCommand(
+        () -> m_Arm.setTargetAngle(ArmConstants.ShuttleAngle),
+        () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+      new RevShooter(m_Shooter, ShooterConstants.ShuttleRPM));
 
     Command revUp = new ConditionalCommand(shuttleRev, speakerRev, this::inShuttleMode);
 
     Command pointAtAmp = new RunCommand(
-    () -> m_robotDrive.drive(
-    -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-    -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-    m_robotDrive.getAmpRotationSpeed(), 
-    true, true),
-    m_robotDrive);
+      () -> m_robotDrive.drive(
+      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+      m_robotDrive.getAmpRotationSpeed(), 
+      true, true),
+      m_robotDrive);
     
-    // Rev Up
-    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger)
-    );
-
-    // Subwoofer rev up
-    m_driverController.rightBumper()
-      .whileTrue(new SequentialCommandGroup(
-        new ParallelCommandGroup(
-          new StartEndCommand(
-            () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
-            () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-          new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM))));
-
-    // outtake
+    Command subwooferRevUp = new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new StartEndCommand(
+          () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
+          () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
+          new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM)));
+          
     Command ampPassBack = (new SequentialCommandGroup(
       new AmpOuttake(m_Shooter, m_AmpRollers),
       new SlowOuttake(m_Shooter),
       new RunIntake(m_Intake, IntakeConstants.IntakeSpeed)));
 
-    m_driverController.a().toggleOnTrue(ampPassBack);
+    Command ampPass = new SequentialCommandGroup(
+      new InstantCommand(() -> toggleAmpMode()),
+      new WaitUntilCommand(intakeBeamTrigger),
+      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+      new WaitUntilCommand(m_Arm::onAmpTarget),
+      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+      new Shoot(m_Intake)),
+      new InstantCommand(() -> toggleAmpMode()));
 
-    m_driverController.b().whileTrue(new ParallelCommandGroup(
+    Command outtake = new ParallelCommandGroup(
       new AmpScore(m_AmpRollers, 4.0),
       new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
       () -> m_Intake.stopMotor(), m_Intake), 
       new StartEndCommand( 
       () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-      () -> m_Shooter.stopMotor())));  
+      () -> m_Shooter.stopMotor()));  
 
-  
+    // Driver Controlls
+    // Intake
+    m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(intake);
+
+    // Rev Up or point at amp
+    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger));
+
+    // Subwoofer rev up
+    m_driverController.rightBumper().whileTrue(subwooferRevUp);
+
+    // pass from amp to shooter
+    m_driverController.a().toggleOnTrue(ampPassBack);
+
+    // outtake
+    m_driverController.b().whileTrue(outtake);
+
+    // ShootCommand
+    m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
+
+    // Score in Amp
+    m_driverController.y().toggleOnTrue(ampScore);
+    
     //Mech Controls
-
     // Climber Down
     m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
 
@@ -234,19 +239,10 @@ public class RobotContainer {
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
 
+    // Toggle shuttle mode
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
-    
-    // Amp
-    Command ampPass = new SequentialCommandGroup(
-    new InstantCommand(() -> toggleAmpMode()),
-    new WaitUntilCommand(intakeBeamTrigger),
-    new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
-    new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-    new WaitUntilCommand(m_Arm::onAmpTarget),
-    new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-    new Shoot(m_Intake)),
-    new InstantCommand(() -> toggleAmpMode()));
 
+    // Amp pass
     m_MechController.x().onTrue(ampPass);
         
     // Zero Arm
@@ -255,12 +251,15 @@ public class RobotContainer {
     // update from smartdashboard
     m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
   }
-    private void toggleAmpMode() {
-      ampAfterIntake = !ampAfterIntake;
+
+
+  private void toggleAmpMode() {
+    ampAfterIntake = !ampAfterIntake;
   }
-    private boolean inAmpMode() {
-      return ampAfterIntake;
-    }
+
+  private boolean inAmpMode() {
+    return ampAfterIntake;
+  }
 
   private void toggleShuttleMode() {
     shuttleMode = !shuttleMode;

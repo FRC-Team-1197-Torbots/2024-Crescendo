@@ -180,8 +180,8 @@ public final class Constants {
     public static final double[] TwoNoteTopTargets = {0.5513, 0.907354};
     public static final double[] TwoNoteMiddleTargets = {0.5513, 0.8131}; //118, 103
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
-    public static final double[] FourNoteMiddleTargetsRed = {0.5513, 0.89164, 0.82, 0.874193}; //118, 98.5, 101.5, 99.5
-    public static final double[] FourNoteMiddleTargetsBlue = {0.5513, 0.89164, 0.82, 0.874193};
+    public static final double[] FourNoteMiddleTargetsRed = {0.5513, 0.90, 0.82, 0.874193}; //118, 98.5, 101.5, 99.5
+    public static final double[] FourNoteMiddleTargetsBlue = {0.5513, 0.90, 0.82, 0.874193};
     public static final double[] FiveNoteMiddleTargets = {118, 98.5, 101.5, 99, 96.937};
     public static final double[] TwoNoteBottomTargets = {0.5513, 0.5013};
 
@@ -262,6 +262,7 @@ public final class Constants {
     public static double kP = 0.004;
     public static final double kI = 0;
     public static final double kD = 0;
+    public static final int OuttakeRPM = 1200;
 
   }
 

@@ -18,7 +18,7 @@ public class SlowOuttake extends Command{
 
     @Override
     public void execute() {    
-        m_Shooter.setTargetRPM(200);
+        m_Shooter.setTargetRPM(ShooterConstants.OuttakeRPM);
         m_Shooter.runIntake(-0.2);
     }
 
