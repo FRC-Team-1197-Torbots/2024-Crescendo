@@ -13,7 +13,6 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -86,7 +85,9 @@ public class RobotContainer {
   private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
+  private final Trigger ampMode = new Trigger(this::inAmpMode);
   private boolean shuttleMode = false;
+  private boolean ampAfterIntake = false;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -102,7 +103,7 @@ public class RobotContainer {
     registerAutoCommands();
 
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
-
+    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -136,12 +137,21 @@ public class RobotContainer {
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
     // Driver Controls
     // Intake Routines
+    Command ampPass = new SequentialCommandGroup(
+    new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
+    new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+    new WaitUntilCommand(m_Arm::onAmpTarget),
+    new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+    new Shoot(m_Intake)));
+
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
     .whileTrue(
       new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmConstants.IntakePos))); //IntakePos
-      
+        
+    m_driverController.rightTrigger(0.5).onFalse(new ConditionalCommand(ampPass, new Kaiden(), ampMode));  
+
     Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
@@ -225,12 +235,8 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
     
     // Amp
-    m_MechController.x().and(ampBeamTrigger.negate()).toggleOnTrue((new SequentialCommandGroup(
-      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-      new WaitUntilCommand(m_Arm::onAmpTarget),
-      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-      new Shoot(m_Intake)))));
+
+    m_MechController.x().onTrue(new InstantCommand(() -> toggleAmpMode()));
         
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
@@ -238,6 +244,12 @@ public class RobotContainer {
     // update from smartdashboard
     m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
   }
+    private void toggleAmpMode() {
+      ampAfterIntake = !ampAfterIntake;
+  }
+    private boolean inAmpMode() {
+      return ampAfterIntake;
+    }
 
   private void toggleShuttleMode() {
     shuttleMode = !shuttleMode;
