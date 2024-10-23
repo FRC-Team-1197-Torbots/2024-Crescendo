@@ -37,6 +37,8 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Commands.Kaiden;
 import frc.robot.Commands.Amp.AmpIntake;
 import frc.robot.Commands.Amp.AmpScore;
+import frc.robot.Commands.Amp.SlowOuttake;
+import frc.robot.Commands.Amp.AmpOuttake;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Climber.RunClimber;
@@ -128,7 +130,7 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-  
+
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
@@ -137,12 +139,6 @@ public class RobotContainer {
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
     // Driver Controls
     // Intake Routines
-    Command ampPass = new SequentialCommandGroup(
-    new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
-    new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-    new WaitUntilCommand(m_Arm::onAmpTarget),
-    new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-    new Shoot(m_Intake)));
 
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()) //Runs Intake while running shooter backwards to prevent pieces from ejecting
     .whileTrue(
@@ -150,7 +146,6 @@ public class RobotContainer {
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmConstants.IntakePos))); //IntakePos
         
-    m_driverController.rightTrigger(0.5).onFalse(new ConditionalCommand(ampPass, new Kaiden(), ampMode));  
 
     Command ampScore = (new SequentialCommandGroup(
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
@@ -211,6 +206,13 @@ public class RobotContainer {
           new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM))));
 
     // outtake
+    Command ampPassBack = (new SequentialCommandGroup(
+      new AmpOuttake(m_Shooter, m_AmpRollers),
+      new SlowOuttake(m_Shooter),
+      new RunIntake(m_Intake, IntakeConstants.IntakeSpeed)));
+
+    m_driverController.a().toggleOnTrue(ampPassBack);
+
     m_driverController.b().whileTrue(new ParallelCommandGroup(
       new AmpScore(m_AmpRollers, 4.0),
       new StartEndCommand( 
@@ -235,8 +237,17 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
     
     // Amp
+    Command ampPass = new SequentialCommandGroup(
+    new InstantCommand(() -> toggleAmpMode()),
+    new WaitUntilCommand(intakeBeamTrigger),
+    new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
+    new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+    new WaitUntilCommand(m_Arm::onAmpTarget),
+    new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+    new Shoot(m_Intake)),
+    new InstantCommand(() -> toggleAmpMode()));
 
-    m_MechController.x().onTrue(new InstantCommand(() -> toggleAmpMode()));
+    m_MechController.x().onTrue(ampPass);
         
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));

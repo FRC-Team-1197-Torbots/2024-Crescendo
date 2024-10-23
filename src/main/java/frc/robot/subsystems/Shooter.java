@@ -110,6 +110,10 @@ public class Shooter extends SubsystemBase {
     public void runIntakeShooter() {
         m_Intake.runIntake(0.5);
     }
+    
+    public void runIntake(double speed) {
+        m_Intake.runIntake(speed);
+    }
 
     public void stopIntakeShooter() {
         m_Intake.stopMotor();
