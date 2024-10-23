@@ -105,7 +105,6 @@ public class RobotContainer {
     registerAutoCommands();
 
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
-    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -147,7 +146,7 @@ public class RobotContainer {
       new WaitUntilCommand(m_Elevator::atAmpHeight),
       new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new Kaiden().withTimeout(0.6),
+      new Kaiden().withTimeout(0.3),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
     Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
@@ -190,7 +189,7 @@ public class RobotContainer {
 
     Command ampPass = new SequentialCommandGroup(
       new InstantCommand(() -> toggleAmpMode()),
-      new WaitUntilCommand(intakeBeamTrigger),
+      // new WaitUntilCommand(intakeBeamTrigger),
       new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
       new WaitUntilCommand(m_Arm::onAmpTarget),
@@ -243,7 +242,7 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
 
     // Amp pass
-    m_MechController.x().onTrue(ampPass);
+    m_MechController.x().toggleOnTrue(new WaitUntilCommand(intakeBeamTrigger).andThen(ampPass));
         
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
@@ -255,6 +254,7 @@ public class RobotContainer {
 
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
+    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
   }
 
   private boolean inAmpMode() {
@@ -334,6 +334,8 @@ private void updateAutoChooser() {
 
   public void teleopPeriodic() {
     m_robotDrive.updatePoseFromVision();
+    
+
   }
  
   public void disableInit() {
