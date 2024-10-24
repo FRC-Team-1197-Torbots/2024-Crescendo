@@ -103,7 +103,7 @@ public class RobotContainer {
     // Add auto selector and commands used
     addAutoPaths();
     registerAutoCommands();
-
+    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -130,18 +130,29 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
+      Command ampPass = new SequentialCommandGroup(
+      // new InstantCommand(() -> toggleAmpMode()),
+      // new WaitUntilCommand(intakeBeamTrigger),
+      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+      new WaitUntilCommand(m_Arm::onAmpTarget),
+      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+      new Shoot(m_Intake)));
+
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
+    intakeBeamTrigger.and(ampMode).whileTrue(ampPass);
     
     Command intake = new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmConstants.IntakePos));
         
     Command ampScore = (new SequentialCommandGroup(
+      new InstantCommand(() -> setAmpMode(false)),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
       new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
@@ -183,21 +194,13 @@ public class RobotContainer {
           new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM)));
           
     Command ampPassBack = (new SequentialCommandGroup(
+      new InstantCommand(() -> setAmpMode(false)),
       new AmpOuttake(m_Shooter, m_AmpRollers),
       new SlowOuttake(m_Shooter),
       new RunIntake(m_Intake, IntakeConstants.IntakeSpeed)));
 
-    Command ampPass = new SequentialCommandGroup(
-      new InstantCommand(() -> toggleAmpMode()),
-      // new WaitUntilCommand(intakeBeamTrigger),
-      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-      new WaitUntilCommand(m_Arm::onAmpTarget),
-      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-      new Shoot(m_Intake)),
-      new InstantCommand(() -> toggleAmpMode()));
-
     Command outtake = new ParallelCommandGroup(
+      new InstantCommand(() -> setAmpMode(false)),
       new AmpScore(m_AmpRollers, 4.0),
       new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
@@ -210,7 +213,7 @@ public class RobotContainer {
     // Intake
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(intake);
 
-    // Rev Up or point at amp
+    // Rev Up or point at amp or shuttle revUp in shuttlemode
     m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger));
 
     // Subwoofer rev up
@@ -242,18 +245,22 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
 
     // Amp pass
-    m_MechController.x().toggleOnTrue(new WaitUntilCommand(intakeBeamTrigger).andThen(ampPass));
+    m_MechController.x().onTrue(new InstantCommand(() -> setAmpMode(true)));
         
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
 
     // update from smartdashboard
-    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
+    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_robotDrive.updateFromSmartDashboard()));
   }
 
 
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
+    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
+  }
+  private void setAmpMode(boolean value) {
+    ampAfterIntake = value;
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
   }
 

@@ -276,7 +276,7 @@ public final class Constants {
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
     public static final double StorePos = 0;
-    public static double AmpPos = 14.4;
+    public static double AmpPos = 14.3;
 
     public static final double kP = 0.9;
     public static final double kI = 0;

@@ -89,7 +89,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private PIDController m_PidController;
   private double turningKp = 0.02;
-  private double turningKd = 0.001;
+  private double turningKd = 0.0012;
+  private double turningKi = 0;
 
   private SwerveDriveKinematics kinematics;
   // private isLocked m_isLocked = isLocked.UNLOCK;
@@ -129,7 +130,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   
 
-
+    SmartDashboard.putNumber("Turn kp", turningKp);
+    SmartDashboard.putNumber("Turn ki", turningKi);
+    SmartDashboard.putNumber("Turn kd", turningKd);
 
     m_PidController = new PIDController(turningKp, 0, turningKd);
     resetEncoders();
@@ -206,7 +209,12 @@ public class DriveSubsystem extends SubsystemBase {
         });
   }
 
-  
+  public void updateFromSmartDashboard() {
+    turningKp = SmartDashboard.getNumber("Turn kp", turningKp);
+    turningKd = SmartDashboard.getNumber("Turn ki", turningKi);
+    turningKd = SmartDashboard.getNumber("Turn kd", turningKd);
+    m_PidController = new PIDController(turningKp, turningKi, turningKd);
+  }
   public void updatePoseFromVision() {
     LimelightHelpers.SetRobotOrientation("limelight-left", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
     LimelightHelpers.SetRobotOrientation("limelight-right", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
@@ -222,10 +230,10 @@ public class DriveSubsystem extends SubsystemBase {
     else if (doRejectUpdate(leftPose))
       leftPose = rightPose;
    
-    Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), leftPose.pose.getRotation());      
+    Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), Rotation2d.fromDegrees(gyroWithOffset()));      
       
     // if odometry is way off
-    if (averagePose.getTranslation().getDistance(m_poseEstimator.getEstimatedPosition().getTranslation()) < 0.25) {
+    if (averagePose.getTranslation().getDistance(m_poseEstimator.getEstimatedPosition().getTranslation()) < 0.15) {
       badPositionCount++;
     } else {
       badPositionCount = 0;
@@ -234,7 +242,7 @@ public class DriveSubsystem extends SubsystemBase {
       resetOdometry(averagePose);
     }
 
-    m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.000001,0.000001,9999999)); // 0.4
+    m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.3,0.3,9999999)); // 0.4 tidal values //0.2 test
     m_poseEstimator.addVisionMeasurement(
         averagePose,
         leftPose.timestampSeconds);
