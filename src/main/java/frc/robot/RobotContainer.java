@@ -88,7 +88,8 @@ public class RobotContainer {
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger ampMode = new Trigger(this::inAmpMode);
-  private boolean shuttleMode = false;
+  private final Trigger shuttleMode = new Trigger(this::inShuttleMode);
+  private boolean shuttling = false;
   private boolean ampAfterIntake = false;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -146,7 +147,9 @@ public class RobotContainer {
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
     ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
     intakeBeamTrigger.and(ampMode).whileTrue(ampPass);
-    
+    shuttleMode.onTrue(new InstantCommand(() ->m_Blinkin.setColor(BlinkinConstants.Orange), m_Blinkin));
+    shuttleMode.onFalse(new InstantCommand(() ->m_Blinkin.setColor(BlinkinConstants.Orange), m_Blinkin));
+
     Command intake = new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmConstants.IntakePos));
@@ -245,7 +248,7 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
 
     // Amp pass
-    m_MechController.x().onTrue(new InstantCommand(() -> setAmpMode(true)));
+    m_MechController.x().onTrue(new InstantCommand(() -> toggleAmpMode()));
         
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
@@ -254,10 +257,28 @@ public class RobotContainer {
     m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_robotDrive.updateFromSmartDashboard()));
   }
 
-
+  private void setBlinkinColor() {
+    if(inAmpMode()) {
+      if(m_AmpRollers.gamePieceStored())
+        m_Blinkin.setColor(BlinkinConstants.Green);
+      else 
+        m_Blinkin.setColor(BlinkinConstants.Blue);
+    } else if(inShuttleMode()) {
+        if(m_Intake.gamePieceStored())
+          m_Blinkin.setColor(BlinkinConstants.Red);
+        else
+           m_Blinkin.setColor(BlinkinConstants.White);
+    } else {
+      if(m_Intake.gamePieceStored())
+          m_Blinkin.setColor(BlinkinConstants.Orange);
+        else
+           m_Blinkin.setColor(BlinkinConstants.Black);
+    }
+  }
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
+
   }
   private void setAmpMode(boolean value) {
     ampAfterIntake = value;
@@ -269,12 +290,12 @@ public class RobotContainer {
   }
 
   private void toggleShuttleMode() {
-    shuttleMode = !shuttleMode;
+    shuttling = !shuttling;
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
   }
 
   public boolean inShuttleMode() {
-    return shuttleMode;
+    return shuttling;
   }
       
   private void registerAutoCommands() {
@@ -341,8 +362,7 @@ private void updateAutoChooser() {
 
   public void teleopPeriodic() {
     m_robotDrive.updatePoseFromVision();
-    
-
+    setBlinkinColor();
   }
  
   public void disableInit() {
