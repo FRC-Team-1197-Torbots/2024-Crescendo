@@ -133,6 +133,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Turn kp", turningKp);
     SmartDashboard.putNumber("Turn ki", turningKi);
     SmartDashboard.putNumber("Turn kd", turningKd);
+    SmartDashboard.putNumber("Shuttle Angle", DriveConstants.ShuttleAngle);
 
     m_PidController = new PIDController(turningKp, 0, turningKd);
     resetEncoders();
@@ -213,6 +214,7 @@ public class DriveSubsystem extends SubsystemBase {
     turningKp = SmartDashboard.getNumber("Turn kp", turningKp);
     turningKd = SmartDashboard.getNumber("Turn ki", turningKi);
     turningKd = SmartDashboard.getNumber("Turn kd", turningKd);
+    DriveConstants.ShuttleAngle = SmartDashboard.getNumber("Shuttle Angle", DriveConstants.ShuttleAngle);
     m_PidController = new PIDController(turningKp, turningKi, turningKd);
   }
   public void updatePoseFromVision() {
