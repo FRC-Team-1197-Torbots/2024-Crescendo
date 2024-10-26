@@ -551,6 +551,10 @@ public class DriveSubsystem extends SubsystemBase {
     return getPIDOutput(getDeltaAngleFrom(adjustAngleForAllianceColor(-90)));
   }
 
+  public double getShuttleRotationSpeed() {
+    return getPIDOutput(getDeltaAngleFrom(adjustAngleForAllianceColor(DriveConstants.ShuttleAngle)));
+  }
+  
   public void pointAt(double angle) {
     drive(0,0, getPIDOutput(getDeltaAngleFrom(angle)),false,false);
   }

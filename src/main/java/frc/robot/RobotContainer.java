@@ -172,12 +172,22 @@ public class RobotContainer {
         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
       new RevShooter(m_Shooter, ShooterConstants.ShootingRPM));
 
+    Command shuttleAim = new RunCommand(
+      () -> m_robotDrive.drive(
+      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+      m_robotDrive.getShuttleRotationSpeed(), 
+      true, true),
+      m_robotDrive);
+
     Command shuttleRev = new ParallelCommandGroup(
-      new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
+      shuttleAim,
+      // new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
       new StartEndCommand(
         () -> m_Arm.setTargetAngle(ArmConstants.ShuttleAngle),
         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
       new RevShooter(m_Shooter, ShooterConstants.ShuttleRPM));
+
 
     Command revUp = new ConditionalCommand(shuttleRev, speakerRev, this::inShuttleMode);
 
