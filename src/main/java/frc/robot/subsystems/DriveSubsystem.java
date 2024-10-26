@@ -509,6 +509,10 @@ public class DriveSubsystem extends SubsystemBase {
     return getPose().getTranslation().getDistance(getAprilTagPos());
   }
 
+  public boolean closeToSpeaker() {
+    return distanceFromSpeaker() < 3.5;
+  }
+
   public double getDeltaAngleFrom(double angle) {
     double deltaAngle = (getPose().getRotation().getDegrees() - angle);
 

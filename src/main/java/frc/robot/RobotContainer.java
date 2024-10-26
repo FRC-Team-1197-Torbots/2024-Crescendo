@@ -372,6 +372,7 @@ private void updateAutoChooser() {
 
   public void teleopPeriodic() {
     m_robotDrive.updatePoseFromVision();
+    shuttling = m_robotDrive.distanceFromSpeaker() < 3.5;
     setBlinkinColor();
   }
  
