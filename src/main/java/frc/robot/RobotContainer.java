@@ -88,7 +88,8 @@ public class RobotContainer {
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger ampMode = new Trigger(this::inAmpMode);
-  private boolean shuttleMode = false;
+  private final Trigger shuttleMode = new Trigger(this::inShuttleMode);
+  private boolean shuttling = false;
   private boolean ampAfterIntake = false;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -103,9 +104,8 @@ public class RobotContainer {
     // Add auto selector and commands used
     addAutoPaths();
     registerAutoCommands();
-
-    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
+    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     // Configure default commands
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -131,23 +131,34 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
+      Command ampPass = new SequentialCommandGroup(
+      // new InstantCommand(() -> toggleAmpMode()),
+      // new WaitUntilCommand(intakeBeamTrigger),
+      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
+      new WaitUntilCommand(m_Arm::onAmpTarget),
+      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
+      new Shoot(m_Intake)));
+
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
-    intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
-    intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
-    ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
-    
+    intakeBeamTrigger.and(ampMode).whileTrue(ampPass);
+    // intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
+    // intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
+    // ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
+
     Command intake = new ParallelCommandGroup(
           new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
         new RunArm(m_Arm, ArmConstants.IntakePos));
         
     Command ampScore = (new SequentialCommandGroup(
+      new InstantCommand(() -> setAmpMode(false)),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
       new WaitUntilCommand(m_Elevator::atAmpHeight),
       new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new Kaiden().withTimeout(0.6),
+      new Kaiden().withTimeout(0.3),
       new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
 
     Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
@@ -159,12 +170,22 @@ public class RobotContainer {
         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
       new RevShooter(m_Shooter, ShooterConstants.ShootingRPM));
 
+    Command shuttleAim = new RunCommand(
+      () -> m_robotDrive.drive(
+      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+      m_robotDrive.getShuttleRotationSpeed(), 
+      true, true),
+      m_robotDrive);
+
     Command shuttleRev = new ParallelCommandGroup(
-      new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
+      shuttleAim,
+      // new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
       new StartEndCommand(
         () -> m_Arm.setTargetAngle(ArmConstants.ShuttleAngle),
         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
       new RevShooter(m_Shooter, ShooterConstants.ShuttleRPM));
+
 
     Command revUp = new ConditionalCommand(shuttleRev, speakerRev, this::inShuttleMode);
 
@@ -184,21 +205,13 @@ public class RobotContainer {
           new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM)));
           
     Command ampPassBack = (new SequentialCommandGroup(
+      new InstantCommand(() -> setAmpMode(false)),
       new AmpOuttake(m_Shooter, m_AmpRollers),
       new SlowOuttake(m_Shooter),
       new RunIntake(m_Intake, IntakeConstants.IntakeSpeed)));
 
-    Command ampPass = new SequentialCommandGroup(
-      new InstantCommand(() -> toggleAmpMode()),
-      new WaitUntilCommand(intakeBeamTrigger),
-      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-      new WaitUntilCommand(m_Arm::onAmpTarget),
-      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-      new Shoot(m_Intake)),
-      new InstantCommand(() -> toggleAmpMode()));
-
     Command outtake = new ParallelCommandGroup(
+      new InstantCommand(() -> setAmpMode(false)),
       new AmpScore(m_AmpRollers, 4.0),
       new StartEndCommand( 
       () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
@@ -211,7 +224,7 @@ public class RobotContainer {
     // Intake
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(intake);
 
-    // Rev Up or point at amp
+    // Rev Up or point at amp or shuttle revUp in shuttlemode
     m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger));
 
     // Subwoofer rev up
@@ -243,18 +256,41 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
 
     // Amp pass
-    m_MechController.x().onTrue(ampPass);
+    m_MechController.x().onTrue(new InstantCommand(() -> toggleAmpMode()));
         
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
 
     // update from smartdashboard
-    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_Arm.updateFromSmartDashboard()));
+    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_robotDrive.updateFromSmartDashboard()));
   }
 
-
+  private void setBlinkinColor() {
+    if(inAmpMode()) {
+      if(m_AmpRollers.gamePieceStored())
+        m_Blinkin.setColor(BlinkinConstants.Green);
+      else 
+        m_Blinkin.setColor(BlinkinConstants.Blue);
+    } else if(inShuttleMode()) {
+        if(m_Intake.gamePieceStored())
+          m_Blinkin.setColor(BlinkinConstants.Red);
+        else
+           m_Blinkin.setColor(BlinkinConstants.White);
+    } else {
+      if(m_Intake.gamePieceStored())
+          m_Blinkin.setColor(BlinkinConstants.Orange);
+        else
+           m_Blinkin.setColor(BlinkinConstants.Black);
+    }
+  }
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
+    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
+
+  }
+  private void setAmpMode(boolean value) {
+    ampAfterIntake = value;
+    SmartDashboard.putBoolean("Amp Mode", inAmpMode());
   }
 
   private boolean inAmpMode() {
@@ -262,12 +298,12 @@ public class RobotContainer {
   }
 
   private void toggleShuttleMode() {
-    shuttleMode = !shuttleMode;
+    shuttling = !shuttling;
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
   }
 
   public boolean inShuttleMode() {
-    return shuttleMode;
+    return shuttling;
   }
       
   private void registerAutoCommands() {
@@ -334,6 +370,8 @@ private void updateAutoChooser() {
 
   public void teleopPeriodic() {
     m_robotDrive.updatePoseFromVision();
+    shuttling = m_robotDrive.distanceFromSpeaker() > 3.5;
+    setBlinkinColor();
   }
  
   public void disableInit() {

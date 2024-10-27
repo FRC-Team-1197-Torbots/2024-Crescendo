@@ -73,7 +73,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
-    public static final double ShuttleAngle = -47.65; // degrees
+    public static double ShuttleAngle = -41.65; // degrees //-47.65
   }
 
   public static final class ModuleConstants {
@@ -279,7 +279,7 @@ public final class Constants {
   public static final class ElevatorConstants {
     public static final int Motor = 19; 
     public static final double StorePos = 0;
-    public static double AmpPos = 14.4;
+    public static double AmpPos = 14.3;
 
     public static final double kP = 0.9;
     public static final double kI = 0;
@@ -288,21 +288,17 @@ public final class Constants {
 
   public static final class BlinkinConstants {
     public static final int Blinkin = 0; 
-    public static final double Red = 0.61;
-    public static final double White = 0.93;
-    public static final double Black = 0.99;
-    public static final double Blue = 0.87;
-    public static final double Green = 0.77;
+    public static final double Red = 0.61; // shuttle mode game piece
+    public static final double White = 0.93; // no game piece shuttle mode
+    public static final double Black = 0.99; // no game piece shooting mode
+    public static final double Blue = 0.87; // amp mode
+    public static final double Green = 0.77; // amp stored
     public static final double Rainbow = -0.99;
-    public static final double Orange = 0.65;
+    public static final double Orange = 0.65; // shooting mode game piece
     public static final double Violet = 0.91;
-    public static final double Gold = 0.67;
+    public static final double Gold = 0.67; // auto
     public static final double Yellow = 0.69;
-    public static final double Pink = 0.57;
-    public static final double Aidan1 = 0.23;
-    public static final double Aidan2 = 0.83;
-    public static final double Aidan3 = -0.89;
-    public static final double Aidan4 = -0.19;
+    public static final double Pink = 0.57; 
   }
 
 
