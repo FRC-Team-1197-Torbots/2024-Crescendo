@@ -1,0 +1,93 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.73,
+      "y": 4.49
+    },
+    "rotation": -60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Red 3 Note Bottom to Center 1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Sequence"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Red 3 Note Bottom to Center 2 "
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Red 3 Note Bottom to Center 3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Sequence"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Red 3 Note Bottom to Center 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Auto Sequence"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Auto End"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Finished Autos",
+  "choreoAuto": false
+}

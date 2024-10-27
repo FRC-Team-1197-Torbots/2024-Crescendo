@@ -182,8 +182,11 @@ public final class Constants {
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
     public static final double[] FourNoteMiddleTargetsRed = {0.5513, 0.90, 0.82, 0.874193}; //118, 98.5, 101.5, 99.5
     public static final double[] FourNoteMiddleTargetsBlue = {0.5513, 0.90, 0.82, 0.874193};
+    public static final double[] FourNoteMiddleReverseTargetsRed = {0.5513, 0.874193, 0.82, 0.90}; //118, 98.5, 101.5, 99.5
+    public static final double[] FourNoteMiddleReverseTargetsBlue = {0.5513, 0.874193, 0.82, 0.90};
     public static final double[] FiveNoteMiddleTargets = {118, 98.5, 101.5, 99, 96.937};
     public static final double[] TwoNoteBottomTargets = {0.5513, 0.5013};
+    public static final double[] ThreeNoteBottomTargets = {0.5513, 0.5013, 0.5013};
 
     public static final double[] OneNoteBottomTargets = {118}; //Old: 107.888
     public static final double[] FourNoteBottomTargets = {118, 100.5, 101.5, 98};
