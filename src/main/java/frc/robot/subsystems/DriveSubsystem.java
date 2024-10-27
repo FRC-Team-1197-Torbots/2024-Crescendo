@@ -117,7 +117,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
-          Rotation2d.fromDegrees(gyroWithOffset()),
+          Rotation2d.fromDegrees(gyroAngle()),
           new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -195,13 +195,13 @@ public class DriveSubsystem extends SubsystemBase {
     color = DriverStation.getAlliance();
   }
 
-  public double gyroWithOffset() {
+  public double gyroAngle() {
       return -m_gyro.getAngle();
   }
   
    public void updateOdometry() {
     m_poseEstimator.update(
-        new Rotation2d(Math.toRadians(gyroWithOffset())),
+        new Rotation2d(Math.toRadians(gyroAngle())),
         new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -217,9 +217,20 @@ public class DriveSubsystem extends SubsystemBase {
     DriveConstants.ShuttleAngle = SmartDashboard.getNumber("Shuttle Angle", DriveConstants.ShuttleAngle);
     m_PidController = new PIDController(turningKp, turningKi, turningKd);
   }
-  public void updatePoseFromVision() {
-    LimelightHelpers.SetRobotOrientation("limelight-left", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-    LimelightHelpers.SetRobotOrientation("limelight-right", m_poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+
+ public void updatePoseFromVision() {
+
+    Rotation2d dumbBugFix;
+    if (color.isPresent() && color.get() == Alliance.Blue) {
+      dumbBugFix = Rotation2d.fromDegrees(gyroAngle());
+      LimelightHelpers.SetRobotOrientation("limelight-left", gyroAngle(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight-right", gyroAngle(), 0, 0, 0, 0, 0);
+      }
+    else {
+      dumbBugFix = Rotation2d.fromDegrees(gyroAngle() + 180);
+      LimelightHelpers.SetRobotOrientation("limelight-left", gyroAngle() + 180, 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight-right", gyroAngle() + 180, 0, 0, 0, 0, 0);
+    }
     
     LimelightHelpers.PoseEstimate leftPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
     LimelightHelpers.PoseEstimate rightPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
@@ -232,7 +243,7 @@ public class DriveSubsystem extends SubsystemBase {
     else if (doRejectUpdate(leftPose))
       leftPose = rightPose;
    
-    Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), Rotation2d.fromDegrees(gyroWithOffset()));      
+    Pose2d averagePose = new Pose2d(leftPose.pose.getTranslation().plus(rightPose.pose.getTranslation()).div(2), dumbBugFix);      
       
     // if odometry is way off
     if (averagePose.getTranslation().getDistance(m_poseEstimator.getEstimatedPosition().getTranslation()) < 0.15) {
@@ -250,6 +261,7 @@ public class DriveSubsystem extends SubsystemBase {
         leftPose.timestampSeconds);
         
     }
+
 
   private boolean doRejectUpdate(LimelightHelpers.PoseEstimate mt2) {
     if(mt2 == null)
@@ -289,7 +301,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     m_poseEstimator.resetPosition(
-        Rotation2d.fromDegrees(gyroWithOffset()),
+        Rotation2d.fromDegrees(gyroAngle()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -400,7 +412,7 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveModuleState[] swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                Rotation2d.fromDegrees(gyroWithOffset())) // angle flipped intentionally
+                Rotation2d.fromDegrees(gyroAngle())) // angle flipped intentionally
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -470,7 +482,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(gyroWithOffset()).getDegrees();
+    return Rotation2d.fromDegrees(gyroAngle()).getDegrees();
   }
 
   /**
@@ -572,11 +584,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setAprilTagID() {
-    int[] validIDs = {4};  // 3,4
+    int[] validIDs = {3,4};  // 3,4
     if (color.isPresent()) 
       if (color.get() == Alliance.Blue) {
         validIDs[0] = 7;
-        // validIDs[1] = 8;
+        validIDs[1] = 8;
       }
 
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
