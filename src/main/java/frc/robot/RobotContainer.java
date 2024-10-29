@@ -12,6 +12,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,10 +36,11 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Commands.Kaiden;
+import frc.robot.Commands.Rumble;
 import frc.robot.Commands.Amp.AmpIntake;
+import frc.robot.Commands.Amp.AmpOuttake;
 import frc.robot.Commands.Amp.AmpScore;
 import frc.robot.Commands.Amp.SlowOuttake;
-import frc.robot.Commands.Amp.AmpOuttake;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Climber.RunClimber;
@@ -99,7 +101,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-
     
     // Add auto selector and commands used
     addAutoPaths();
@@ -142,6 +143,7 @@ public class RobotContainer {
 
     exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
+    intakeBeamTrigger.onTrue(new Rumble(m_driverController,0.35));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     intakeBeamTrigger.and(ampMode).whileTrue(ampPass);
     // intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));

@@ -583,12 +583,12 @@ public class DriveSubsystem extends SubsystemBase {
     return m_PidController.calculate(error);
   }
 
-  public void setAprilTagID() {
-    int[] validIDs = {3,4};  // 3,4
+ public void setAprilTagID() {
+    int[] validIDs = {4};  // 3,4
     if (color.isPresent()) 
       if (color.get() == Alliance.Blue) {
         validIDs[0] = 7;
-        validIDs[1] = 8;
+        // validIDs[1] = 8;
       }
 
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
