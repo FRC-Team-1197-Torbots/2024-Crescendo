@@ -265,6 +265,9 @@ public class RobotContainer {
 
     // update from smartdashboard
     m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_robotDrive.updateFromSmartDashboard()));
+
+    // intake
+    m_MechController.rightTrigger(0.5).whileTrue(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
   }
 
   private void setBlinkinColor() {
