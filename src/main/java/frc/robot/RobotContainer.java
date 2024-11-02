@@ -70,11 +70,11 @@ public class RobotContainer {
   private SendableChooser<String> autoNameChooser = new SendableChooser<>();
 
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_RobotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
   private final Climber m_Climber = new Climber();
-  public final Arm m_Arm = new Arm(m_robotDrive);
+  public final Arm m_Arm = new Arm(m_RobotDrive);
   public final Blinkin m_Blinkin = new Blinkin();
   private final AmpRollers m_AmpRollers = new AmpRollers();
   private final Elevator m_Elevator = new Elevator();
@@ -85,7 +85,7 @@ public class RobotContainer {
   private CommandXboxController m_MechController = new CommandXboxController(1);
 
   // Triggers
-  private final Trigger exTrigger = new Trigger(m_robotDrive::checkLocked);
+  private final Trigger exTrigger = new Trigger(m_RobotDrive::checkLocked);
   private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
   private final Trigger ampBeamTrigger = new Trigger(m_AmpRollers::gamePieceStored);
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
@@ -108,16 +108,16 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     // Configure default commands
-    m_robotDrive.setDefaultCommand(
+    m_RobotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
       new RunCommand(
-        () -> m_robotDrive.drive(
+        () -> m_RobotDrive.drive(
         -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         true, true),
-        m_robotDrive));
+        m_RobotDrive));
     }
     
   /**
@@ -141,7 +141,7 @@ public class RobotContainer {
       new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
       new Shoot(m_Intake)));
 
-    exTrigger.whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+    exTrigger.whileTrue(new RunCommand(() -> m_RobotDrive.setX(), m_RobotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onTrue(new Rumble(m_driverController,0.35));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
@@ -166,19 +166,19 @@ public class RobotContainer {
     Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
     
     Command speakerRev = new ParallelCommandGroup(
-      new RunCommand(() -> m_robotDrive.aimRobotAtSpeaker(),m_robotDrive),
+      new RunCommand(() -> m_RobotDrive.aimRobotAtSpeaker(),m_RobotDrive),
       new StartEndCommand(
         () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
         () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
       new RevShooter(m_Shooter, ShooterConstants.ShootingRPM));
 
     Command shuttleAim = new RunCommand(
-      () -> m_robotDrive.drive(
+      () -> m_RobotDrive.drive(
       -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
       -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-      m_robotDrive.getShuttleRotationSpeed(), 
+      m_RobotDrive.getShuttleRotationSpeed(), 
       true, true),
-      m_robotDrive);
+      m_RobotDrive);
 
     Command shuttleRev = new ParallelCommandGroup(
       shuttleAim,
@@ -192,12 +192,12 @@ public class RobotContainer {
     Command revUp = new ConditionalCommand(shuttleRev, speakerRev, this::inShuttleMode);
 
     Command pointAtAmp = new RunCommand(
-      () -> m_robotDrive.drive(
+      () -> m_RobotDrive.drive(
       -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
       -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-      m_robotDrive.getAmpRotationSpeed(), 
+      m_RobotDrive.getAmpRotationSpeed(), 
       true, true),
-      m_robotDrive);
+      m_RobotDrive);
     
     Command subwooferRevUp = new SequentialCommandGroup(
       new ParallelCommandGroup(
@@ -221,13 +221,17 @@ public class RobotContainer {
       new StartEndCommand( 
       () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
       () -> m_Shooter.stopMotor()));  
+    
+    Command Wangle = new ParallelCommandGroup(
+      new InstantCommand(() -> m_Blinkin.setColor(0.570)), new InstantCommand(()-> m_RobotDrive.setWangle(90)));
+  
 
     // Driver Controlls
     // Intake
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(intake);
 
     // Rev Up or point at amp or shuttle revUp in shuttlemode
-    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger));
+    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger.or(ampMode)));
 
     // Subwoofer rev up
     m_driverController.rightBumper().whileTrue(subwooferRevUp);
@@ -252,7 +256,7 @@ public class RobotContainer {
     m_MechController.y().whileTrue(new RunClimber(m_Climber, ClimberDirection.UP));
     
     // zero gyro *press to reset field relative drive*
-    m_MechController.povUp().onTrue(new InstantCommand(() -> m_robotDrive.resetGyro()));  
+    m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  
 
     // Toggle shuttle mode
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
@@ -264,10 +268,13 @@ public class RobotContainer {
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
 
     // update from smartdashboard
-    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_robotDrive.updateFromSmartDashboard()));
+    m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_RobotDrive.updateFromSmartDashboard()));
 
     // intake
     m_MechController.rightTrigger(0.5).whileTrue(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+
+    // Wheel 90deg (wade coded this)
+    m_MechController.leftBumper().onTrue(Wangle);
   }
 
   private void setBlinkinColor() {
@@ -288,6 +295,7 @@ public class RobotContainer {
            m_Blinkin.setColor(BlinkinConstants.Black);
     }
   }
+  
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
@@ -365,24 +373,24 @@ private void updateAutoChooser() {
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
-    m_robotDrive.setMotorMode(IdleMode.kBrake);
+    m_RobotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.stopMotor();
-    m_robotDrive.getAlliance();
-    m_robotDrive.setAprilTagID();
+    m_RobotDrive.getAlliance();
+    m_RobotDrive.setAprilTagID();
   }
 
   public void teleopPeriodic() {
-    m_robotDrive.updatePoseFromVision();
-    shuttling = m_robotDrive.distanceFromSpeaker() > 3.5;
+    m_RobotDrive.updatePoseFromVision();
+    shuttling = m_RobotDrive.distanceFromSpeaker() > 3.5;
     setBlinkinColor();
   }
  
   public void disableInit() {
     m_Blinkin.setColor(BlinkinConstants.Orange);
     m_Arm.setMotorMode(IdleMode.kCoast);
-    m_robotDrive.setMotorMode(IdleMode.kCoast);
+    m_RobotDrive.setMotorMode(IdleMode.kCoast);
     m_Intake.setMotorMode(IdleMode.kCoast);
   }
 
@@ -392,8 +400,7 @@ private void updateAutoChooser() {
     m_Arm.setAutoTargets(getAutonomousCommand().getName());
     m_Shooter.setMotorMode(IdleMode.kBrake);
     m_Shooter.resetAutoShots();
-    m_robotDrive.setAngle(m_robotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
-    m_robotDrive.getAlliance();
+    m_RobotDrive.setAngle(m_RobotDrive.getAutoStartingAngle(getAutonomousCommand().getName()));
+    m_RobotDrive.getAlliance();
   }
-
 }
