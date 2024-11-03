@@ -223,7 +223,7 @@ public class RobotContainer {
       () -> m_Shooter.stopMotor()));  
     
     Command Wangle = new ParallelCommandGroup(
-      new InstantCommand(() -> m_Blinkin.setColor(0.570)), new InstantCommand(()-> m_RobotDrive.setWangle(90)));
+      new InstantCommand(() -> m_Blinkin.setColor(0.570)), new InstantCommand(()-> m_RobotDrive.setWangle(90), m_RobotDrive));
   
 
     // Driver Controlls
@@ -273,8 +273,6 @@ public class RobotContainer {
     // intake
     m_MechController.rightTrigger(0.5).whileTrue(new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
 
-    // Wheel 90deg (wade coded this)
-    m_MechController.leftBumper().onTrue(Wangle);
   }
 
   private void setBlinkinColor() {

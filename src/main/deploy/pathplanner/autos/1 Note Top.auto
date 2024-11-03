@@ -2,21 +2,15 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.39,
-      "y": 6.92
+      "x": 0.7284778050297884,
+      "y": 6.628333484912334
     },
-    "rotation": 0
+    "rotation": 59.58
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
-        {
-          "type": "path",
-          "data": {
-            "pathName": "1NoteTop_1"
-          }
-        },
         {
           "type": "named",
           "data": {
@@ -24,9 +18,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "1NoteTop_2"
+            "name": "Auto End"
           }
         }
       ]

@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Red 3 Note Bottom to Center 1"
+                  "pathName": "2 Note Bottom to Inner Center 1"
                 }
               },
               {
@@ -39,38 +39,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Red 3 Note Bottom to Center 2 "
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shooter Auto Sequence"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Blue 3 Note Bottom to Center 3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Sequence"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Blue 3 Note Bottom to Center 4"
+            "pathName": "2 Note Bottom to Inner Center 2"
           }
         },
         {

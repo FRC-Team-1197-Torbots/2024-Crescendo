@@ -6,6 +6,7 @@
     "1 Note Bottom",
     "1 Note Top",
     "2 Note Bottom Shrunk",
+    "2 Note Bottom To Inner Center",
     "2 Note Bottom to Center",
     "2 Note Middle",
     "2 Note Top Shrunk",
@@ -13,10 +14,11 @@
     "3 Note Bottom to Center",
     "3 Note Top to Center",
     "4 Note Middle",
+    "4 Note Middle Reverse",
     "4 Note Top",
     "5 Note Middle",
     "5 Note Top",
-    "4 Note Middle Reverse"
+    "New Folder"
   ],
   "autoFolders": [
     "Finished Autos"
