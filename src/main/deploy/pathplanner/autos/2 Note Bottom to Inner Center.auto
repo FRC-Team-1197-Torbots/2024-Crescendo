@@ -49,6 +49,25 @@
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "2 Note Bottom to Inner Center 3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Sequence"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Auto End"

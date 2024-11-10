@@ -20,10 +20,10 @@ public class Climber extends SubsystemBase {
 
     public Climber() {
         // Spark Flex Instantiations
-        leftClimberFlex = new CANSparkFlex(ClimberConstants.LeftClimberMotor, MotorType.kBrushless);
-        rightClimberFlex = new CANSparkFlex(ClimberConstants.RightClimberMotor, MotorType.kBrushless);
+        // leftClimberFlex = new CANSparkFlex(ClimberConstants.LeftClimberMotor, MotorType.kBrushless);
+        // rightClimberFlex = new CANSparkFlex(ClimberConstants.RightClimberMotor, MotorType.kBrushless);
 
-        setMotorMode(IdleMode.kBrake);
+        // setMotorMode(IdleMode.kBrake);
 
         resetPosition();
     }

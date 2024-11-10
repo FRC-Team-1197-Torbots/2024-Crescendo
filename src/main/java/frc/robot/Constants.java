@@ -172,13 +172,15 @@ public final class Constants {
     /* Auto arm angles
     * r = -d * Math.PI + Math.PI / 2 + 1.04
      */  
-    public static final double[] OneNoteTopTargets = {107.367};
     public static final double[] ThreeNoteTopCenterTargets = {118, 100.1, 97.6};
     public static final double[] FourNoteTopTargets = {118, 100.5, 101.5, 98};
     public static final double[] FiveNoteTopTargets = {118, 100.5, 101.5, 98, 71};
 
+    public static final double[] OneNoteTopTargets = {0.5513};
     public static final double[] TwoNoteTopTargets = {0.5513, 0.907354};
     public static final double[] TwoNoteMiddleTargets = {0.5513, 0.8131}; //118, 103
+    public static final double[] TwoNoteBottomInnerCenterTargets = {0.5513, 0.5013};
+    public static final double[] ThreeNoteBottomInnerCenterTargets = {0.5513, 0.5013, 0.5013};
     public static final double[] ThreeNoteMiddleTargets = {118, 101.5, 102.011};
     public static final double[] FourNoteMiddleTargetsRed = {0.5513, 0.90, 0.82, 0.85}; //118, 98.5, 101.5, 99.5 0.874193
     public static final double[] FourNoteMiddleTargetsBlue = {0.5513, 0.90, 0.82, 0.85};
@@ -187,7 +189,6 @@ public final class Constants {
     public static final double[] FiveNoteMiddleTargets = {118, 98.5, 101.5, 99, 96.937};
     public static final double[] TwoNoteBottomTargets = {0.5513, 0.5013};
     public static final double[] ThreeNoteBottomTargets = {0.5513, 0.5013, 0.5013};
-    public static final double[] ThreeNoteBottomInnerCenterTargets = {0.5513, 0.5013, 0.5013};
 
     public static final double[] OneNoteBottomTargets = {118}; //Old: 107.888
     public static final double[] FourNoteBottomTargets = {118, 100.5, 101.5, 98};

@@ -73,7 +73,7 @@ public class RobotContainer {
   private final DriveSubsystem m_RobotDrive = new DriveSubsystem();
   private final Intake m_Intake = new Intake();
   private final Shooter m_Shooter = new Shooter(m_Intake);
-  private final Climber m_Climber = new Climber();
+  // private final Climber m_Climber = new Climber();
   public final Arm m_Arm = new Arm(m_RobotDrive);
   public final Blinkin m_Blinkin = new Blinkin();
   private final AmpRollers m_AmpRollers = new AmpRollers();
@@ -180,6 +180,14 @@ public class RobotContainer {
       true, true),
       m_RobotDrive);
 
+    Command pointAtNote = new RunCommand(
+      () -> m_RobotDrive.drive(
+      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
+      m_RobotDrive.getNoteAngleOutput(), 
+      true, true),
+      m_RobotDrive);
+
     Command shuttleRev = new ParallelCommandGroup(
       shuttleAim,
       // new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
@@ -246,14 +254,14 @@ public class RobotContainer {
     m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
 
     // Score in Amp
-    m_driverController.y().toggleOnTrue(ampScore);
+    // m_driverController.y().toggleOnTrue(ampScore);
     
     //Mech Controls
     // Climber Down
-    m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
+    // m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
 
     // Climber Up
-    m_MechController.y().whileTrue(new RunClimber(m_Climber, ClimberDirection.UP));
+    m_MechController.y().whileTrue(pointAtNote);
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  

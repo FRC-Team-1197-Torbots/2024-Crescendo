@@ -281,6 +281,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putData("Robot Field", m_field2d);
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getX() - Constants.AprilTag4PosX));
+    SmartDashboard.putNumber("LL left (ty)", LimelightHelpers.getTY("limelight-left"));
     SmartDashboard.putNumber("LL left (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-left").getX() - Constants.AprilTag4PosX));
     SmartDashboard.putNumber("LL right (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-right").getX() - Constants.AprilTag4PosX));
   }
@@ -565,6 +566,8 @@ public class DriveSubsystem extends SubsystemBase {
      pointAt(adjustAngleForAllianceColor(DriveConstants.ShuttleAngle));
   }
 
+  
+
   public double adjustAngleForAllianceColor(double angle) {
     if (color.isPresent()) {
        if (color.get() == Alliance.Red) {
@@ -607,4 +610,8 @@ public class DriveSubsystem extends SubsystemBase {
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-right", validIDs);
   }
+
+public double getNoteAngleOutput() {
+  return getPIDOutput(-LimelightHelpers.getTY("limelight-left"));
+}
 }
