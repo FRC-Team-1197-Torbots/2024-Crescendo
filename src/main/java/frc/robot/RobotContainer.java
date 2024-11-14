@@ -254,14 +254,13 @@ public class RobotContainer {
     m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
 
     // Score in Amp
-    // m_driverController.y().toggleOnTrue(ampScore);
+    m_driverController.y().toggleOnTrue(ampScore);
     
     //Mech Controls
     // Climber Down
     // m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
 
     // Climber Up
-    m_MechController.y().whileTrue(pointAtNote);
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  
