@@ -16,6 +16,7 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 import com.revrobotics.CANSparkBase.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -112,8 +113,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    //m_autoName = autoName;
-    //SmartDashboard.putNumber("Auto initial", PathPlannerAuto.getStaringPoseFromAutoFile(m_autoName).getRotation().getDegrees());
+    SmartDashboard.putNumber("Max Note PID Output", DriveConstants.MaxNotePIDOutput);
     m_poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
@@ -133,7 +133,6 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Turn kp", turningKp);
     SmartDashboard.putNumber("Turn ki", turningKi);
     SmartDashboard.putNumber("Turn kd", turningKd);
-    SmartDashboard.putNumber("Shuttle Angle", DriveConstants.ShuttleAngle);
 
     m_PidController = new PIDController(turningKp, 0, turningKd);
     resetEncoders();
@@ -211,11 +210,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void updateFromSmartDashboard() {
-    turningKp = SmartDashboard.getNumber("Turn kp", turningKp);
-    turningKd = SmartDashboard.getNumber("Turn ki", turningKi);
-    turningKd = SmartDashboard.getNumber("Turn kd", turningKd);
-    DriveConstants.ShuttleAngle = SmartDashboard.getNumber("Shuttle Angle", DriveConstants.ShuttleAngle);
-    m_PidController = new PIDController(turningKp, turningKi, turningKd);
+    // turningKp = SmartDashboard.getNumber("Turn kp", turningKp);
+    // turningKd = SmartDashboard.getNumber("Turn ki", turningKi);
+    // turningKd = SmartDashboard.getNumber("Turn kd", turningKd);
+    // DriveConstants.ShuttleAngle = SmartDashboard.getNumber("Shuttle Angle", DriveConstants.ShuttleAngle);
+    // m_PidController = new PIDController(turningKp, turningKi, turningKd);
   }
 
  public void updatePoseFromVision() {
@@ -282,8 +281,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getX() - Constants.AprilTag4PosX));
     SmartDashboard.putNumber("LL left (ty)", LimelightHelpers.getTY("limelight-left"));
-    SmartDashboard.putNumber("LL left (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-left").getX() - Constants.AprilTag4PosX));
-    SmartDashboard.putNumber("LL right (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-right").getX() - Constants.AprilTag4PosX));
+    SmartDashboard.putNumber("note tracking Pid output", getNoteAngleOutput());
+    // SmartDashboard.putNumber("LL left (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-left").getX() - Constants.AprilTag4PosX));
+    // SmartDashboard.putNumber("LL right (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-right").getX() - Constants.AprilTag4PosX));
   }
 
   /**
@@ -354,6 +354,72 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
+  public void driveAidan(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
+
+    double xSpeedCommanded;
+    double ySpeedCommanded;
+
+    if (rateLimit) {
+      // Convert XY to polar for rate limiting
+      double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
+      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+
+      // Calculate the direction slew rate based on an estimate of the lateral
+      // acceleration
+      double directionSlewRate;
+      if (m_currentTranslationMag != 0.0) {
+        directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
+      } else {
+        directionSlewRate = 500.0; // some high number that means the slew rate is effectively instantaneous
+      }
+
+      double currentTime = WPIUtilJNI.now() * 1e-6;
+      double elapsedTime = currentTime - m_prevTime;
+      double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
+      if (angleDif < 0.45 * Math.PI) {
+        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+            directionSlewRate * elapsedTime);
+        m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+      } else if (angleDif > 0.85 * Math.PI) {
+        if (m_currentTranslationMag > 1e-4) { // some small number to avoid floating-point errors with equality checking
+          // keep currentTranslationDir unchanged
+          m_currentTranslationMag = m_magLimiter.calculate(0.0);
+        } else {
+          m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
+          m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+        }
+      } else {
+        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+            directionSlewRate * elapsedTime);
+        m_currentTranslationMag = m_magLimiter.calculate(0.0);
+      }
+      m_prevTime = currentTime;
+
+      xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
+      ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
+      m_currentRotation = m_rotLimiter.calculate(rot);
+
+    } else {
+      xSpeedCommanded = xSpeed;
+      ySpeedCommanded = ySpeed;
+      m_currentRotation = rot;
+    }
+
+    // Convert the commanded speeds into the correct units for the drivetrain
+    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
+
+    SwerveModuleState[] swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+       new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
 
     double xSpeedCommanded;
@@ -612,6 +678,10 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
 public double getNoteAngleOutput() {
-  return getPIDOutput(-LimelightHelpers.getTY("limelight-left"));
+  double pidOutput = getPIDOutput(LimelightHelpers.getTY("limelight-left"));
+  if (pidOutput > DriveConstants.MaxNotePIDOutput) {
+    return DriveConstants.MaxNotePIDOutput;
+  }
+  return pidOutput;
 }
 }

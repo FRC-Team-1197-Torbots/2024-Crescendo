@@ -73,6 +73,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
+    public static final double MaxNotePIDOutput = 0.07;
     public static double ShuttleAngle = -41.65; // degrees //-47.65
   }
 

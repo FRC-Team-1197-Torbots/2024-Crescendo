@@ -43,6 +43,9 @@ import frc.robot.Commands.Amp.AmpScore;
 import frc.robot.Commands.Amp.SlowOuttake;
 import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
+import frc.robot.Commands.Auto.AutoAlign;
+import frc.robot.Commands.Auto.DriveForward;
+import frc.robot.Commands.Auto.FindNote;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
@@ -326,8 +329,11 @@ public class RobotContainer {
   }
       
   private void registerAutoCommands() {
+    NamedCommands.registerCommand("AutoAlign", new AutoAlign(m_RobotDrive));
+    NamedCommands.registerCommand("Drive Forward", new DriveForward(m_RobotDrive, m_Intake, 0.3));
     NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
     NamedCommands.registerCommand("Intake Sequence", new AutoIntake(m_Arm, m_Intake).withTimeout(7));
+    NamedCommands.registerCommand("Find Note", new FindNote(m_RobotDrive, 0.1));
     NamedCommands.registerCommand("Store", new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)));
     NamedCommands.registerCommand("Auto End", new ParallelCommandGroup(
       new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
@@ -337,6 +343,7 @@ public class RobotContainer {
   private void addAutoPaths() {
     positionChooser.onChange(oh -> updateAutoChooser());  // update auto chooser when position is changed
     positionChooser.addOption("Top (AMP)", "Top");
+    positionChooser.addOption("AI", "AI");
     positionChooser.addOption("Middle (SPEAKER)", "Middle");
     positionChooser.addOption("Bottom (STATION)", "Bottom");
     positionChooser.setDefaultOption("None Selected", "None");
