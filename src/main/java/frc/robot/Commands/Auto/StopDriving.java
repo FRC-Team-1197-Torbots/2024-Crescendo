@@ -8,16 +8,12 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Limelight;
 import frc.robot.utils.LimelightHelpers;
 
-public class DriveForward extends Command {
+public class StopDriving extends Command {
 
     private DriveSubsystem m_RobotDrive;
-    private Intake m_Intake;
-    private double speed;
 
-    public DriveForward(DriveSubsystem drive, Intake intake, double speed) {
+    public StopDriving(DriveSubsystem drive) {
         m_RobotDrive = drive;
-        m_Intake = intake; 
-        this.speed = speed;
         addRequirements(drive);
     }
 
@@ -28,17 +24,17 @@ public class DriveForward extends Command {
 
     @Override
     public void execute() {
-        m_RobotDrive.drive(speed,0,0,false, true);
-    }
-
-    @Override
-    public void end(boolean interrupted) {
         m_RobotDrive.drive(0,0,0,false, true);
     }
 
     @Override
+    public void end(boolean interrupted) {
+
+    }
+
+    @Override
     public boolean isFinished() {
-        return m_Intake.gamePieceStored();
+        return false;
     }
     
 }

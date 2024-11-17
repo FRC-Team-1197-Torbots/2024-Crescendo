@@ -46,6 +46,7 @@ import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Auto.AutoAlign;
 import frc.robot.Commands.Auto.DriveForward;
 import frc.robot.Commands.Auto.FindNote;
+import frc.robot.Commands.Auto.StopDriving;
 import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
@@ -111,7 +112,7 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     // Configure default commands
-    m_RobotDrive.setDefaultCommand(
+     m_RobotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
       new RunCommand(
@@ -121,7 +122,9 @@ public class RobotContainer {
         -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
         true, true),
         m_RobotDrive));
-    }
+        SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
+        m_Blinkin.setColor(BlinkinConstants.White);
+  }
     
   /**
    * Use this method to 
@@ -236,10 +239,16 @@ public class RobotContainer {
     Command Wangle = new ParallelCommandGroup(
       new InstantCommand(() -> m_Blinkin.setColor(0.570)), new InstantCommand(()-> m_RobotDrive.setWangle(90), m_RobotDrive));
   
+    Command getNote = new SequentialCommandGroup(
+      new AutoAlign(m_RobotDrive),
+      intake.alongWith(new DriveForward(m_RobotDrive, m_Intake, 0.2)));
 
     // Driver Controlls
     // Intake
     m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(intake);
+
+    m_driverController.x().whileTrue(getNote);
+
 
     // Rev Up or point at amp or shuttle revUp in shuttlemode
     m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger.or(ampMode)));
@@ -257,7 +266,7 @@ public class RobotContainer {
     m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
 
     // Score in Amp
-    // m_driverController.y().toggleOnTrue(ampScore);
+    m_driverController.y().toggleOnTrue(ampScore);
     
     //Mech Controls
     // Climber Down
@@ -329,6 +338,24 @@ public class RobotContainer {
   }
       
   private void registerAutoCommands() {
+
+  Command ampscore = new SequentialCommandGroup(
+      new WaitUntilCommand(ampBeamTrigger),
+      new InstantCommand(() -> setAmpMode(false)),
+      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
+      new WaitUntilCommand(m_Elevator::atAmpHeight),
+      new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
+      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
+      new Kaiden().withTimeout(0.3),
+      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos)));
+
+
+
+
+    NamedCommands.registerCommand("Amp Score", ampscore);
+    NamedCommands.registerCommand("Toggle Amp Pass Mode", new InstantCommand(() -> setAmpMode(true)));
+    NamedCommands.registerCommand("Stop Driving", new StopDriving(m_RobotDrive));
+
     NamedCommands.registerCommand("AutoAlign", new AutoAlign(m_RobotDrive));
     NamedCommands.registerCommand("Drive Forward", new DriveForward(m_RobotDrive, m_Intake, 0.3));
     NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
@@ -383,8 +410,6 @@ private void updateAutoChooser() {
   }
 
   public void teleopInit() { 
-    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
-    m_Blinkin.setColor(BlinkinConstants.White);
     m_Arm.setMotorMode(IdleMode.kBrake);
     m_RobotDrive.setMotorMode(IdleMode.kBrake);
     m_Intake.setMotorMode(IdleMode.kBrake);
@@ -408,6 +433,7 @@ private void updateAutoChooser() {
   }
 
   public void autoInit() {
+    m_RobotDrive.setMotorMode(IdleMode.kBrake);
     m_Blinkin.setColor(BlinkinConstants.Pink);
     m_Arm.resetArm();
     m_Arm.setAutoTargets(getAutonomousCommand().getName());

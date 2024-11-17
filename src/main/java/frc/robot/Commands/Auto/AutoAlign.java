@@ -33,7 +33,7 @@ public class AutoAlign extends Command {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(LimelightHelpers.getTY("limelight-left")) < 5 && LimelightHelpers.getTY("limelight-left") != 0;
+        return Math.abs(LimelightHelpers.getTY("limelight-left")) < 4 && LimelightHelpers.getTY("limelight-left") != 0;
     }
     
 }
