@@ -23,7 +23,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -35,9 +34,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.utils.LimelightHelpers;
 import frc.utils.SwerveUtils;
 
@@ -677,11 +681,43 @@ public class DriveSubsystem extends SubsystemBase {
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-right", validIDs);
   }
 
-public double getNoteAngleOutput() {
-  double pidOutput = getPIDOutput(LimelightHelpers.getTY("limelight-left"));
-  if (pidOutput > DriveConstants.MaxNotePIDOutput) {
-    return DriveConstants.MaxNotePIDOutput;
+  public double getNoteAngleOutput() {
+    double pidOutput = getPIDOutput(LimelightHelpers.getTY("limelight-left"));
+    if (pidOutput > DriveConstants.MaxNotePIDOutput) {
+      return DriveConstants.MaxNotePIDOutput;
+    }
+    return pidOutput;
   }
-  return pidOutput;
-}
+
+  public Command driveWithController(CommandXboxController controller) {
+    return Commands.run(() -> this.drive(
+      -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband), 
+      true, true), this);
+  }
+
+  public Command shuttleAimCommand(CommandXboxController controller) {
+    return Commands.run(() -> this.drive(
+      -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband),
+      getShuttleRotationSpeed(), 
+      true, true), this);
+  }
+
+  public Command pointAtNote(CommandXboxController controller) {
+    return Commands.run(() -> this.drive(
+      -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband),
+      getNoteAngleOutput(), 
+      true, true), this);
+  }
+
+  public Command pointAtAmp(CommandXboxController controller) {
+    return Commands.run(() -> this.drive(
+      -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband),
+      getAmpRotationSpeed(), 
+      true, true), this);
+  }
 }

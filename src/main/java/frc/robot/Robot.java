@@ -17,6 +17,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     //SmartDashboard.putData(CommandScheduler.getInstance());
     m_robotContainer = new RobotContainer();
+    m_robotContainer.robotInit();
   }
 
   @Override

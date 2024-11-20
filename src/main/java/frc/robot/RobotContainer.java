@@ -11,8 +11,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.CANSparkBase.IdleMode;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,42 +19,30 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AmpRollerConstants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.BlinkinConstants;
-import frc.robot.Constants.ClimberConstants.ClimberDirection;
-import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.ShooterConstants;
-import frc.robot.Commands.Kaiden;
 import frc.robot.Commands.Rumble;
-import frc.robot.Commands.Amp.AmpIntake;
-import frc.robot.Commands.Amp.AmpOuttake;
-import frc.robot.Commands.Amp.AmpScore;
-import frc.robot.Commands.Amp.SlowOuttake;
-import frc.robot.Commands.Arm.RunArm;
 import frc.robot.Commands.Arm.ZeroArm;
 import frc.robot.Commands.Auto.AutoAlign;
 import frc.robot.Commands.Auto.DriveForward;
 import frc.robot.Commands.Auto.FindNote;
 import frc.robot.Commands.Auto.StopDriving;
-import frc.robot.Commands.Climber.RunClimber;
 import frc.robot.Commands.Intake.AutoIntake;
 import frc.robot.Commands.Intake.RunIntake;
 import frc.robot.Commands.Intake.Shoot;
-import frc.robot.Commands.Shooter.RevShooter;
+import frc.robot.Commands.LongCommands.AmpScoreSequence;
+import frc.robot.Commands.LongCommands.IntakeSequence;
+import frc.robot.Commands.LongCommands.SubwooferRevUp;
 import frc.robot.Commands.Shooter.ShootAuto;
 import frc.robot.subsystems.AmpRollers;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Blinkin;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
@@ -83,11 +69,13 @@ public class RobotContainer {
   private final AmpRollers m_AmpRollers = new AmpRollers();
   private final Elevator m_Elevator = new Elevator();
   
-
+  
   // Driver controllers
   private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
-
+  
+  private final ButtonCommands m_ButtonCommands = new ButtonCommands(this, m_RobotDrive, m_Intake, m_Shooter, m_Arm, m_Blinkin, m_AmpRollers, m_Elevator, m_driverController);
+  
   // Triggers
   private final Trigger exTrigger = new Trigger(m_RobotDrive::checkLocked);
   private final Trigger intakeBeamTrigger = new Trigger(m_Intake::gamePieceStored);
@@ -95,6 +83,7 @@ public class RobotContainer {
   private final Trigger atShooterTarget = new Trigger(m_Shooter::onTarget);
   private final Trigger ampMode = new Trigger(this::inAmpMode);
   private final Trigger shuttleMode = new Trigger(this::inShuttleMode);
+
   private boolean shuttling = false;
   private boolean ampAfterIntake = false;
   /**
@@ -102,7 +91,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Add subsystems to different subsystems
-
+    
     // Configure the button bindings
     configureButtonBindings();
     
@@ -112,18 +101,7 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     // Configure default commands
-     m_RobotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-      new RunCommand(
-        () -> m_RobotDrive.drive(
-        -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-        -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-        -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband), 
-        true, true),
-        m_RobotDrive));
-        SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
-        m_Blinkin.setColor(BlinkinConstants.White);
+     m_RobotDrive.setDefaultCommand(m_RobotDrive.driveWithController(m_driverController));
   }
     
   /**
@@ -138,142 +116,44 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-      Command ampPass = new SequentialCommandGroup(
-      // new InstantCommand(() -> toggleAmpMode()),
-      // new WaitUntilCommand(intakeBeamTrigger),
-      new InstantCommand(() -> m_Shooter.setTargetRPM(ShooterConstants.IdleSpeed)),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.AmpPos)),
-      new WaitUntilCommand(m_Arm::onAmpTarget),
-      new AmpIntake(m_AmpRollers, AmpRollerConstants.IntakeVoltage).alongWith(
-      new Shoot(m_Intake)));
-
     exTrigger.whileTrue(new RunCommand(() -> m_RobotDrive.setX(), m_RobotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
     intakeBeamTrigger.onTrue(new Rumble(m_driverController,0.35));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
-    intakeBeamTrigger.and(ampMode).whileTrue(ampPass);
-    // intakeBeamTrigger.or(ampBeamTrigger).onFalse(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.White), m_Blinkin));
-    // intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Red), m_Blinkin));
-    // ampBeamTrigger.onTrue(new InstantCommand(() -> m_Blinkin.setColor(BlinkinConstants.Green), m_Blinkin));
+    intakeBeamTrigger.and(ampMode).whileTrue(m_ButtonCommands.ampPass());
 
-    Command intake = new ParallelCommandGroup(
-          new RunIntake(m_Intake, IntakeConstants.IntakeSpeed), 
-        new RunArm(m_Arm, ArmConstants.IntakePos));
-        
-    Command ampScore = (new SequentialCommandGroup(
-      new InstantCommand(() -> setAmpMode(false)),
-      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
-      new WaitUntilCommand(m_Elevator::atAmpHeight),
-      new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new Kaiden().withTimeout(0.3),
-      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos))));
-
-    Command shootSpeaker = new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5);
-    
-    Command speakerRev = new ParallelCommandGroup(
-      new RunCommand(() -> m_RobotDrive.aimRobotAtSpeaker(),m_RobotDrive),
-      new StartEndCommand(
-        () -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance()),
-        () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new RevShooter(m_Shooter, ShooterConstants.ShootingRPM));
-
-    Command shuttleAim = new RunCommand(
-      () -> m_RobotDrive.drive(
-      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-      m_RobotDrive.getShuttleRotationSpeed(), 
-      true, true),
-      m_RobotDrive);
-
-    Command pointAtNote = new RunCommand(
-      () -> m_RobotDrive.drive(
-      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-      m_RobotDrive.getNoteAngleOutput(), 
-      true, true),
-      m_RobotDrive);
-
-    Command shuttleRev = new ParallelCommandGroup(
-      shuttleAim,
-      // new RunCommand(() -> m_robotDrive.aimRobotShuttle(),m_robotDrive),
-      new StartEndCommand(
-        () -> m_Arm.setTargetAngle(ArmConstants.ShuttleAngle),
-        () -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new RevShooter(m_Shooter, ShooterConstants.ShuttleRPM));
-
-
-    Command revUp = new ConditionalCommand(shuttleRev, speakerRev, this::inShuttleMode);
-
-    Command pointAtAmp = new RunCommand(
-      () -> m_RobotDrive.drive(
-      -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-      -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-      m_RobotDrive.getAmpRotationSpeed(), 
-      true, true),
-      m_RobotDrive);
-    
-    Command subwooferRevUp = new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new StartEndCommand(
-          () -> m_Arm.setTargetAngle(ArmConstants.SubwooferPos), 
-          () -> m_Arm.setTargetAngle(ArmConstants.StorePos)), 
-          new RevShooter(m_Shooter, ShooterConstants.SubwooferRPM)));
-          
-    Command ampPassBack = (new SequentialCommandGroup(
-      new InstantCommand(() -> setAmpMode(false)),
-      new AmpOuttake(m_Shooter, m_AmpRollers),
-      new SlowOuttake(m_Shooter),
-      new RunIntake(m_Intake, IntakeConstants.IntakeSpeed)));
-
-    Command outtake = new ParallelCommandGroup(
-      new InstantCommand(() -> setAmpMode(false)),
-      new AmpScore(m_AmpRollers, 4.0),
-      new StartEndCommand( 
-      () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-      () -> m_Intake.stopMotor(), m_Intake), 
-      new StartEndCommand( 
-      () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-      () -> m_Shooter.stopMotor()));  
-    
-    Command Wangle = new ParallelCommandGroup(
-      new InstantCommand(() -> m_Blinkin.setColor(0.570)), new InstantCommand(()-> m_RobotDrive.setWangle(90), m_RobotDrive));
-  
-    Command getNote = new SequentialCommandGroup(
-      new AutoAlign(m_RobotDrive),
-      intake.alongWith(new DriveForward(m_RobotDrive, m_Intake, 0.2)));
-
-    // Driver Controlls
+    /* ************************* Driver Controls ******************** */ 
     // Intake
-    m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(intake);
+    m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(new IntakeSequence(m_Intake, m_Arm));
 
-    m_driverController.x().whileTrue(getNote);
-
+    // Drive to note and intake
+    m_driverController.x().whileTrue(m_ButtonCommands.getNote());
 
     // Rev Up or point at amp or shuttle revUp in shuttlemode
-    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(pointAtAmp, revUp, ampBeamTrigger.or(ampMode)));
+    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(
+      m_RobotDrive.pointAtAmp(m_MechController),
+      m_ButtonCommands.revUp(),
+      ampBeamTrigger.or(ampMode)));
 
     // Subwoofer rev up
-    m_driverController.rightBumper().whileTrue(subwooferRevUp);
+    m_driverController.rightBumper().whileTrue(new SubwooferRevUp(m_Arm, m_Shooter));
 
     // pass from amp to shooter
-    m_driverController.a().toggleOnTrue(ampPassBack);
+    m_driverController.a().toggleOnTrue(m_ButtonCommands.ampPassBack);
 
     // outtake
-    m_driverController.b().whileTrue(outtake);
+    m_driverController.b().whileTrue(m_ButtonCommands.outtake);
 
     // ShootCommand
-    m_driverController.leftBumper().toggleOnTrue(shootSpeaker);
+    m_driverController.leftBumper().toggleOnTrue(new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5));
 
     // Score in Amp
-    m_driverController.y().toggleOnTrue(ampScore);
+    m_driverController.y().toggleOnTrue(new AmpScoreSequence(this, m_Elevator, m_AmpRollers, m_Arm));
     
-    //Mech Controls
-    // Climber Down
-    // m_MechController.a().whileTrue(new RunClimber(m_Climber, ClimberDirection.DOWN));
 
-    // Climber Up
-    m_MechController.y().whileTrue(pointAtNote);
+    /* ************************* Mech Controls ******************** */ 
+    // Point at note
+    m_MechController.y().whileTrue(m_RobotDrive.pointAtNote(m_MechController));
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  
@@ -317,9 +197,9 @@ public class RobotContainer {
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
-
   }
-  private void setAmpMode(boolean value) {
+
+  public void setAmpMode(boolean value) {
     ampAfterIntake = value;
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
   }
@@ -338,24 +218,9 @@ public class RobotContainer {
   }
       
   private void registerAutoCommands() {
-
-  Command ampscore = new SequentialCommandGroup(
-      new WaitUntilCommand(ampBeamTrigger),
-      new InstantCommand(() -> setAmpMode(false)),
-      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.AmpPos)),
-      new WaitUntilCommand(m_Elevator::atAmpHeight),
-      new AmpScore(m_AmpRollers, AmpRollerConstants.ScoreVoltage),
-      new InstantCommand(() -> m_Arm.setTargetAngle(ArmConstants.StorePos)),
-      new Kaiden().withTimeout(0.3),
-      new InstantCommand(() -> m_Elevator.setTargetPos(ElevatorConstants.StorePos)));
-
-
-
-
-    NamedCommands.registerCommand("Amp Score", ampscore);
+    NamedCommands.registerCommand("Amp Score", new AmpScoreSequence(null, m_Elevator, m_AmpRollers, m_Arm));
     NamedCommands.registerCommand("Toggle Amp Pass Mode", new InstantCommand(() -> setAmpMode(true)));
     NamedCommands.registerCommand("Stop Driving", new StopDriving(m_RobotDrive));
-
     NamedCommands.registerCommand("AutoAlign", new AutoAlign(m_RobotDrive));
     NamedCommands.registerCommand("Drive Forward", new DriveForward(m_RobotDrive, m_Intake, 0.3));
     NamedCommands.registerCommand("Shooter Auto Sequence", new ShootAuto(m_Arm, m_Shooter).withTimeout(5));
@@ -407,6 +272,11 @@ private void updateAutoChooser() {
     catch(Exception e){
       return new PathPlannerAuto("Nothing");
     }  
+  }
+
+  public void robotInit() {
+    m_Blinkin.setColor(BlinkinConstants.White);
+    SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
   }
 
   public void teleopInit() { 
