@@ -77,22 +77,24 @@ public class ButtonCommands {
             m_Robot::inShuttleMode);
     }
 
-    // or as instance variable
-    public Command ampPassBack = Commands.sequence(
-        new InstantCommand(() -> m_Robot.setAmpMode(false)),
-        new AmpOuttake(m_Shooter, m_AmpRollers),
-        new SlowOuttake(m_Shooter),
-        new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+    public Command ampPassBack() {
+        return Commands.sequence(
+            new InstantCommand(() -> m_Robot.setAmpMode(false)),
+            new AmpOuttake(m_Shooter, m_AmpRollers),
+            new SlowOuttake(m_Shooter),
+            new RunIntake(m_Intake, IntakeConstants.IntakeSpeed));
+    }
 
-    public Command outtake = new ParallelCommandGroup(
-        new InstantCommand(() -> m_Robot.setAmpMode(false)),
-        new AmpScore(m_AmpRollers, 4.0),
-        new StartEndCommand( 
-        () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
-        () -> m_Intake.stopMotor(), m_Intake), 
-        new StartEndCommand( 
-        () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
-        () -> m_Shooter.stopMotor()));  
-      
+    public Command outtake() { 
+        return Commands.parallel(
+            new InstantCommand(() -> m_Robot.setAmpMode(false)),
+            new AmpScore(m_AmpRollers, 4.0),
+            new StartEndCommand( 
+            () -> m_Intake.runIntake(IntakeConstants.OuttakeSpeed),
+            () -> m_Intake.stopMotor(), m_Intake), 
+            new StartEndCommand( 
+            () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
+            () -> m_Shooter.stopMotor()));
+    }  
 }
 

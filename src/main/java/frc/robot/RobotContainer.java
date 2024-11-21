@@ -47,6 +47,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utils.GeneratePath;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -139,10 +140,10 @@ public class RobotContainer {
     m_driverController.rightBumper().whileTrue(new SubwooferRevUp(m_Arm, m_Shooter));
 
     // pass from amp to shooter
-    m_driverController.a().toggleOnTrue(m_ButtonCommands.ampPassBack);
+    m_driverController.a().toggleOnTrue(m_ButtonCommands.ampPassBack());
 
     // outtake
-    m_driverController.b().whileTrue(m_ButtonCommands.outtake);
+    m_driverController.b().whileTrue(m_ButtonCommands.outtake());
 
     // ShootCommand
     m_driverController.leftBumper().toggleOnTrue(new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5));
@@ -152,8 +153,8 @@ public class RobotContainer {
     
 
     /* ************************* Mech Controls ******************** */ 
-    // Point at note
-    m_MechController.y().whileTrue(m_RobotDrive.pointAtNote(m_MechController));
+    // Drive to random point
+    m_MechController.y().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 4.5, 4.5));
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  

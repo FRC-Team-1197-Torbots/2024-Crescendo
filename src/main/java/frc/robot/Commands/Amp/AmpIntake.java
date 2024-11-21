@@ -18,6 +18,7 @@ public class AmpIntake extends Command {
     public AmpIntake(AmpRollers rollers, double voltage) {
         m_AmpRollers = rollers;
         this.voltage = voltage;
+        addRequirements(rollers);
     }
 
     @Override
