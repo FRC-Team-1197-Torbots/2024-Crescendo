@@ -132,7 +132,7 @@ public class RobotContainer {
 
     // Rev Up or point at amp or shuttle revUp in shuttlemode
     m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(
-      m_RobotDrive.pointAtAmp(m_MechController),
+      m_RobotDrive.pointAtAmp(m_driverController),
       m_ButtonCommands.revUp(),
       ampBeamTrigger.or(ampMode)));
 
@@ -154,7 +154,7 @@ public class RobotContainer {
 
     /* ************************* Mech Controls ******************** */ 
     // Drive to random point
-    m_MechController.y().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 4.5, 4.5));
+    m_driverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 3.6, 2.5));
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  

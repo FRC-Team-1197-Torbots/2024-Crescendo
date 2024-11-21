@@ -22,7 +22,6 @@ public class AutoAlign extends Command {
 
     @Override
     public void execute() {
-        System.out.println(m_RobotDrive.getNoteAngleOutput());
         m_RobotDrive.drive(0, 0, m_RobotDrive.getNoteAngleOutput(), false, true);
     }
 
