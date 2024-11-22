@@ -154,7 +154,7 @@ public class RobotContainer {
 
     /* ************************* Mech Controls ******************** */ 
     // Drive to random point
-    m_driverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 3.6, 2.5));
+    m_driverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 6.3, 3.0));
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  

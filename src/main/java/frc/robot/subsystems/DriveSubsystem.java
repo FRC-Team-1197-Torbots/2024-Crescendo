@@ -236,7 +236,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
     
     LimelightHelpers.PoseEstimate leftPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-    LimelightHelpers.PoseEstimate rightPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
+    LimelightHelpers.PoseEstimate rightPose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
 
     if(doRejectUpdate(rightPose) && doRejectUpdate(leftPose)) {
       return;
@@ -261,7 +261,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.3,0.3,9999999)); // 0.4 tidal values //0.2 test
     m_poseEstimator.addVisionMeasurement(
         averagePose,
-        leftPose.timestampSeconds);
+        rightPose.timestampSeconds);
         
     }
 
@@ -285,7 +285,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getX() - Constants.AprilTag4PosX));
     SmartDashboard.putNumber("LL left (ty)", LimelightHelpers.getTY("limelight-left"));
-    SmartDashboard.putNumber("note tracking Pid output", getNoteAngleOutput());
+    // SmartDashboard.putNumber("note tracking Pid output", getNoteAngleOutput()); hell no
     // SmartDashboard.putNumber("LL left (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-left").getX() - Constants.AprilTag4PosX));
     // SmartDashboard.putNumber("LL right (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-right").getX() - Constants.AprilTag4PosX));
   }
