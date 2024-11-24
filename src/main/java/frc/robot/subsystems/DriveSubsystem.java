@@ -285,6 +285,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Distance From Speaker (hypot)", distanceFromSpeaker());
     SmartDashboard.putNumber("Distance From Speaker (x)", Math.abs(getPose().getX() - Constants.AprilTag4PosX));
     SmartDashboard.putNumber("LL left (ty)", LimelightHelpers.getTY("limelight-left"));
+    SmartDashboard.putNumber("LL left (tx)", LimelightHelpers.getTX("limelight-left"));
+    SmartDashboard.putNumber("robot pose", getPose().getY());
+    SmartDashboard.putNumber("Gyro Angle", gyroAngle());
     // SmartDashboard.putNumber("note tracking Pid output", getNoteAngleOutput()); hell no
     // SmartDashboard.putNumber("LL left (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-left").getX() - Constants.AprilTag4PosX));
     // SmartDashboard.putNumber("LL right (x)", Math.abs(LimelightHelpers.getBotPose2d_wpiBlue("limelight-right").getX() - Constants.AprilTag4PosX));

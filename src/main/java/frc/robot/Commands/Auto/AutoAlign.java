@@ -8,21 +8,24 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.LimelightHelpers;
 public class AutoAlign extends Command {
 
-    /**
-    * Does nothing, just like Kaiden instead of making drawing files!
-    */
-    public DriveSubsystem m_RobotDrive;
+  
+    private DriveSubsystem m_RobotDrive;
+    private double targetAngle;
+
     public AutoAlign(DriveSubsystem drive) {
         m_RobotDrive = drive;
+        addRequirements(drive);
     }
 
     @Override
     public void initialize() {
+        targetAngle =  m_RobotDrive.gyroAngle() - LimelightHelpers.getTY("limelight-left");
     }
 
     @Override
     public void execute() {
-        m_RobotDrive.drive(0, 0, m_RobotDrive.getNoteAngleOutput(), false, true);
+        m_RobotDrive.pointAt(targetAngle);
+        // m_RobotDrive.drive(0, 0, m_RobotDrive.getNoteAngleOutput(), false, true);
     }
 
     @Override

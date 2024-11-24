@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2,
-      "y": 2
+      "x": 1.2490196273393739,
+      "y": 5.560508013068222
     },
     "rotation": 0
   },
@@ -14,70 +14,31 @@
         {
           "type": "named",
           "data": {
-            "name": "Toggle Amp Pass Mode"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Find Note"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoAlign"
+            "name": "Get Note"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Sequence"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.1
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Drive Forward"
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "name": "Shooter Auto Sequence"
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop Driving"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Amp Score"
-                }
-              }
-            ]
+            "pathName": "Drive To Speaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Aim and Shoot"
           }
         }
       ]

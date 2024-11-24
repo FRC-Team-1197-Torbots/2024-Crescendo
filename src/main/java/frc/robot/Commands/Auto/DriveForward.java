@@ -28,7 +28,11 @@ public class DriveForward extends Command {
 
     @Override
     public void execute() {
-        m_RobotDrive.drive(speed,0,0,false, true);
+        if (LimelightHelpers.getTX("limelight-left") > 10)
+            m_RobotDrive.drive(-speed,0,0,false, true);
+        else {
+            m_RobotDrive.drive(speed,0,m_RobotDrive.getNoteAngleOutput(),false, true);
+        }
     }
 
     @Override

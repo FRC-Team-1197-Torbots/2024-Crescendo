@@ -1,5 +1,9 @@
 package frc.robot.Commands.Arm;
 
+import java.io.WriteAbortedException;
+
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.Arm;
@@ -19,6 +23,7 @@ public class RunArm extends Command {
   @Override
   public void initialize() {
     m_Arm.setTargetAngle(m_targetAngle);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -34,5 +39,6 @@ public class RunArm extends Command {
   @Override
   public boolean isFinished() {
     return false;
+    // return false;
   }
 }

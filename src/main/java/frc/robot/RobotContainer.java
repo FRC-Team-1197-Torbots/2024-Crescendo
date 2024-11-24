@@ -151,10 +151,10 @@ public class RobotContainer {
     // Score in Amp
     m_driverController.y().toggleOnTrue(new AmpScoreSequence(this, m_Elevator, m_AmpRollers, m_Arm));
     
-
-    /* ************************* Mech Controls ******************** */ 
     // Drive to random point
     m_driverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 6.3, 3.0));
+
+    /* ************************* Mech Controls ******************** */ 
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  
@@ -163,8 +163,8 @@ public class RobotContainer {
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
 
     // Amp pass
-    m_MechController.x().onTrue(new InstantCommand(() -> toggleAmpMode()));
-        
+    m_MechController.x().onTrue(new InstantCommand(() -> toggleAmpMode()));    
+    
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
 
@@ -219,6 +219,10 @@ public class RobotContainer {
   }
       
   private void registerAutoCommands() {
+     
+    NamedCommands.registerCommand("Drive to Speaker", GeneratePath.driveToPoint(m_RobotDrive, 1.8, 5.56));
+    NamedCommands.registerCommand("Aim and Shoot", m_ButtonCommands.revUpAndShoot());
+    NamedCommands.registerCommand("Get Note", m_ButtonCommands.getNote().withTimeout(2));
     NamedCommands.registerCommand("Amp Score", new AmpScoreSequence(null, m_Elevator, m_AmpRollers, m_Arm));
     NamedCommands.registerCommand("Toggle Amp Pass Mode", new InstantCommand(() -> setAmpMode(true)));
     NamedCommands.registerCommand("Stop Driving", new StopDriving(m_RobotDrive));

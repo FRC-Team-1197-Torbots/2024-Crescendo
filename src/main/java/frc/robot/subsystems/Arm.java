@@ -1,6 +1,11 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase.IdleMode;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -18,6 +23,7 @@ public class Arm extends SubsystemBase {
     private CANSparkFlex ArmMotor1;
     private CANSparkFlex ArmMotor2;
     private Encoder ArmEncoder;
+    public File armTimes = new File("logs.txt");
 
     private double targetPos = ArmConstants.StorePos;
 
@@ -230,4 +236,5 @@ public class Arm extends SubsystemBase {
     public boolean onAmpTarget() {
         return Math.abs(getRadians() - ArmConstants.AmpPos) < 0.07;
     }
+
 }

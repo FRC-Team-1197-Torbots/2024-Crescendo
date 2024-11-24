@@ -73,7 +73,7 @@ public final class Constants {
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
-    public static final double MaxNotePIDOutput = 0.07;
+    public static final double MaxNotePIDOutput = 0.1;
     public static double ShuttleAngle = -41.65; // degrees //-47.65
   }
 
@@ -169,6 +169,8 @@ public final class Constants {
     public static final double SecondShotSpeaker = 105;
     public static double AmpPos = 1.35;
     public static final double SubwooferPos = 0.5;  
+
+    public static final double TimeToIntake = 0.701; // seconds
 
     /* Auto arm angles
     * r = -d * Math.PI + Math.PI / 2 + 1.04

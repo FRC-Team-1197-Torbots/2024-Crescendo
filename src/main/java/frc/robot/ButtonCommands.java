@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,6 +31,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utils.LimelightHelpers;
 
 public class ButtonCommands {
     private  DriveSubsystem m_RobotDrive;
@@ -67,7 +69,17 @@ public class ButtonCommands {
     public Command getNote() {
         return Commands.sequence(
             new AutoAlign(m_RobotDrive),
-            new IntakeSequence(m_Intake, m_Arm).alongWith(new DriveForward(m_RobotDrive, m_Intake, 0.2)));
+            driveForwardAndIntake());
+    }
+
+    private Command driveForwardAndIntake() {
+        return new ParallelRaceGroup(
+            new DriveForward(m_RobotDrive, m_Intake, 0.2),
+            new WaitUntilCommand(this::closeToNote).andThen(new IntakeSequence(m_Intake, m_Arm)));
+    }
+
+    private boolean closeToNote() {
+        return LimelightHelpers.getTX("limelight-left") > -10;
     }
     
     public Command revUp() { 
@@ -75,6 +87,12 @@ public class ButtonCommands {
             new ShuttleRevUp(m_Shooter, m_RobotDrive, m_Arm, m_DriveController),
             new SpeakerRevUp(m_Shooter, m_RobotDrive, m_Arm), 
             m_Robot::inShuttleMode);
+    }
+
+    public Command revUpAndShoot() {
+        return Commands.parallel(
+            new SpeakerRevUp(m_Shooter, m_RobotDrive, m_Arm),   
+            new WaitUntilCommand(m_Shooter::onTarget).andThen(new Shoot(m_Intake)));
     }
 
     public Command ampPassBack() {
