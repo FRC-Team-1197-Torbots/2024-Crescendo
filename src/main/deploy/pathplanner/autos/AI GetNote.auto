@@ -24,21 +24,34 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Shooter Auto Sequence"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Drive To Speaker"
           }
         },
         {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Aim and Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Rev Up"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Aim and Shoot"
+            "name": "Auto End"
           }
         }
       ]

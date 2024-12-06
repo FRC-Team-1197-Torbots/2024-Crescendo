@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,6 +33,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.utils.LimelightHelpers;
+import frc.robot.Commands.Shooter.RevShooter;
 
 public class ButtonCommands {
     private  DriveSubsystem m_RobotDrive;
@@ -89,10 +91,15 @@ public class ButtonCommands {
             m_Robot::inShuttleMode);
     }
 
-    public Command revUpAndShoot() {
-        return Commands.parallel(
-            new SpeakerRevUp(m_Shooter, m_RobotDrive, m_Arm),   
-            new WaitUntilCommand(m_Shooter::onTarget).andThen(new Shoot(m_Intake)));
+    public Command AutorevUp() {
+        return Commands.runOnce(() -> m_Shooter.setTargetRPM(ShooterConstants.ShootingRPM));
+    }
+
+    public Command revUpAndAim() {
+        return Commands.sequence(
+            new InstantCommand(() -> m_Arm.setTargetAngle(m_Arm.setAngleFromDistance())),
+            new WaitUntilCommand(m_Shooter::onTarget), 
+            new Shoot(m_Intake));
     }
 
     public Command ampPassBack() {
