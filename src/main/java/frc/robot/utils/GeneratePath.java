@@ -21,8 +21,8 @@ public class GeneratePath {
         // The rotation component of the pose should be the direction of travel. Do not use holonomic rotation.
         List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
         drive.getPose(),
-        new Pose2d(6.3, 3.0, Rotation2d.fromDegrees(0)),
-        new Pose2d(x, y, Rotation2d.fromDegrees(90)));
+        new Pose2d(2.8, 4.27 , Rotation2d.fromDegrees(0)),
+        new Pose2d(x, y, Rotation2d.fromDegrees(0)));
     
         PathConstraints constraints = new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared, AutoConstants.kMaxAngularSpeedRadiansPerSecond, AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared); // The constraints for this path.
@@ -31,8 +31,10 @@ public class GeneratePath {
         PathPlannerPath path = new PathPlannerPath(
         waypoints,
         constraints,
-        new GoalEndState(0.0, Rotation2d.fromDegrees(180))); // Goal end state. You can set a holonomic rotation here.
-    
-        return AutoBuilder.followPath(path);
+        new GoalEndState(0.0, Rotation2d.fromDegrees(0))); // Goal end state. You can set a holonomic rotation here.
+
+        path.preventFlipping = true;
+
+        return AutoBuilder.followPath(path).until(() -> drive.positionOnTarget(x,y));
     }
 }

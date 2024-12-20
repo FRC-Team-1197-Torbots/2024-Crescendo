@@ -117,7 +117,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    SmartDashboard.putNumber("Max Note PID Output", DriveConstants.MaxNotePIDOutput);
     m_poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
@@ -673,11 +672,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
  public void setAprilTagID() {
-    int[] validIDs = {4};  // 3,4
+    int[] validIDs = {3,4}; 
     if (color.isPresent()) 
       if (color.get() == Alliance.Blue) {
         validIDs[0] = 7;
-        // validIDs[1] = 8;
+        validIDs[1] = 8;
       }
 
     LimelightHelpers.SetFiducialIDFiltersOverride("limelight-left", validIDs);
@@ -691,6 +690,11 @@ public class DriveSubsystem extends SubsystemBase {
     }
     return pidOutput;
   }
+
+  public boolean positionOnTarget(double x, double y) {
+    return getPose().getTranslation().getDistance(new Translation2d(x,y)) < 0.1;
+  }
+
 
   public Command driveWithController(CommandXboxController controller) {
     return Commands.run(() -> this.drive(

@@ -72,10 +72,10 @@ public class RobotContainer {
   
   
   // Driver controllers
-  private CommandXboxController m_driverController = new CommandXboxController(OIConstants.kDriverControllerPort);
+  private CommandXboxController m_DriverController = new CommandXboxController(OIConstants.kDriverControllerPort);
   private CommandXboxController m_MechController = new CommandXboxController(1);
   
-  private final ButtonCommands m_ButtonCommands = new ButtonCommands(this, m_RobotDrive, m_Intake, m_Shooter, m_Arm, m_Blinkin, m_AmpRollers, m_Elevator, m_driverController);
+  private final ButtonCommands m_ButtonCommands = new ButtonCommands(this, m_RobotDrive, m_Intake, m_Shooter, m_Arm, m_Blinkin, m_AmpRollers, m_Elevator, m_DriverController);
   
   // Triggers
   private final Trigger exTrigger = new Trigger(m_RobotDrive::checkLocked);
@@ -102,7 +102,7 @@ public class RobotContainer {
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
     SmartDashboard.putBoolean("Shuttle Mode", inShuttleMode());
     // Configure default commands
-     m_RobotDrive.setDefaultCommand(m_RobotDrive.driveWithController(m_driverController));
+     m_RobotDrive.setDefaultCommand(m_RobotDrive.driveWithController(m_DriverController));
   }
     
   /**
@@ -119,45 +119,46 @@ public class RobotContainer {
 
     exTrigger.whileTrue(new RunCommand(() -> m_RobotDrive.setX(), m_RobotDrive));
     intakeBeamTrigger.onTrue(new InstantCommand(() -> m_Shooter.idleMotor(), m_Shooter));
-    intakeBeamTrigger.onTrue(new Rumble(m_driverController,0.35));
+    intakeBeamTrigger.onTrue(new Rumble(m_DriverController,0.35));
     intakeBeamTrigger.onFalse(new InstantCommand(() -> m_Shooter.stopMotor(), m_Shooter));
     intakeBeamTrigger.and(ampMode).whileTrue(m_ButtonCommands.ampPass());
 
     /* ************************* Driver Controls ******************** */ 
     // Intake
-    m_driverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(new IntakeSequence(m_Intake, m_Arm));
+    m_DriverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(new IntakeSequence(m_Intake, m_Arm));
 
     // Drive to note and intake
-    m_driverController.x().whileTrue(m_ButtonCommands.getNote());
+    m_DriverController.x().whileTrue(m_ButtonCommands.getNote());
 
     // Rev Up or point at amp or shuttle revUp in shuttlemode
-    m_driverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(
-      m_RobotDrive.pointAtAmp(m_driverController),
+    m_DriverController.leftTrigger(0.5).whileTrue(new ConditionalCommand(
+      m_RobotDrive.pointAtAmp(m_DriverController),
       m_ButtonCommands.revUp(),
       ampBeamTrigger.or(ampMode)));
 
     // Subwoofer rev up
-    m_driverController.rightBumper().whileTrue(new SubwooferRevUp(m_Arm, m_Shooter));
+    m_DriverController.rightBumper().whileTrue(new SubwooferRevUp(m_Arm, m_Shooter));
 
     // pass from amp to shooter
-    m_driverController.a().toggleOnTrue(m_ButtonCommands.ampPassBack());
+    m_DriverController.a().toggleOnTrue(m_ButtonCommands.ampPassBack());
 
     // outtake
-    m_driverController.b().whileTrue(m_ButtonCommands.outtake());
+    m_DriverController.b().whileTrue(m_ButtonCommands.outtake());
 
     // ShootCommand
-    m_driverController.leftBumper().toggleOnTrue(new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5));
+    m_DriverController.leftBumper().toggleOnTrue(new WaitUntilCommand(atShooterTarget).andThen(new Shoot(m_Intake)).withTimeout(5));
 
     // Score in Amp
-    m_driverController.y().toggleOnTrue(new AmpScoreSequence(this, m_Elevator, m_AmpRollers, m_Arm));
+    m_DriverController.y().toggleOnTrue(new AmpScoreSequence(this, m_Elevator, m_AmpRollers, m_Arm));
     
     // Drive to random point
-    m_driverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 6.3, 3.0));
+    m_DriverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 1.55, 5.58).andThen(m_ButtonCommands.revUpAndShoot()));
 
     /* ************************* Mech Controls ******************** */ 
     
     // zero gyro *press to reset field relative drive*
     m_MechController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  
+    m_DriverController.povUp().onTrue(new InstantCommand(() -> m_RobotDrive.resetGyro()));  
 
     // Toggle shuttle mode
     m_MechController.b().onTrue(new InstantCommand(() -> toggleShuttleMode()));    
@@ -167,6 +168,7 @@ public class RobotContainer {
     
     // Zero Arm
     m_MechController.povDown().onTrue(new ZeroArm(m_Arm));
+    m_DriverController.povDown().onTrue(new ZeroArm(m_Arm));
 
     // update from smartdashboard
     m_MechController.rightBumper().onTrue(new InstantCommand(() -> m_RobotDrive.updateFromSmartDashboard()));
