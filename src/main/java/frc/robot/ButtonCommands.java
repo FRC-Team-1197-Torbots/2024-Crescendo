@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.utils.GeneratePath;
 import frc.robot.utils.LimelightHelpers;
 
 public class ButtonCommands {
@@ -69,7 +71,7 @@ public class ButtonCommands {
     public Command getNote() {
         return Commands.sequence(
             new AutoAlign(m_RobotDrive),
-            driveForwardAndIntake());
+            driveForwardAndIntake()).until(m_Intake::gamePieceStored);
     }
 
     private Command driveForwardAndIntake() {
@@ -113,6 +115,12 @@ public class ButtonCommands {
             new StartEndCommand( 
             () -> m_Shooter.setTargetRPM(-ShooterConstants.IdleSpeed),
             () -> m_Shooter.stopMotor()));
+    }
+
+    public Command driveAndScore() {
+        return Commands.sequence(
+            GeneratePath.driveToPoint(m_RobotDrive, 1.55, 5.58),
+            revUpAndShoot());
     }  
 }
 

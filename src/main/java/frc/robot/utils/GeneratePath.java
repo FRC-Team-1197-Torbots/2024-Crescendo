@@ -19,10 +19,18 @@ public class GeneratePath {
     public static Command driveToPoint(DriveSubsystem drive, double x, double y) {
         // Create a list of waypoints from poses. Each pose represents one waypoint.
         // The rotation component of the pose should be the direction of travel. Do not use holonomic rotation.
-        List<Translation2d> waypoints = PathPlannerPath.bezierFromPoses(
-        drive.getPose(),
-        new Pose2d(2.8, 4.27 , Rotation2d.fromDegrees(0)),
-        new Pose2d(x, y, Rotation2d.fromDegrees(0)));
+        List<Translation2d> waypoints;
+        if(drive.closeToSpeaker()) {
+            waypoints = PathPlannerPath.bezierFromPoses(
+            drive.getPose(),
+            new Pose2d(x, y, Rotation2d.fromDegrees(0)));
+        } else { // add way point so the robot doesnt crash into a table
+            waypoints = PathPlannerPath.bezierFromPoses(
+            drive.getPose(),
+            new Pose2d(2.8, 4.27 , Rotation2d.fromDegrees(0)),
+            new Pose2d(x, y, Rotation2d.fromDegrees(0)));
+        }
+        
     
         PathConstraints constraints = new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared, AutoConstants.kMaxAngularSpeedRadiansPerSecond, AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared); // The constraints for this path.
@@ -37,4 +45,6 @@ public class GeneratePath {
 
         return AutoBuilder.followPath(path).until(() -> drive.positionOnTarget(x,y));
     }
+
+
 }

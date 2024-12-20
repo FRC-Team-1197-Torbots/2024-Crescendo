@@ -31,11 +31,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -106,6 +108,7 @@ public class DriveSubsystem extends SubsystemBase {
   Optional<Alliance> color = DriverStation.getAlliance();
   private String m_autoName = "0 Note Middle";
   private int badPositionCount = 0;
+  private Timer stopTimer = new Timer();
 
   // Robot's Unit Vector
 
@@ -117,6 +120,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    stopTimer.start();
     m_poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.kDriveKinematics,
@@ -427,7 +431,6 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
-
     double xSpeedCommanded;
     double ySpeedCommanded;
 
@@ -702,6 +705,25 @@ public class DriveSubsystem extends SubsystemBase {
       -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband),
       -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband), 
       true, true), this);
+  }
+
+  public Command victorDriveWithController(CommandXboxController controller) {
+    return new ConditionalCommand(Commands.runOnce(() -> this.drive(
+      -MathUtil.applyDeadband(controller.getLeftY(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getLeftX(), OIConstants.kDriveDeadband),
+      -MathUtil.applyDeadband(controller.getRightX(), OIConstants.kDriveDeadband), 
+      true, true), this),
+      Commands.runOnce(() -> this.drive(0, 0, 0, true, true), this).andThen(this::updateTimer),
+      () -> controllerClose(controller));
+  }
+
+  private boolean controllerClose(CommandXboxController controller) {
+    return Math.abs(controller.getLeftX()) < 0.8 && Math.abs(controller.getLeftY()) < 0.8 && stopTimer.get() > 2;
+  }
+
+  private void updateTimer() {
+    if(stopTimer.get() > 2.1)
+      stopTimer.reset();
   }
 
   public Command shuttleAimCommand(CommandXboxController controller) {

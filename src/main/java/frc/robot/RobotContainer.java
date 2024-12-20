@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -85,8 +86,10 @@ public class RobotContainer {
   private final Trigger ampMode = new Trigger(this::inAmpMode);
   private final Trigger shuttleMode = new Trigger(this::inShuttleMode);
 
+
   private boolean shuttling = false;
   private boolean ampAfterIntake = false;
+  private boolean victor;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -127,6 +130,7 @@ public class RobotContainer {
     // Intake
     m_DriverController.rightTrigger(0.5).and(intakeBeamTrigger.negate()).whileTrue(new IntakeSequence(m_Intake, m_Arm));
 
+
     // Drive to note and intake
     m_DriverController.x().whileTrue(m_ButtonCommands.getNote());
 
@@ -152,7 +156,10 @@ public class RobotContainer {
     m_DriverController.y().toggleOnTrue(new AmpScoreSequence(this, m_Elevator, m_AmpRollers, m_Arm));
     
     // Drive to random point
-    m_DriverController.start().whileTrue(GeneratePath.driveToPoint(m_RobotDrive, 1.55, 5.58).andThen(m_ButtonCommands.revUpAndShoot()));
+    m_DriverController.start().whileTrue(m_ButtonCommands.driveAndScore());
+
+    m_DriverController.back().onTrue(Commands.runOnce(() -> toggleVictor()));
+
 
     /* ************************* Mech Controls ******************** */ 
     
@@ -179,7 +186,10 @@ public class RobotContainer {
   }
 
   private void setBlinkinColor() {
-    if(inAmpMode()) {
+    if(isVictor()) {
+      m_Blinkin.setColor(BlinkinConstants.Violet);
+    }
+    else if(inAmpMode()) {
       if(m_AmpRollers.gamePieceStored())
         m_Blinkin.setColor(BlinkinConstants.Green);
       else 
@@ -197,6 +207,14 @@ public class RobotContainer {
     }
   }
   
+  private boolean isVictor() {
+    return victor;
+  }
+
+  private void toggleVictor() {
+    victor = !victor;
+  }
+
   private void toggleAmpMode() {
     ampAfterIntake = !ampAfterIntake;
     SmartDashboard.putBoolean("Amp Mode", inAmpMode());
