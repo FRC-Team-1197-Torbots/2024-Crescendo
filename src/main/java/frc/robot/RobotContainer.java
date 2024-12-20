@@ -239,10 +239,11 @@ public class RobotContainer {
   }
       
   private void registerAutoCommands() {
-     
+    
+    NamedCommands.registerCommand("Rev Up", m_ButtonCommands.AutorevUp());
     NamedCommands.registerCommand("Drive to Speaker", GeneratePath.driveToPoint(m_RobotDrive, 1.8, 5.56));
-    NamedCommands.registerCommand("Aim and Shoot", m_ButtonCommands.revUpAndShoot());
-    NamedCommands.registerCommand("Get Note", m_ButtonCommands.getNote().withTimeout(2));
+    NamedCommands.registerCommand("Aim and Shoot", m_ButtonCommands.revUpAndAim());
+    NamedCommands.registerCommand("Get Note", m_ButtonCommands.getNote().withTimeout(5));
     NamedCommands.registerCommand("Amp Score", new AmpScoreSequence(null, m_Elevator, m_AmpRollers, m_Arm));
     NamedCommands.registerCommand("Toggle Amp Pass Mode", new InstantCommand(() -> setAmpMode(true)));
     NamedCommands.registerCommand("Stop Driving", new StopDriving(m_RobotDrive));

@@ -282,6 +282,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     updateOdometry();
+    updatePoseFromVision();
 
     m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition());
     SmartDashboard.putData("Robot Field", m_field2d);
